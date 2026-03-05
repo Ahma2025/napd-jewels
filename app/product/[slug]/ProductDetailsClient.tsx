@@ -28,11 +28,31 @@ type DbProductImage = {
   created_at: string;
 };
 
+type DbProductParameter = {
+  id: string;
+  product_id: string;
+  key: string;
+  value: string;
+  sort_order: number;
+  created_at: string;
+  updated_at: string;
+};
+
 // حط رقم حميد هون بصيغة دولية بدون +
 const WHATSAPP_NUMBER = "972593255260";
 
 function formatMoney(n: number) {
   return Number(n || 0).toFixed(2);
+}
+
+function paramLabel(key: string) {
+  if (key === "zircon_grade") return "Zircon Grade";
+  if (key === "main_stone_size") return "Main stone size";
+  if (key === "main_stone_shape") return "Main stone shape";
+  if (key === "main_stone_cut") return "Main stone cut";
+  if (key === "plating_color") return "Plating color";
+  if (key === "main_stone_carat") return "Main stone carat";
+  return key;
 }
 
 export default function ProductDetailsClient({ id }: { id: string }) {
@@ -45,6 +65,8 @@ export default function ProductDetailsClient({ id }: { id: string }) {
   const [images, setImages] = useState<string[]>([]);
   const [activeIndex, setActiveIndex] = useState(0);
   const [loading, setLoading] = useState(true);
+
+  const [parameters, setParameters] = useState<DbProductParameter[]>([]);
 
   // IMPORTANT: خلي الرابط ثابت عشان ما يصير Hydration mismatch
   // لازم تضيف في .env.local:
@@ -63,21 +85,29 @@ export default function ProductDetailsClient({ id }: { id: string }) {
 
       setLoading(true);
 
-      const [{ data: prod, error: prodErr }, { data: imgs, error: imgsErr }] =
-        await Promise.all([
-          supabase
-            .from("products")
-            .select(
-              "id,title,price,quantity,has_discount,discount_percentage,final_price,image_url,is_active,created_at,category_id"
-            )
-            .eq("id", safeId)
-            .single(),
-          supabase
-            .from("product_images")
-            .select("id,product_id,image_url,sort_order,created_at")
-            .eq("product_id", safeId)
-            .order("sort_order", { ascending: true }),
-        ]);
+      const [
+        { data: prod, error: prodErr },
+        { data: imgs, error: imgsErr },
+        { data: params, error: paramsErr },
+      ] = await Promise.all([
+        supabase
+          .from("products")
+          .select(
+            "id,title,price,quantity,has_discount,discount_percentage,final_price,image_url,is_active,created_at,category_id"
+          )
+          .eq("id", safeId)
+          .single(),
+        supabase
+          .from("product_images")
+          .select("id,product_id,image_url,sort_order,created_at")
+          .eq("product_id", safeId)
+          .order("sort_order", { ascending: true }),
+        supabase
+          .from("product_parameters")
+          .select("id,product_id,key,value,sort_order,created_at,updated_at")
+          .eq("product_id", safeId)
+          .order("sort_order", { ascending: true }),
+      ]);
 
       if (!mounted) return;
 
@@ -85,6 +115,7 @@ export default function ProductDetailsClient({ id }: { id: string }) {
         setProduct(null);
         setImages([]);
         setActiveIndex(0);
+        setParameters([]);
         setLoading(false);
         return;
       }
@@ -103,8 +134,16 @@ export default function ProductDetailsClient({ id }: { id: string }) {
       setImages(finalImgs);
       setActiveIndex(0);
 
+      const pRows = (params as DbProductParameter[]) || [];
+      setParameters(pRows);
+
       // لو في مشكلة بتحميل الصور مش قاتلة، بنضل نعرض fallback
       if (imgsErr && !urls.length) {
+        // ignore
+      }
+
+      // لو في مشكلة بتحميل المواصفات مش قاتلة برضو
+      if (paramsErr) {
         // ignore
       }
 
@@ -207,6 +246,10 @@ ${priceLine}
     }
   };
 
+  const hasParameters = useMemo(() => {
+    return parameters.some((p) => (p.value || "").trim());
+  }, [parameters]);
+
   return (
     <section className="bg-white py-10">
       <div className="max-w-[1200px] mx-auto px-6">
@@ -307,6 +350,33 @@ ${priceLine}
                   </span>
                 )}
               </div>
+
+              {/* ✅ NEW: Product Parameters */}
+              {hasParameters && (
+                <div className="mt-8 max-w-[420px] border rounded-xl overflow-hidden">
+                  <div className="px-4 py-4 bg-[#f6f6f6] border-b">
+                    <div className="text-sm tracking-widest text-gray-700">
+                      Product Parameters
+                    </div>
+                  </div>
+
+                  <div className="divide-y">
+                    {parameters
+                      .filter((p) => (p.value || "").trim())
+                      .map((p) => (
+                        <div
+                          key={p.id}
+                          className="grid grid-cols-1 sm:grid-cols-2 gap-2 px-4 py-4"
+                        >
+                          <div className="text-sm text-gray-600">
+                            {paramLabel(p.key)}
+                          </div>
+                          <div className="text-sm text-gray-900">{p.value}</div>
+                        </div>
+                      ))}
+                  </div>
+                </div>
+              )}
 
               {/* Quick info */}
               <div className="mt-6 border-t pt-6">

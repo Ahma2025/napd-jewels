@@ -217,6 +217,9 @@ export default function Header() {
             <Link href="/pandora" className={navLinkClass}>
               Pandora
             </Link>
+            <Link href="/moissanite" className={navLinkClass}>
+              Moissanite
+            </Link>
 
             {/* Orders يظهر فقط للـ owner */}
             {isOwner && (
@@ -369,6 +372,13 @@ export default function Header() {
             onClick={() => setIsOpen(false)}
           >
             Pandora
+          </Link>
+          <Link
+            href="/moissanite"
+            className="block uppercase text-black/70 hover:text-[#123E38]"
+            onClick={() => setIsOpen(false)}
+          >
+            Moissanite
           </Link>
 
           {/* Orders يظهر فقط للـ owner */}

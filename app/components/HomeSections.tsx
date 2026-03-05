@@ -222,12 +222,12 @@ export default function HomeSections() {
                               <p className="text-sm text-black/40 line-through">
                                 {formatMoney(product.price)}
                               </p>
-                              <p className="text-base md:text-lg font-medium text-[#123E38]">
+                              <p className="text-base md:text-lg font-semibold text-[#123E38]">
                                 {formatMoney(finalPrice)}
                               </p>
                             </>
                           ) : (
-                            <p className="text-base md:text-lg font-medium">
+                            <p className="text-base md:text-lg font-semibold">
                               {formatMoney(product.price)}
                             </p>
                           )}

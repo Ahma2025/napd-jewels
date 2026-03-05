@@ -10,7 +10,8 @@ type Category =
   | "BRACELETS"
   | "SETS"
   | "RINGS"
-  | "PANDORA";
+  | "PANDORA"
+  | "MOISSANITE";
 
 type Product = {
   id: string;
@@ -57,6 +58,24 @@ type DbProductImage = {
   created_at: string;
 };
 
+type ParamKey =
+  | "zircon_grade"
+  | "main_stone_size"
+  | "main_stone_shape"
+  | "main_stone_cut"
+  | "plating_color"
+  | "main_stone_carat";
+
+type DbProductParameter = {
+  id: string;
+  product_id: string;
+  key: ParamKey;
+  value: string;
+  sort_order: number;
+  created_at: string;
+  updated_at: string;
+};
+
 const PRIMARY = "#123E38";
 
 function displayCategoryLabel(cat: Category) {
@@ -71,6 +90,16 @@ const CATEGORIES: { key: Category; label: string; hint: string }[] = [
   { key: "SETS", label: "SETS", hint: "Manage sets products" },
   { key: "RINGS", label: "RINGS", hint: "Manage rings products" },
   { key: "PANDORA", label: "PANDORA", hint: "Manage Bandora products" },
+  { key: "MOISSANITE", label: "MOISSANITE", hint: "Manage moissanite products" },
+];
+
+const PARAM_FIELDS: { key: ParamKey; label: string; placeholder?: string; sort: number }[] = [
+  { key: "zircon_grade", label: "Zircon Grade", placeholder: "8A", sort: 0 },
+  { key: "main_stone_size", label: "Main stone size", placeholder: "8MM*10MM", sort: 1 },
+  { key: "main_stone_shape", label: "Main stone shape", placeholder: "Rectangle", sort: 2 },
+  { key: "main_stone_cut", label: "Main stone cut", placeholder: "Radiant", sort: 3 },
+  { key: "plating_color", label: "Plating color", placeholder: "18K", sort: 4 },
+  { key: "main_stone_carat", label: "Main stone carat", placeholder: "4.0", sort: 5 },
 ];
 
 function uid() {
@@ -96,7 +125,8 @@ function normalizeCategory(v: string | null | undefined): Category | null {
     x === "BRACELETS" ||
     x === "SETS" ||
     x === "RINGS" ||
-    x === "PANDORA"
+    x === "PANDORA" ||
+    x === "MOISSANITE"
   ) {
     return x as Category;
   }
@@ -142,6 +172,16 @@ export default function OwnerDashboardClient() {
   const [quantity, setQuantity] = useState<string>("1");
   const [hasDiscount, setHasDiscount] = useState(false);
   const [discountPercent, setDiscountPercent] = useState<string>("10");
+
+  // ✅ NEW: Product parameters (Product Parameters table)
+  const [params, setParams] = useState<Record<ParamKey, string>>({
+    zircon_grade: "",
+    main_stone_size: "",
+    main_stone_shape: "",
+    main_stone_cut: "",
+    plating_color: "",
+    main_stone_carat: "",
+  });
 
   // 4 images (slot 0 = main)
   const [imagePreviews, setImagePreviews] = useState<string[]>([
@@ -266,6 +306,14 @@ export default function OwnerDashboardClient() {
     setQuantity("1");
     setHasDiscount(false);
     setDiscountPercent("10");
+    setParams({
+      zircon_grade: "",
+      main_stone_size: "",
+      main_stone_shape: "",
+      main_stone_cut: "",
+      plating_color: "",
+      main_stone_carat: "",
+    });
     setImagePreviews([...EMPTY_PREVIEWS]);
     setPickedFiles([null, null, null, null]);
     setEditingId(null);
@@ -396,6 +444,75 @@ export default function OwnerDashboardClient() {
     return true;
   }
 
+  // ✅ NEW: load parameters for edit
+  async function loadParametersForEdit(productId: string) {
+    const { data, error } = await supabase
+      .from("product_parameters")
+      .select("id,product_id,key,value,sort_order,created_at,updated_at")
+      .eq("product_id", productId);
+
+    if (error) {
+      return {
+        zircon_grade: "",
+        main_stone_size: "",
+        main_stone_shape: "",
+        main_stone_cut: "",
+        plating_color: "",
+        main_stone_carat: "",
+      } as Record<ParamKey, string>;
+    }
+
+    const rows = (data as DbProductParameter[]) || [];
+    const base: Record<ParamKey, string> = {
+      zircon_grade: "",
+      main_stone_size: "",
+      main_stone_shape: "",
+      main_stone_cut: "",
+      plating_color: "",
+      main_stone_carat: "",
+    };
+
+    for (const r of rows) {
+      if (r?.key) base[r.key] = r.value || "";
+    }
+
+    return base;
+  }
+
+  // ✅ NEW: save parameters (upsert by product_id,key)
+  async function saveProductParameters(productId: string) {
+    const rows = PARAM_FIELDS.map((f) => ({
+      product_id: productId,
+      key: f.key,
+      value: (params[f.key] || "").trim(),
+      sort_order: f.sort,
+    }));
+
+    const filtered = rows.filter((r) => !!r.value);
+
+    // delete all then insert filtered (clean + simple)
+    const { error: delErr } = await supabase
+      .from("product_parameters")
+      .delete()
+      .eq("product_id", productId);
+
+    if (delErr) {
+      alert(delErr.message || "Failed to clear product parameters");
+      return false;
+    }
+
+    if (!filtered.length) return true;
+
+    const { error: insErr } = await supabase.from("product_parameters").insert(filtered);
+
+    if (insErr) {
+      alert(insErr.message || "Failed to save product parameters");
+      return false;
+    }
+
+    return true;
+  }
+
   async function reloadProducts() {
     const { data, error } = await supabase
       .from("products_with_main_image")
@@ -511,6 +628,10 @@ export default function OwnerDashboardClient() {
     const ok = await upsertProductImages(productId, uploadedUrls);
     if (!ok) return;
 
+    // ✅ NEW: Save product parameters
+    const okParams = await saveProductParameters(productId);
+    if (!okParams) return;
+
     await reloadProducts();
     resetForm();
   }
@@ -573,6 +694,10 @@ export default function OwnerDashboardClient() {
     setQuantity(String(p.quantity));
     setHasDiscount(!!p.discountPercent && p.discountPercent > 0);
     setDiscountPercent(String(p.discountPercent ?? 10));
+
+    // ✅ NEW: load product parameters for edit
+    const loadedParams = await loadParametersForEdit(p.id);
+    setParams(loadedParams);
 
     // reset file inputs (editing uses existing URLs unless user uploads new files)
     setPickedFiles([null, null, null, null]);
@@ -944,6 +1069,42 @@ export default function OwnerDashboardClient() {
                           </div>
                         )}
                       </div>
+                    </div>
+                  </div>
+
+                  {/* ✅ NEW: Product Parameters */}
+                  <div className="border rounded-2xl overflow-hidden">
+                    <div className="px-4 py-4 bg-black/[0.02] border-b">
+                      <div className="text-xs uppercase tracking-widest text-black/50">
+                        Product Parameters
+                      </div>
+                    </div>
+
+                    <div className="divide-y">
+                      {PARAM_FIELDS.map((f) => (
+                        <div
+                          key={f.key}
+                          className="grid grid-cols-1 sm:grid-cols-[1fr_1fr] gap-3 px-4 py-4"
+                        >
+                          <div className="text-sm text-black/70">{f.label}</div>
+
+                          <input
+                            value={params[f.key]}
+                            onChange={(e) =>
+                              setParams((prev) => ({
+                                ...prev,
+                                [f.key]: e.target.value,
+                              }))
+                            }
+                            placeholder={f.placeholder || ""}
+                            className="w-full rounded-xl border px-4 py-3 outline-none focus:ring-2"
+                            style={{
+                              borderColor: "rgba(0,0,0,0.15)",
+                              boxShadow: "none",
+                            }}
+                          />
+                        </div>
+                      ))}
                     </div>
                   </div>
 
