@@ -114,7 +114,7 @@ export default function CheckoutPage() {
       ].filter(Boolean);
 
       const { data: orderId, error } = await supabase.rpc(
-        "place_order_and_decrease_stock",
+        "place_order_only",
         {
           p_customer_name: name,
           p_customer_phone: phone,

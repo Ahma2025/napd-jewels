@@ -238,10 +238,25 @@ export default function OwnerOrdersPage() {
       p.map((o) => (o.id === orderId ? { ...o, status: optimisticStatus } : o))
     );
 
+    if (targetStage === "confirmed") {
+      const { error } = await supabase.rpc("confirm_order_and_decrease_stock", {
+        p_order_id: orderId,
+      });
+
+      if (!error) {
+        setOrders((p) =>
+          p.map((o) => (o.id === orderId ? { ...o, status: "confirmed" } : o))
+        );
+        return;
+      }
+
+      setOrders(prev);
+      await loadOrders();
+      return;
+    }
+
     const candidates =
-      targetStage === "confirmed"
-        ? ["confirmed", "approved", "processing"]
-        : targetStage === "done"
+      targetStage === "done"
         ? ["done", "completed", "delivered"]
         : ["pending"];
 

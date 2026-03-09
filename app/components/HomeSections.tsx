@@ -31,7 +31,7 @@ function formatMoney(n: number) {
 function displayCategoryName(name: string) {
   const n = (name || "").trim().toUpperCase();
   if (n === "CHAINS") return "NECKLACES";
-  return n; // باقي الأقسام نخليها زي ما هي (Uppercase)
+  return n;
 }
 
 export default function HomeSections() {
@@ -48,10 +48,11 @@ export default function HomeSections() {
       map[p.category_id].push(p);
     }
 
-    // تأكيد ترتيب أحدث أولاً داخل كل قسم
     for (const key of Object.keys(map)) {
       map[key].sort(
-        (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+        (a, b) =>
+          new Date(b.created_at).getTime() -
+          new Date(a.created_at).getTime()
       );
     }
 
@@ -101,7 +102,6 @@ export default function HomeSections() {
     };
   }, []);
 
-  // Realtime: أي إضافة/تعديل/حذف على المنتجات ينعكس مباشرة على الهوم
   useEffect(() => {
     const channel = supabase
       .channel("realtime-home-products")
@@ -165,7 +165,6 @@ export default function HomeSections() {
 
           return (
             <div key={category.id} className="mb-20">
-              {/* Title Row */}
               <div className="flex justify-between items-center border-b pb-4 mb-10">
                 <Link
                   href={`/${category.slug}`}
@@ -182,9 +181,10 @@ export default function HomeSections() {
                 </Link>
               </div>
 
-              {/* Products */}
               {items.length === 0 ? (
-                <div className="text-sm text-black/50">No products available</div>
+                <div className="text-sm text-black/50">
+                  No products available
+                </div>
               ) : (
                 <div className="flex gap-6 overflow-x-auto pb-4">
                   {items.map((product) => {
@@ -203,12 +203,12 @@ export default function HomeSections() {
                         href={`/product/${product.id}`}
                         className="min-w-[160px] md:min-w-[200px] lg:min-w-0 lg:flex-1 flex-shrink-0 text-center group cursor-pointer block"
                       >
-                        <div className="relative w-full h-[200px] md:h-[260px] bg-[#f6f6f6] rounded-lg overflow-hidden">
+                        <div className="relative w-full h-[220px] md:h-[280px] bg-white rounded-lg overflow-hidden">
                           <Image
                             src={product.image_url || "/hero.jpeg"}
                             alt={product.title}
                             fill
-                            className="object-cover transition-transform duration-300 group-hover:scale-105"
+                            className="object-contain object-center transition-transform duration-300 group-hover:scale-105"
                           />
                         </div>
 
