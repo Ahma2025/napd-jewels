@@ -5,9 +5,9 @@ export async function POST(req: Request) {
     const body = await req.json();
 
     const amount = Number(body.amount);
-    const email = body.email;
-    const mobile = body.mobile;
-    const reference = body.reference;
+    const email = String(body.email || "").trim();
+    const mobile = String(body.mobile || "").trim();
+    const reference = String(body.reference || "").trim();
 
     if (!amount || !email || !reference) {
       return NextResponse.json(
@@ -23,25 +23,49 @@ export async function POST(req: Request) {
         Authorization: `Bearer ${process.env.LAHZA_SECRET_KEY}`,
       },
       body: JSON.stringify({
-        amount: amount, 
+        amount: String(amount),
         currency: "ILS",
-        email: email,
-        mobile: mobile,
-        reference: reference,
-        callback_url: "http://localhost:3000/payment-success",
-        metadata: {
+        email,
+        mobile,
+        reference,
+        callback_url: "https://napd-jewels.vercel.app/payment-success",
+        metadata: JSON.stringify({
           source: "napd-jewels",
-        },
+          payment_method: "card",
+        }),
       }),
     });
 
     const data = await response.json();
 
-    return NextResponse.json(data);
-  } catch (error) {
-    console.error("Lahza error:", error);
+    const paymentUrl =
+      data?.data?.authorization_url ||
+      data?.authorization_url ||
+      null;
+
+    if (!response.ok || !paymentUrl) {
+      return NextResponse.json(
+        {
+          error:
+            data?.message ||
+            data?.error ||
+            "Lahza did not return authorization_url",
+          lahza: data,
+        },
+        { status: 400 }
+      );
+    }
+
+    return NextResponse.json({
+      status: true,
+      payment_url: paymentUrl,
+      reference: data?.data?.reference || reference,
+      raw: data,
+    });
+  } catch (error: any) {
+    console.error("Lahza create-session error:", error);
     return NextResponse.json(
-      { error: "Payment initialization failed" },
+      { error: error?.message || "Payment initialization failed" },
       { status: 500 }
     );
   }
