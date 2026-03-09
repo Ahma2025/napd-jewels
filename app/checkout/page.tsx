@@ -23,6 +23,7 @@ function formatMoney(n: number) {
 
 function extractLahzaUrl(data: any) {
   return (
+    data?.payment_url ||
     data?.data?.authorization_url ||
     data?.data?.checkout_url ||
     data?.data?.url ||
@@ -161,6 +162,7 @@ export default function CheckoutPage() {
       const data = await res.json();
 
       if (!res.ok) {
+        console.error("Lahza error response:", data);
         throw new Error(data?.error || "Failed to initialize card payment.");
       }
 
@@ -309,10 +311,7 @@ export default function CheckoutPage() {
                 {item.name} × {item.quantity}
               </div>
               <div>
-                ₪{" "}
-                {formatMoney(
-                  Number(item.price) * Number(item.quantity)
-                )}
+                ₪ {formatMoney(Number(item.price) * Number(item.quantity))}
               </div>
             </div>
           ))}
@@ -328,7 +327,7 @@ export default function CheckoutPage() {
               <span>₪ {formatMoney(shipping)}</span>
             </div>
 
-            <div className="flex justify-between">
+            <div className="flex justify-between font-semibold">
               <span>Total</span>
               <span>₪ {formatMoney(total)}</span>
             </div>
