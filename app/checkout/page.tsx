@@ -9,6 +9,7 @@ import { supabase } from "@/lib/supabase";
 const PRIMARY = "#123E38";
 
 type DeliveryArea = "West Bank" | "Jerusalem" | "Inside";
+type PaymentMethod = "cod" | "card";
 
 const SHIPPING: Record<DeliveryArea, number> = {
   "West Bank": 20,
@@ -20,16 +21,31 @@ function formatMoney(n: number) {
   return Number(n || 0).toFixed(2);
 }
 
+function extractLahzaUrl(data: any) {
+  return (
+    data?.data?.authorization_url ||
+    data?.data?.checkout_url ||
+    data?.data?.url ||
+    data?.authorization_url ||
+    data?.checkout_url ||
+    data?.url ||
+    null
+  );
+}
+
 export default function CheckoutPage() {
   const router = useRouter();
   const { cart, subtotal, clearCart } = useCart();
 
   const [fullName, setFullName] = useState("");
+  const [email, setEmail] = useState("");
   const [cityName, setCityName] = useState("");
   const [deliveryArea, setDeliveryArea] =
     useState<DeliveryArea>("West Bank");
   const [address, setAddress] = useState("");
   const [mobile, setMobile] = useState("");
+  const [paymentMethod, setPaymentMethod] =
+    useState<PaymentMethod>("cod");
 
   const [submitting, setSubmitting] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
@@ -60,12 +76,18 @@ export default function CheckoutPage() {
     setErrorMsg(null);
 
     const name = fullName.trim();
+    const mail = email.trim();
     const city = cityName.trim();
     const addr = address.trim();
     const phone = mobile.trim();
 
     if (!name || !city || !addr || !phone) {
       setErrorMsg("Please fill all required fields.");
+      return;
+    }
+
+    if (paymentMethod === "card" && !mail) {
+      setErrorMsg("Please enter your email for card payment.");
       return;
     }
 
@@ -81,6 +103,15 @@ export default function CheckoutPage() {
         image_url: item.image ?? null,
       }));
 
+      const paymentMethodLabel =
+        paymentMethod === "cod" ? "Cash on Delivery" : "Card Payment";
+
+      const notesLines = [
+        `Delivery Area: ${deliveryArea}`,
+        `Payment Method: ${paymentMethodLabel}`,
+        mail ? `Email: ${mail}` : null,
+      ].filter(Boolean);
+
       const { data: orderId, error } = await supabase.rpc(
         "place_order_and_decrease_stock",
         {
@@ -91,7 +122,7 @@ export default function CheckoutPage() {
           p_subtotal: subtotal,
           p_shipping_fee: shipping,
           p_total: total,
-          p_notes: `Delivery Area: ${deliveryArea}`,
+          p_notes: notesLines.join(" | "),
           p_items: itemsPayload,
         }
       );
@@ -100,16 +131,54 @@ export default function CheckoutPage() {
         throw new Error(error.message);
       }
 
-      setToast("Your order has been placed successfully");
-      clearCart();
+      if (paymentMethod === "cod") {
+        setToast("Your order has been placed successfully");
+        clearCart();
 
-      setTimeout(() => {
-        router.push("/");
-      }, 1200);
+        setTimeout(() => {
+          router.push("/");
+        }, 1200);
+
+        return;
+      }
+
+      const amountInAgorot = Math.round(total * 100);
+      const reference = `NAPD-${orderId}-${Date.now()}`;
+
+      const res = await fetch("/api/lahza/create-session", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          amount: amountInAgorot,
+          email: mail,
+          mobile: phone,
+          reference,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data?.error || "Failed to initialize card payment.");
+      }
+
+      const paymentUrl = extractLahzaUrl(data);
+
+      if (!paymentUrl) {
+        console.error("Lahza response:", data);
+        throw new Error(
+          "Payment link was not returned from Lahza. Please try again."
+        );
+      }
+
+      clearCart();
+      window.location.href = paymentUrl;
     } catch (e: any) {
       setErrorMsg(
         e?.message ||
-          "Some items may be out of stock. Please refresh and try again."
+          "Some items may be out of stock or payment could not be started. Please try again."
       );
     } finally {
       setSubmitting(false);
@@ -135,6 +204,13 @@ export default function CheckoutPage() {
               value={fullName}
               onChange={(e) => setFullName(e.target.value)}
               placeholder="Full Name"
+              className="w-full border border-black/15 rounded-xl p-3"
+            />
+
+            <input
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="Email Address"
               className="w-full border border-black/15 rounded-xl p-3"
             />
 
@@ -171,6 +247,30 @@ export default function CheckoutPage() {
               className="w-full border border-black/15 rounded-xl p-3"
             />
 
+            <div className="border border-black/10 rounded-2xl p-4">
+              <h3 className="text-sm font-medium mb-3">Payment Method</h3>
+
+              <label className="flex items-center gap-3 cursor-pointer mb-3">
+                <input
+                  type="radio"
+                  name="paymentMethod"
+                  checked={paymentMethod === "cod"}
+                  onChange={() => setPaymentMethod("cod")}
+                />
+                <span>Cash on Delivery</span>
+              </label>
+
+              <label className="flex items-center gap-3 cursor-pointer">
+                <input
+                  type="radio"
+                  name="paymentMethod"
+                  checked={paymentMethod === "card"}
+                  onChange={() => setPaymentMethod("card")}
+                />
+                <span>Pay with Card</span>
+              </label>
+            </div>
+
             {errorMsg && (
               <div className="text-sm text-red-600">{errorMsg}</div>
             )}
@@ -182,7 +282,11 @@ export default function CheckoutPage() {
             onClick={handleConfirm}
             disabled={submitting}
           >
-            {submitting ? "Submitting..." : "Confirm Order"}
+            {submitting
+              ? "Submitting..."
+              : paymentMethod === "cod"
+              ? "Confirm Order"
+              : "Continue to Card Payment"}
           </button>
 
           <Link
@@ -224,7 +328,7 @@ export default function CheckoutPage() {
               <span>₪ {formatMoney(shipping)}</span>
             </div>
 
-            <div className="flex justify-between font-semibold">
+            <div className="flex justify-between">
               <span>Total</span>
               <span>₪ {formatMoney(total)}</span>
             </div>
