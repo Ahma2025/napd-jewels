@@ -285,6 +285,29 @@ export default function OwnerOrdersPage() {
     }
   }
 
+  async function rejectOrder(orderId: string) {
+    const prevOrders = orders;
+    const prevActiveOrder = activeOrder;
+    const prevActiveItems = activeItems;
+
+    setOrders((p) => p.filter((o) => o.id !== orderId));
+
+    if (activeOrder?.id === orderId) {
+      setActiveOrder(null);
+      setActiveItems([]);
+      setPreviewUrl(null);
+    }
+
+    const { error } = await supabase.from("orders").delete().eq("id", orderId);
+
+    if (error) {
+      setOrders(prevOrders);
+      setActiveOrder(prevActiveOrder);
+      setActiveItems(prevActiveItems);
+      await loadOrders();
+    }
+  }
+
   // ===== Analytics =====
   const analyticsEligibleOrders = useMemo(() => {
     // count sales on confirmed + done (you can restrict to done only if you want)
@@ -452,13 +475,23 @@ export default function OwnerOrdersPage() {
                   </button>
 
                   {stageFromStatus(o.status) === "pending" && (
-                    <button
-                      type="button"
-                      className="px-3 py-2 rounded-lg text-xs uppercase tracking-wide text-white bg-[#123E38] hover:opacity-90"
-                      onClick={() => updateStatus(o.id, "confirmed")}
-                    >
-                      Confirm
-                    </button>
+                    <>
+                      <button
+                        type="button"
+                        className="px-3 py-2 rounded-lg text-xs uppercase tracking-wide text-white bg-[#123E38] hover:opacity-90"
+                        onClick={() => updateStatus(o.id, "confirmed")}
+                      >
+                        Confirm
+                      </button>
+
+                      <button
+                        type="button"
+                        className="px-3 py-2 rounded-lg text-xs uppercase tracking-wide text-white bg-red-600 hover:opacity-90"
+                        onClick={() => rejectOrder(o.id)}
+                      >
+                        Reject
+                      </button>
+                    </>
                   )}
 
                   {stageFromStatus(o.status) === "confirmed" && (
@@ -742,18 +775,30 @@ export default function OwnerOrdersPage() {
 
             <div className="p-4 border-t border-black/10 flex items-center justify-end gap-2">
               {stageFromStatus(activeOrder.status) === "pending" && (
-                <button
-                  type="button"
-                  className="px-4 py-2 rounded-xl text-xs uppercase tracking-wide text-white bg-[#123E38] hover:opacity-90"
-                  onClick={async () => {
-                    await updateStatus(activeOrder.id, "confirmed");
-                    setActiveOrder((prev) =>
-                      prev ? { ...prev, status: "confirmed" } : prev
-                    );
-                  }}
-                >
-                  Confirm
-                </button>
+                <>
+                  <button
+                    type="button"
+                    className="px-4 py-2 rounded-xl text-xs uppercase tracking-wide text-white bg-[#123E38] hover:opacity-90"
+                    onClick={async () => {
+                      await updateStatus(activeOrder.id, "confirmed");
+                      setActiveOrder((prev) =>
+                        prev ? { ...prev, status: "confirmed" } : prev
+                      );
+                    }}
+                  >
+                    Confirm
+                  </button>
+
+                  <button
+                    type="button"
+                    className="px-4 py-2 rounded-xl text-xs uppercase tracking-wide text-white bg-red-600 hover:opacity-90"
+                    onClick={async () => {
+                      await rejectOrder(activeOrder.id);
+                    }}
+                  >
+                    Reject
+                  </button>
+                </>
               )}
 
               {stageFromStatus(activeOrder.status) === "confirmed" && (

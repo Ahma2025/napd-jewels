@@ -19,8 +19,8 @@ type Product = {
   title: string;
   imageUrl: string; // MAIN image (sort_order = 0)
   price: number;
+  finalPrice?: number; // optional discounted/final price
   quantity: number;
-  discountPercent?: number; // optional
   isActive: boolean;
   createdAt: number; // for ordering (newest)
 };
@@ -111,10 +111,9 @@ function formatMoney(n: number) {
   return n.toFixed(2);
 }
 
-function calcFinalPrice(price: number, discountPercent?: number) {
-  if (!discountPercent || discountPercent <= 0) return price;
-  const v = price * (1 - discountPercent / 100);
-  return Math.max(0, v);
+function calcDiscountPercent(price: number, finalPrice?: number) {
+  if (!finalPrice || finalPrice <= 0 || finalPrice >= price || price <= 0) return 0;
+  return Math.round(((price - finalPrice) / price) * 100);
 }
 
 function normalizeCategory(v: string | null | undefined): Category | null {
@@ -171,7 +170,7 @@ export default function OwnerDashboardClient() {
   const [price, setPrice] = useState<string>("");
   const [quantity, setQuantity] = useState<string>("1");
   const [hasDiscount, setHasDiscount] = useState(false);
-  const [discountPercent, setDiscountPercent] = useState<string>("10");
+  const [finalPriceInput, setFinalPriceInput] = useState<string>("");
 
   // ✅ NEW: Product parameters (Product Parameters table)
   const [params, setParams] = useState<Record<ParamKey, string>>({
@@ -208,9 +207,10 @@ export default function OwnerDashboardClient() {
 
   const finalPricePreview = useMemo(() => {
     const p = Number(price || 0);
-    const d = hasDiscount ? Number(discountPercent || 0) : undefined;
-    return calcFinalPrice(p, d);
-  }, [price, hasDiscount, discountPercent]);
+    const fp = hasDiscount ? Number(finalPriceInput || 0) : 0;
+    if (!hasDiscount || !Number.isFinite(fp) || fp <= 0 || fp >= p) return p;
+    return fp;
+  }, [price, hasDiscount, finalPriceInput]);
 
   useEffect(() => {
     let mounted = true;
@@ -265,9 +265,9 @@ export default function OwnerDashboardClient() {
           const cat = normalizeCategory(catName);
           if (!cat) return null;
 
-          const d =
-            r.has_discount && typeof r.discount_percentage === "number"
-              ? r.discount_percentage
+          const final =
+            r.has_discount && typeof r.final_price === "number" && r.final_price > 0
+              ? Number(r.final_price)
               : undefined;
 
           const main =
@@ -281,8 +281,8 @@ export default function OwnerDashboardClient() {
             title: r.title,
             imageUrl: main,
             price: Number(r.price || 0),
+            finalPrice: final,
             quantity: Number(r.quantity || 0),
-            discountPercent: d,
             isActive: r.is_active !== false,
             createdAt: new Date(r.created_at).getTime(),
           } as Product;
@@ -305,7 +305,7 @@ export default function OwnerDashboardClient() {
     setPrice("");
     setQuantity("1");
     setHasDiscount(false);
-    setDiscountPercent("10");
+    setFinalPriceInput("");
     setParams({
       zircon_grade: "",
       main_stone_size: "",
@@ -536,9 +536,9 @@ export default function OwnerDashboardClient() {
         const cat = normalizeCategory(catName);
         if (!cat) return null;
 
-        const d =
-          r.has_discount && typeof r.discount_percentage === "number"
-            ? r.discount_percentage
+        const final =
+          r.has_discount && typeof r.final_price === "number" && r.final_price > 0
+            ? Number(r.final_price)
             : undefined;
 
         const main =
@@ -552,8 +552,8 @@ export default function OwnerDashboardClient() {
           title: r.title,
           imageUrl: main,
           price: Number(r.price || 0),
+          finalPrice: final,
           quantity: Number(r.quantity || 0),
-          discountPercent: d,
           isActive: r.is_active !== false,
           createdAt: new Date(r.created_at).getTime(),
         } as Product;
@@ -567,6 +567,7 @@ export default function OwnerDashboardClient() {
     const t = title.trim();
     const p = Number(price);
     const q = Number(quantity);
+    const fp = hasDiscount ? Number(finalPriceInput) : 0;
 
     if (!t) return alert("Please enter product title");
     if (!Number.isFinite(p) || p < 0) return alert("Please enter valid price");
@@ -576,9 +577,11 @@ export default function OwnerDashboardClient() {
     if (!imagePreviews[0]) return alert("Please upload MAIN product image (Image 1)");
 
     if (hasDiscount) {
-      const d = Number(discountPercent);
-      if (!Number.isFinite(d) || d <= 0 || d > 95) {
-        return alert("Discount must be between 1 and 95");
+      if (!Number.isFinite(fp) || fp <= 0) {
+        return alert("Please enter valid final price");
+      }
+      if (fp >= p) {
+        return alert("Final price must be less than original price");
       }
     }
 
@@ -593,13 +596,15 @@ export default function OwnerDashboardClient() {
     if (!uploadedUrls) return;
 
     const mainUrl = (uploadedUrls[0] || "").trim();
+    const discountPercent = hasDiscount ? calcDiscountPercent(p, fp) : 0;
 
     const payload = {
       title: t,
       price: p,
       quantity: q,
       has_discount: hasDiscount,
-      discount_percentage: hasDiscount ? Number(discountPercent) : 0,
+      discount_percentage: discountPercent,
+      final_price: hasDiscount ? fp : null,
       // keep for backward compatibility (and for old pages)
       image_url: mainUrl,
       category_id: catRow.id,
@@ -692,8 +697,10 @@ export default function OwnerDashboardClient() {
     setTitle(p.title);
     setPrice(String(p.price));
     setQuantity(String(p.quantity));
-    setHasDiscount(!!p.discountPercent && p.discountPercent > 0);
-    setDiscountPercent(String(p.discountPercent ?? 10));
+    setHasDiscount(!!p.finalPrice && p.finalPrice > 0 && p.finalPrice < p.price);
+    setFinalPriceInput(
+      !!p.finalPrice && p.finalPrice > 0 && p.finalPrice < p.price ? String(p.finalPrice) : ""
+    );
 
     // ✅ NEW: load product parameters for edit
     const loadedParams = await loadParametersForEdit(p.id);
@@ -716,8 +723,9 @@ export default function OwnerDashboardClient() {
     return (
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4">
         {items.map((p) => {
-          const final = calcFinalPrice(p.price, p.discountPercent);
-          const hasD = !!p.discountPercent;
+          const hasD = !!p.finalPrice && p.finalPrice > 0 && p.finalPrice < p.price;
+          const final = hasD ? p.finalPrice! : p.price;
+          const discountPercent = hasD ? calcDiscountPercent(p.price, p.finalPrice) : 0;
 
           return (
             <div key={p.id} className="border rounded-2xl overflow-hidden bg-white">
@@ -741,7 +749,7 @@ export default function OwnerDashboardClient() {
                         <div className="text-sm font-medium" style={{ color: PRIMARY }}>
                           {formatMoney(final)}
                         </div>
-                        <div className="text-xs text-black/45">{p.discountPercent}% off</div>
+                        <div className="text-xs text-black/45">{discountPercent}% off</div>
                       </div>
                     ) : (
                       <div className="text-sm font-medium">{formatMoney(p.price)}</div>
@@ -1004,7 +1012,7 @@ export default function OwnerDashboardClient() {
 
                     <div className="space-y-2">
                       <div className="text-xs uppercase tracking-widest text-black/50">
-                        Price
+                        Original Price
                       </div>
                       <input
                         value={price}
@@ -1045,7 +1053,13 @@ export default function OwnerDashboardClient() {
                       <div className="flex items-center gap-3">
                         <button
                           type="button"
-                          onClick={() => setHasDiscount((v) => !v)}
+                          onClick={() => {
+                            setHasDiscount((v) => {
+                              const next = !v;
+                              if (!next) setFinalPriceInput("");
+                              return next;
+                            });
+                          }}
                           className="px-4 py-3 rounded-xl border text-xs uppercase tracking-widest transition-all bg-white"
                           style={{
                             borderColor: hasDiscount ? PRIMARY : "rgba(0,0,0,0.15)",
@@ -1058,14 +1072,13 @@ export default function OwnerDashboardClient() {
                         {hasDiscount && (
                           <div className="flex-1 flex items-center gap-2">
                             <input
-                              value={discountPercent}
-                              onChange={(e) => setDiscountPercent(e.target.value)}
-                              inputMode="numeric"
+                              value={finalPriceInput}
+                              onChange={(e) => setFinalPriceInput(e.target.value)}
+                              inputMode="decimal"
                               className="w-full rounded-xl border px-4 py-3 outline-none"
                               style={{ borderColor: "rgba(0,0,0,0.15)" }}
-                              placeholder="10"
+                              placeholder="Final price"
                             />
-                            <span className="text-sm text-black/60">%</span>
                           </div>
                         )}
                       </div>
@@ -1116,14 +1129,14 @@ export default function OwnerDashboardClient() {
                       </div>
 
                       <div className="flex items-center gap-3">
-                        <span className="text-sm text-black/60">Base:</span>
+                        <span className="text-sm text-black/60">Before:</span>
                         <span className="text-sm font-medium">
                           {formatMoney(Number(price || 0))}
                         </span>
 
                         <span className="text-sm text-black/40">|</span>
 
-                        <span className="text-sm text-black/60">Final:</span>
+                        <span className="text-sm text-black/60">After:</span>
                         <span className="text-sm font-medium" style={{ color: PRIMARY }}>
                           {formatMoney(finalPricePreview)}
                         </span>
@@ -1188,8 +1201,9 @@ export default function OwnerDashboardClient() {
 
                       <tbody>
                         {catProducts.map((p) => {
-                          const final = calcFinalPrice(p.price, p.discountPercent);
-                          const hasD = !!p.discountPercent;
+                          const hasD = !!p.finalPrice && p.finalPrice > 0 && p.finalPrice < p.price;
+                          const final = hasD ? p.finalPrice! : p.price;
+                          const discountPercent = hasD ? calcDiscountPercent(p.price, p.finalPrice) : 0;
 
                           return (
                             <tr key={p.id} className="border-t">
@@ -1222,7 +1236,7 @@ export default function OwnerDashboardClient() {
                                     <div className="text-sm font-medium" style={{ color: PRIMARY }}>
                                       {formatMoney(final)}
                                     </div>
-                                    <div className="text-xs text-black/45">{p.discountPercent}% off</div>
+                                    <div className="text-xs text-black/45">{discountPercent}% off</div>
                                   </div>
                                 ) : (
                                   <div className="text-sm font-medium">{formatMoney(p.price)}</div>
