@@ -208,17 +208,8 @@ export default function Header() {
             <Link href="/bracelets" className={navLinkClass}>
               Bracelets
             </Link>
-            <Link href="/sets" className={navLinkClass}>
-              Sets
-            </Link>
             <Link href="/rings" className={navLinkClass}>
               Rings
-            </Link>
-            <Link href="/pandora" className={navLinkClass}>
-              Pandora
-            </Link>
-            <Link href="/moissanite" className={navLinkClass}>
-              Moissanite
             </Link>
 
             {/* Orders يظهر فقط للـ owner */}
@@ -353,32 +344,11 @@ export default function Header() {
             Bracelets
           </Link>
           <Link
-            href="/sets"
-            className="block uppercase text-black/70 hover:text-[#123E38]"
-            onClick={() => setIsOpen(false)}
-          >
-            Sets
-          </Link>
-          <Link
             href="/rings"
             className="block uppercase text-black/70 hover:text-[#123E38]"
             onClick={() => setIsOpen(false)}
           >
             Rings
-          </Link>
-          <Link
-            href="/pandora"
-            className="block uppercase text-black/70 hover:text-[#123E38]"
-            onClick={() => setIsOpen(false)}
-          >
-            Pandora
-          </Link>
-          <Link
-            href="/moissanite"
-            className="block uppercase text-black/70 hover:text-[#123E38]"
-            onClick={() => setIsOpen(false)}
-          >
-            Moissanite
           </Link>
 
           {/* Orders يظهر فقط للـ owner */}
