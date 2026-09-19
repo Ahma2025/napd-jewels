@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { Facebook, Instagram, Phone } from "lucide-react";
 
@@ -9,12 +10,18 @@ const SOCIAL = {
 
 export default function Footer() {
   return (
-    <footer className="bg-white pt-20 pb-12 border-t">
+    <footer className="pt-20 pb-12 border-t border-white/10" style={{ backgroundColor: "#182B2A" }}>
       <div className="max-w-[1200px] mx-auto px-6 text-center">
 
         {/* Brand */}
-        <div className="text-[22px] tracking-[0.25em] font-medium">
-          NAPD JEWELS
+        <div className="flex justify-center">
+          <Image
+            src="/napd-logo.png"
+            alt="NAPD Jewels"
+            width={183}
+            height={160}
+            className="h-16 w-auto"
+          />
         </div>
 
         {/* Social Icons */}
@@ -29,7 +36,7 @@ export default function Footer() {
             <Facebook
               size={22}
               strokeWidth={1.5}
-              className="text-black transition-all duration-300 group-hover:scale-110 group-hover:text-neutral-500"
+              className="text-white/80 transition-all duration-300 group-hover:scale-110 group-hover:text-[#B08D57]"
             />
           </a>
 
@@ -43,7 +50,7 @@ export default function Footer() {
             <Instagram
               size={22}
               strokeWidth={1.5}
-              className="text-black transition-all duration-300 group-hover:scale-110 group-hover:text-neutral-500"
+              className="text-white/80 transition-all duration-300 group-hover:scale-110 group-hover:text-[#B08D57]"
             />
           </a>
 
@@ -57,36 +64,37 @@ export default function Footer() {
             <Phone
               size={22}
               strokeWidth={1.5}
-              className="text-black transition-all duration-300 group-hover:scale-110 group-hover:text-neutral-500"
+              className="text-white/80 transition-all duration-300 group-hover:scale-110 group-hover:text-[#B08D57]"
             />
           </a>
         </div>
 
         {/* Links */}
-        <nav className="mt-12 flex flex-wrap items-center justify-center gap-x-10 gap-y-4 text-[15px]">
-          <Link href="/contact" className="hover:underline">
+        <nav className="mt-12 flex flex-wrap items-center justify-center gap-x-10 gap-y-4 text-[14px] uppercase tracking-wide text-white/75">
+          <Link href="/contact" className="hover:text-[#B08D57]">
             Contact Us
           </Link>
-          <Link href="/about" className="hover:underline">
+          <Link href="/about" className="hover:text-[#B08D57]">
             About Us
           </Link>
-          <Link href="/faqs" className="hover:underline">
+          <Link href="/faqs" className="hover:text-[#B08D57]">
             FAQs
           </Link>
-          <Link href="/shipping-policy" className="hover:underline">
+          <Link href="/shipping-policy" className="hover:text-[#B08D57]">
             Shipping Policy
           </Link>
-          <Link href="/exchange-policy" className="hover:underline">
+          <Link href="/exchange-policy" className="hover:text-[#B08D57]">
             Exchange Policy
           </Link>
-          <Link href="/privacy-policy" className="hover:underline">
+          <Link href="/privacy-policy" className="hover:text-[#B08D57]">
             Privacy Policy
           </Link>
         </nav>
 
         {/* Copyright */}
-        <div className="mt-16 text-sm text-black/50 text-left">
-          © NAPD
+        <div className="mt-16 pt-6 border-t border-white/10 flex items-center justify-between text-[11px] text-white/40">
+          <span>© 2026 NAPD Jewels. All rights reserved.</span>
+          <span>Sterling Silver 925</span>
         </div>
       </div>
     </footer>
