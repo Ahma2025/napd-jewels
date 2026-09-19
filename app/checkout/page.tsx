@@ -144,7 +144,10 @@ export default function CheckoutPage() {
       }
 
       const amountInAgorot = Math.round(total * 100);
-      const reference = `NAPD-${orderId}-${Date.now()}`;
+      // NOTE: order ids are UUIDs (they contain hyphens themselves), so the
+      // separator between the parts of this reference must be something that
+      // never appears inside a UUID — use "_" and keep "-" free for the id.
+      const reference = `NAPD_${orderId}_${Date.now()}`;
 
       const res = await fetch("/api/lahza/create-session", {
         method: "POST",
@@ -156,6 +159,7 @@ export default function CheckoutPage() {
           email: mail,
           mobile: phone,
           reference,
+          orderId,
         }),
       });
 
