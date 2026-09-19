@@ -18,6 +18,7 @@ type DbProduct = {
   is_active: boolean | null;
   created_at: string;
   category_id: string;
+  categories?: { name: string } | { name: string }[] | null;
 };
 
 type DbProductImage = {
@@ -41,6 +42,8 @@ type DbProductParameter = {
 // حط رقم حميد هون بصيغة دولية بدون +
 const WHATSAPP_NUMBER = "972593255260";
 
+const RING_SIZES = ["15", "16", "17", "18", "19", "20", "21"];
+
 function formatMoney(n: number) {
   return Number(n || 0).toFixed(2);
 }
@@ -58,6 +61,8 @@ function paramLabel(key: string) {
 export default function ProductDetailsClient({ id }: { id: string }) {
   const safeId = id || "";
   const [qty, setQty] = useState(1);
+  const [size, setSize] = useState<string | null>(null);
+  const [sizeTouched, setSizeTouched] = useState(false);
 
   const { addToCart } = useCart();
 
@@ -93,7 +98,7 @@ export default function ProductDetailsClient({ id }: { id: string }) {
         supabase
           .from("products")
           .select(
-            "id,title,price,quantity,has_discount,discount_percentage,final_price,image_url,is_active,created_at,category_id"
+            "id,title,price,quantity,has_discount,discount_percentage,final_price,image_url,is_active,created_at,category_id,categories(name)"
           )
           .eq("id", safeId)
           .single(),
@@ -121,6 +126,8 @@ export default function ProductDetailsClient({ id }: { id: string }) {
       }
 
       setProduct((prod as DbProduct) || null);
+      setSize(null);
+      setSizeTouched(false);
 
       const rows = (imgs as DbProductImage[]) || [];
       const urls = rows
@@ -160,6 +167,14 @@ export default function ProductDetailsClient({ id }: { id: string }) {
   const title = useMemo(() => {
     return (product?.title || "Product").toUpperCase();
   }, [product?.title]);
+
+  const isRing = useMemo(() => {
+    const cats = product?.categories;
+    const catName = Array.isArray(cats) ? cats[0]?.name : cats?.name;
+    return (catName || "").toUpperCase() === "RINGS";
+  }, [product?.categories]);
+
+  const needsSize = isRing && !size;
 
   const hasDiscount = useMemo(() => {
     return !!(
@@ -211,8 +226,10 @@ export default function ProductDetailsClient({ id }: { id: string }) {
         )}, خصم: ${product?.discount_percentage || 0}%)`
       : `السعر: ${formatMoney(basePriceNumber)}`;
 
+    const sizeLine = isRing && size ? `\nالمقاس: ${size}` : "";
+
     return `مرحبا ، بدي أطلب:
-المنتج: ${t}
+المنتج: ${t}${sizeLine}
 ${priceLine}
 الكمية: ${qty}
 رابط المنتج: ${productUrl}`;
@@ -224,6 +241,8 @@ ${priceLine}
     hasDiscount,
     finalPriceNumber,
     basePriceNumber,
+    isRing,
+    size,
   ]);
 
   const waLink = useMemo(() => {
@@ -233,6 +252,10 @@ ${priceLine}
   const handleAddToCart = () => {
     if (!product) return;
     if (!inStock) return;
+    if (isRing && !size) {
+      setSizeTouched(true);
+      return;
+    }
 
     const allowedQty = Math.min(Math.max(1, qty), Math.max(1, maxQty));
 
@@ -242,6 +265,7 @@ ${priceLine}
         name: product.title,
         price: finalPriceNumber,
         image: activeImage,
+        size: isRing && size ? size : undefined,
       });
     }
   };
@@ -374,6 +398,44 @@ ${priceLine}
                           <div className="text-sm text-gray-900">{p.value}</div>
                         </div>
                       ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Ring Size */}
+              {isRing && (
+                <div className="mt-8">
+                  <p className="text-sm tracking-widest text-gray-500 mb-3">
+                    RING SIZE {needsSize && sizeTouched ? (
+                      <span className="text-red-600 normal-case tracking-normal">
+                        — please select a size
+                      </span>
+                    ) : null}
+                  </p>
+
+                  <div className="flex flex-wrap gap-2">
+                    {RING_SIZES.map((s) => {
+                      const active = size === s;
+                      return (
+                        <button
+                          key={s}
+                          type="button"
+                          onClick={() => {
+                            setSize(s);
+                            setSizeTouched(false);
+                          }}
+                          disabled={!inStock}
+                          className={[
+                            "w-12 h-12 rounded-lg border text-sm transition disabled:opacity-50",
+                            active
+                              ? "bg-black text-white border-black"
+                              : "border-black/15 hover:border-black/40",
+                          ].join(" ")}
+                        >
+                          {s}
+                        </button>
+                      );
+                    })}
                   </div>
                 </div>
               )}
