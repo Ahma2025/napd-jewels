@@ -99,12 +99,14 @@ export default function RingsPage() {
                 className="group block"
               >
                 <div className="relative w-full aspect-[3/4] bg-[#f6f6f6] rounded-lg overflow-hidden">
-                  <Image
-                    src={product.image_url || "/hero.jpeg"}
-                    alt={product.title}
-                    fill
-                    className="object-cover transition-transform duration-300 group-hover:scale-105"
-                  />
+                  <div className="absolute inset-3 md:inset-4">
+                    <Image
+                      src={product.image_url || "/hero.jpeg"}
+                      alt={product.title}
+                      fill
+                      className="object-contain transition-transform duration-300 group-hover:scale-105"
+                    />
+                  </div>
                 </div>
 
                 <div className="mt-4 space-y-1">
