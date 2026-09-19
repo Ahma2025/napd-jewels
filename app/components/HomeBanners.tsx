@@ -15,12 +15,56 @@ const CATEGORIES = [
       "https://otkgofsblfouiauwqlbj.supabase.co/storage/v1/object/public/product-images/products/CHAINS/cb3e2e616f796819cd52db4f5.jpg",
   },
   {
-    href: "/rings",
-    label: "The Moissanite Edit",
+    href: "/bracelets",
+    label: "Bracelets",
     image:
-      "https://otkgofsblfouiauwqlbj.supabase.co/storage/v1/object/public/product-images/products/MOISSANITE/882145ed4040e19ccb273db4.jpg",
+      "https://otkgofsblfouiauwqlbj.supabase.co/storage/v1/object/public/product-images/products/BRACELETS/196ddffcb5d81819cd528286c.jpg",
   },
 ];
+
+function CategoryTile({
+  href,
+  label,
+  image,
+}: {
+  href: string;
+  label: string;
+  image: string;
+}) {
+  return (
+    <Link
+      href={href}
+      className="group relative aspect-[3/4] overflow-hidden rounded-xl block ring-1 ring-[#B08D57]/25 hover:ring-[#B08D57]/60 shadow-[0_8px_24px_rgba(24,43,42,0.12)] transition-all duration-500"
+    >
+      <Image
+        src={image}
+        alt={label}
+        fill
+        sizes="(min-width: 640px) 33vw, 100vw"
+        className="object-cover transition-transform duration-700 group-hover:scale-110"
+      />
+
+      <div
+        className="absolute inset-x-0 bottom-0 backdrop-blur-md border-t px-4 py-4 flex flex-col items-center transition-all duration-500 group-hover:py-5"
+        style={{ backgroundColor: "rgba(14,27,26,0.45)", borderColor: "rgba(176,141,87,0.3)" }}
+      >
+        <h3 className="text-lg md:text-xl italic" style={{ color: "#FAF7F1" }}>
+          {label}
+        </h3>
+
+        <span
+          className="mt-2 inline-flex items-center gap-1 text-[10px] uppercase tracking-[0.25em]"
+          style={{ color: "#D9C6A0" }}
+        >
+          Shop Now
+          <span className="transition-transform duration-300 group-hover:translate-x-1">
+            &rarr;
+          </span>
+        </span>
+      </div>
+    </Link>
+  );
+}
 
 export default function HomeBanners() {
   return (
@@ -37,42 +81,41 @@ export default function HomeBanners() {
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 md:gap-6">
           {CATEGORIES.map((cat) => (
-            <Link
-              key={cat.label}
-              href={cat.href}
-              className="group relative aspect-[3/4] overflow-hidden rounded-xl cursor-pointer block shadow-[0_8px_24px_rgba(24,43,42,0.12)]"
-            >
-              <Image
-                src={cat.image}
-                alt={cat.label}
-                fill
-                sizes="(min-width: 640px) 33vw, 100vw"
-                className="object-cover transition-transform duration-700 group-hover:scale-110"
-              />
-
-              <div
-                className="absolute inset-0 transition-all duration-500"
-                style={{
-                  background:
-                    "linear-gradient(0deg, rgba(14,27,26,0.78) 0%, rgba(14,27,26,0.05) 55%)",
-                }}
-              />
-
-              <div className="absolute inset-0 flex flex-col items-center justify-end pb-6 text-white">
-                <h3 className="text-xl md:text-2xl italic mb-3 text-center px-4" style={{ color: "#FAF7F1" }}>
-                  {cat.label}
-                </h3>
-
-                <span
-                  className="px-5 py-1.5 border uppercase tracking-widest text-[10px] transition-all duration-300 group-hover:bg-[#B08D57]/10"
-                  style={{ borderColor: "#B08D57", color: "#D9C6A0" }}
-                >
-                  Shop Now
-                </span>
-              </div>
-            </Link>
+            <CategoryTile key={cat.label} {...cat} />
           ))}
         </div>
+
+        <Link
+          href="/moissanite"
+          className="group relative mt-5 md:mt-6 h-[220px] md:h-[300px] overflow-hidden rounded-xl block ring-1 ring-[#B08D57]/25 hover:ring-[#B08D57]/60 shadow-[0_8px_24px_rgba(24,43,42,0.12)] transition-all duration-500"
+        >
+          <Image
+            src="https://otkgofsblfouiauwqlbj.supabase.co/storage/v1/object/public/product-images/products/MOISSANITE/882145ed4040e19ccb273db4.jpg"
+            alt="The Moissanite Edit"
+            fill
+            sizes="100vw"
+            className="object-cover transition-transform duration-700 group-hover:scale-110"
+          />
+
+          <div
+            className="absolute inset-x-0 bottom-0 backdrop-blur-md border-t px-4 py-5 flex flex-col items-center transition-all duration-500 group-hover:py-6"
+            style={{ backgroundColor: "rgba(14,27,26,0.45)", borderColor: "rgba(176,141,87,0.3)" }}
+          >
+            <h3 className="text-2xl md:text-3xl italic" style={{ color: "#FAF7F1" }}>
+              The Moissanite Edit
+            </h3>
+
+            <span
+              className="mt-2 inline-flex items-center gap-1 text-[10px] uppercase tracking-[0.25em]"
+              style={{ color: "#D9C6A0" }}
+            >
+              Shop Now
+              <span className="transition-transform duration-300 group-hover:translate-x-1">
+                &rarr;
+              </span>
+            </span>
+          </div>
+        </Link>
       </div>
     </section>
   );
