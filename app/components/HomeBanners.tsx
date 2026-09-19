@@ -38,13 +38,15 @@ function CategoryTile({
       href={href}
       className={`group relative aspect-[3/4] overflow-hidden rounded-xl block ring-1 ring-[#B08D57]/25 hover:ring-[#B08D57]/60 shadow-[0_8px_24px_rgba(24,43,42,0.12)] transition-all duration-500 bg-white ${className}`}
     >
-      <Image
-        src={image}
-        alt={label}
-        fill
-        sizes="(min-width: 640px) 33vw, 100vw"
-        className="object-cover transition-transform duration-700 group-hover:scale-110"
-      />
+      <div className="absolute inset-3 md:inset-4">
+        <Image
+          src={image}
+          alt={label}
+          fill
+          sizes="(min-width: 640px) 33vw, 100vw"
+          className="object-contain transition-transform duration-700 group-hover:scale-110"
+        />
+      </div>
 
       <div
         className="absolute inset-x-0 bottom-0 backdrop-blur-md border-t px-4 py-4 flex flex-col items-center transition-all duration-500 group-hover:py-5"
