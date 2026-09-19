@@ -165,19 +165,21 @@ export default function HomeSections() {
 
           return (
             <div key={category.id} className="mb-20">
-              <div className="flex justify-between items-center border-b pb-4 mb-10">
+              <div className="flex justify-between items-end border-b border-black/10 pb-4 mb-10">
                 <Link
                   href={`/${category.slug}`}
-                  className="text-xl tracking-widest font-medium hover:underline"
+                  className="italic text-2xl md:text-3xl hover:opacity-70 transition"
+                  style={{ color: "#182B2A", fontFamily: 'Georgia, "Times New Roman", serif' }}
                 >
                   {displayCategoryName(category.name)}
                 </Link>
 
                 <Link
                   href={`/${category.slug}`}
-                  className="text-sm tracking-widest hover:underline"
+                  className="text-[11px] uppercase tracking-[0.2em] hover:opacity-70 transition"
+                  style={{ color: "#B08D57" }}
                 >
-                  VIEW ALL
+                  View All
                 </Link>
               </div>
 
@@ -203,7 +205,7 @@ export default function HomeSections() {
                         href={`/product/${product.id}`}
                         className="min-w-[160px] md:min-w-[200px] lg:min-w-0 lg:flex-1 flex-shrink-0 text-center group cursor-pointer block"
                       >
-                        <div className="relative w-full h-[220px] md:h-[280px] bg-white rounded-lg overflow-hidden">
+                        <div className="relative w-full h-[220px] md:h-[280px] bg-white border border-black/5 rounded-lg overflow-hidden">
                           <Image
                             src={product.image_url || "/hero.jpeg"}
                             alt={product.title}
@@ -222,12 +224,18 @@ export default function HomeSections() {
                               <p className="text-sm text-black/40 line-through">
                                 {formatMoney(product.price)}
                               </p>
-                              <p className="text-base md:text-lg font-semibold text-[#123E38]">
+                              <p
+                                className="text-base md:text-lg font-semibold"
+                                style={{ color: "#182B2A" }}
+                              >
                                 {formatMoney(finalPrice)}
                               </p>
                             </>
                           ) : (
-                            <p className="text-base md:text-lg font-semibold">
+                            <p
+                              className="text-base md:text-lg font-semibold"
+                              style={{ color: "#182B2A" }}
+                            >
                               {formatMoney(product.price)}
                             </p>
                           )}
