@@ -8,19 +8,24 @@ export type CartItem = {
   price: number;
   image: string;
   quantity: number;
+  size?: string;
 };
 
 type CartContextType = {
   cart: CartItem[];
   addToCart: (item: Omit<CartItem, "quantity">) => void;
-  removeFromCart: (id: string) => void;
-  increase: (id: string) => void;
-  decrease: (id: string) => void;
+  removeFromCart: (id: string, size?: string) => void;
+  increase: (id: string, size?: string) => void;
+  decrease: (id: string, size?: string) => void;
   clearCart: () => void; // ✅ جديد
   subtotal: number;
 };
 
 const CartContext = createContext<CartContextType | null>(null);
+
+function sameLine(a: { id: string; size?: string }, b: { id: string; size?: string }) {
+  return a.id === b.id && (a.size || "") === (b.size || "");
+}
 
 export function CartProvider({ children }: { children: React.ReactNode }) {
   const [cart, setCart] = useState<CartItem[]>([]);
@@ -36,33 +41,33 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
   const addToCart = (item: Omit<CartItem, "quantity">) => {
     setCart((prev) => {
-      const existing = prev.find((p) => p.id === item.id);
+      const existing = prev.find((p) => sameLine(p, item));
       if (existing) {
         return prev.map((p) =>
-          p.id === item.id ? { ...p, quantity: p.quantity + 1 } : p
+          sameLine(p, item) ? { ...p, quantity: p.quantity + 1 } : p
         );
       }
       return [...prev, { ...item, quantity: 1 }];
     });
   };
 
-  const removeFromCart = (id: string) => {
-    setCart((prev) => prev.filter((item) => item.id !== id));
+  const removeFromCart = (id: string, size?: string) => {
+    setCart((prev) => prev.filter((item) => !sameLine(item, { id, size })));
   };
 
-  const increase = (id: string) => {
+  const increase = (id: string, size?: string) => {
     setCart((prev) =>
       prev.map((item) =>
-        item.id === id ? { ...item, quantity: item.quantity + 1 } : item
+        sameLine(item, { id, size }) ? { ...item, quantity: item.quantity + 1 } : item
       )
     );
   };
 
-  const decrease = (id: string) => {
+  const decrease = (id: string, size?: string) => {
     setCart((prev) =>
       prev
         .map((item) =>
-          item.id === id ? { ...item, quantity: item.quantity - 1 } : item
+          sameLine(item, { id, size }) ? { ...item, quantity: item.quantity - 1 } : item
         )
         .filter((item) => item.quantity > 0)
     );
