@@ -37,7 +37,7 @@ export default function CartPage() {
       <div className="border border-black/10 rounded-2xl overflow-hidden">
         {cart.map((item) => (
           <div
-            key={item.id}
+            key={`${item.id}-${item.size ?? ""}`}
             className="flex items-center gap-5 p-5 border-b border-black/10 last:border-b-0"
           >
             <div className="w-20 h-20 rounded-xl overflow-hidden bg-black/5 shrink-0">
@@ -51,13 +51,18 @@ export default function CartPage() {
 
             <div className="flex-1">
               <div className="font-medium">{item.name}</div>
+              {item.size ? (
+                <div className="text-xs text-black/50 mt-0.5">
+                  Ring Size: {item.size}
+                </div>
+              ) : null}
               <div className="text-sm text-black/60 mt-1">₪ {item.price}</div>
             </div>
 
             {/* Qty */}
             <div className="flex items-center gap-2">
               <button
-                onClick={() => decrease(item.id)}
+                onClick={() => decrease(item.id, item.size)}
                 className="w-9 h-9 rounded-full border border-black/15 hover:border-black/30 transition"
               >
                 -
@@ -66,7 +71,7 @@ export default function CartPage() {
               <div className="w-10 text-center">{item.quantity}</div>
 
               <button
-                onClick={() => increase(item.id)}
+                onClick={() => increase(item.id, item.size)}
                 className="w-9 h-9 rounded-full border border-black/15 hover:border-black/30 transition"
               >
                 +
@@ -80,7 +85,7 @@ export default function CartPage() {
 
             {/* Remove */}
             <button
-              onClick={() => removeFromCart(item.id)}
+              onClick={() => removeFromCart(item.id, item.size)}
               className="text-sm text-red-600 hover:underline"
             >
               Remove
