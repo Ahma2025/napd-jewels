@@ -1,19 +1,21 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
 import { ShoppingBag, Menu, X } from "lucide-react";
 import { useCart } from "../context/CartContext";
 import { supabase } from "@/lib/supabase";
 
-const PRIMARY = "#123E38";
+const PRIMARY = "#182B2A";
+const GOLD = "#B08D57";
 
 const navLinkClass =
-  "relative uppercase text-[14px] tracking-wide text-black/70 transition-all duration-300 " +
-  "hover:text-[#123E38] " +
-  "hover:drop-shadow-[0_0_10px_rgba(18,62,56,0.35)] " +
-  "after:content-[''] after:absolute after:left-0 after:-bottom-2 after:h-[2px] after:w-0 after:bg-[#123E38] " +
+  "relative uppercase text-[13px] tracking-[0.15em] text-white/80 transition-all duration-300 " +
+  "hover:text-[#B08D57] " +
+  "hover:drop-shadow-[0_0_10px_rgba(176,141,87,0.35)] " +
+  "after:content-[''] after:absolute after:left-0 after:-bottom-2 after:h-[1px] after:w-0 after:bg-[#B08D57] " +
   "after:transition-all after:duration-300 hover:after:w-full";
 
 type Profile = {
@@ -194,8 +196,34 @@ export default function Header() {
   }
 
   return (
-    <header className="sticky top-0 z-50 bg-white border-b border-black/10">
-      <div className="w-full px-6">
+    <header className="sticky top-0 z-50" style={{ backgroundColor: PRIMARY }}>
+      {/* ANNOUNCEMENT MARQUEE */}
+      <div className="hidden md:flex h-9 items-center overflow-hidden border-b border-white/10">
+        <div className="napd-marquee-track">
+          {[0, 1].map((rep) => (
+            <div key={rep} className="flex items-center">
+              {[
+                "1 Year Warranty on Every Piece",
+                "Imported Sterling Silver 925",
+                "Order Directly on WhatsApp",
+                "Free Delivery Over 300₪",
+              ].map((t) => (
+                <div key={t} className="flex items-center gap-3 px-7 whitespace-nowrap">
+                  <span
+                    className="text-[11px] uppercase tracking-[0.2em]"
+                    style={{ color: "#D9C6A0" }}
+                  >
+                    {t}
+                  </span>
+                  <span style={{ color: GOLD }}>✦</span>
+                </div>
+              ))}
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="w-full px-6 border-b border-white/10">
         <div className="h-20 flex items-center justify-between">
           {/* LEFT - DESKTOP NAV */}
           <nav className="hidden md:flex items-center gap-10">
@@ -219,7 +247,7 @@ export default function Header() {
                 {newOrdersCount > 0 && (
                   <span
                     className="absolute -top-2 -right-4 text-white text-[10px] min-w-[18px] h-[18px] px-[6px] flex items-center justify-center rounded-full"
-                    style={{ backgroundColor: PRIMARY }}
+                    style={{ backgroundColor: GOLD, color: PRIMARY }}
                   >
                     {newOrdersCount}
                   </span>
@@ -236,7 +264,7 @@ export default function Header() {
           </nav>
 
           {/* MOBILE MENU BUTTON */}
-          <button className="md:hidden" onClick={() => setIsOpen(!isOpen)}>
+          <button className="md:hidden text-white" onClick={() => setIsOpen(!isOpen)}>
             {isOpen ? (
               <X size={26} strokeWidth={1.5} />
             ) : (
@@ -250,7 +278,7 @@ export default function Header() {
             {!authLoading && !userId ? (
               <Link
                 href="/login"
-                className="hidden md:inline-flex items-center justify-center px-4 py-2 rounded-full border border-black/10 text-[13px] uppercase tracking-wide text-black/70 transition-all duration-200 hover:text-[#123E38] hover:border-[#123E38]/40 hover:shadow-[0_0_18px_rgba(18,62,56,0.12)]"
+                className="hidden md:inline-flex items-center justify-center px-4 py-2 rounded-full border border-white/20 text-[12px] uppercase tracking-wide text-white/80 transition-all duration-200 hover:text-[#B08D57] hover:border-[#B08D57]/50"
               >
                 Login
               </Link>
@@ -259,7 +287,7 @@ export default function Header() {
                 <button
                   type="button"
                   disabled={authLoading}
-                  className="inline-flex items-center justify-center px-4 py-2 rounded-full border border-black/10 text-[13px] uppercase tracking-wide text-black/70 transition-all duration-200 hover:text-[#123E38] hover:border-[#123E38]/40 hover:shadow-[0_0_18px_rgba(18,62,56,0.12)] disabled:opacity-60"
+                  className="inline-flex items-center justify-center px-4 py-2 rounded-full border border-white/20 text-[12px] uppercase tracking-wide text-white/80 transition-all duration-200 hover:text-[#B08D57] hover:border-[#B08D57]/50 disabled:opacity-60"
                   onClick={() => {
                     if (!userId) {
                       router.push("/login");
@@ -273,10 +301,13 @@ export default function Header() {
                 </button>
 
                 {userId && isAccountOpen && (
-                  <div className="absolute right-0 mt-2 w-44 rounded-xl border border-black/10 bg-white shadow-lg overflow-hidden">
+                  <div
+                    className="absolute right-0 mt-2 w-44 rounded-xl border border-white/10 shadow-lg overflow-hidden"
+                    style={{ backgroundColor: PRIMARY }}
+                  >
                     <button
                       type="button"
-                      className="w-full text-left px-4 py-3 text-[13px] uppercase tracking-wide text-black/70 hover:text-[#123E38] hover:bg-black/[0.02] transition-all"
+                      className="w-full text-left px-4 py-3 text-[13px] uppercase tracking-wide text-white/80 hover:text-[#B08D57] hover:bg-white/[0.04] transition-all"
                       onClick={handleLogout}
                     >
                       Logout
@@ -291,13 +322,13 @@ export default function Header() {
               <ShoppingBag
                 size={22}
                 strokeWidth={1.5}
-                className="text-black/70 hover:text-[#123E38] transition-colors duration-200"
+                className="text-white/80 hover:text-[#B08D57] transition-colors duration-200"
               />
 
               {totalItems > 0 && (
                 <span
                   className="absolute -top-2 -right-2 text-white text-[10px] w-5 h-5 flex items-center justify-center rounded-full"
-                  style={{ backgroundColor: PRIMARY }}
+                  style={{ backgroundColor: GOLD, color: PRIMARY }}
                 >
                   {totalItems}
                 </span>
@@ -305,15 +336,15 @@ export default function Header() {
             </Link>
 
             {/* LOGO */}
-            <Link href="/" className="text-right">
-              <div className="leading-tight text-center md:text-right">
-                <div className="text-2xl font-serif tracking-[0.2em] text-black">
-                  NAPD
-                </div>
-                <div className="text-[11px] tracking-[0.5em] text-black/60">
-                  JEWELS
-                </div>
-              </div>
+            <Link href="/" className="shrink-0">
+              <Image
+                src="/napd-logo.png"
+                alt="NAPD Jewels"
+                width={183}
+                height={160}
+                priority
+                className="h-11 w-auto"
+              />
             </Link>
           </div>
         </div>
@@ -321,31 +352,34 @@ export default function Header() {
 
       {/* MOBILE DROPDOWN MENU */}
       {isOpen && (
-        <div className="md:hidden border-t border-black/10 bg-white px-6 py-6 space-y-6">
+        <div
+          className="md:hidden border-t border-white/10 px-6 py-6 space-y-6"
+          style={{ backgroundColor: PRIMARY }}
+        >
           <Link
             href="/chains"
-            className="block uppercase text-black/70 hover:text-[#123E38]"
+            className="block uppercase text-white/80 hover:text-[#B08D57]"
             onClick={() => setIsOpen(false)}
           >
             Necklaces
           </Link>
           <Link
             href="/earrings"
-            className="block uppercase text-black/70 hover:text-[#123E38]"
+            className="block uppercase text-white/80 hover:text-[#B08D57]"
             onClick={() => setIsOpen(false)}
           >
             Earrings
           </Link>
           <Link
             href="/bracelets"
-            className="block uppercase text-black/70 hover:text-[#123E38]"
+            className="block uppercase text-white/80 hover:text-[#B08D57]"
             onClick={() => setIsOpen(false)}
           >
             Bracelets
           </Link>
           <Link
             href="/rings"
-            className="block uppercase text-black/70 hover:text-[#123E38]"
+            className="block uppercase text-white/80 hover:text-[#B08D57]"
             onClick={() => setIsOpen(false)}
           >
             Rings
@@ -355,14 +389,14 @@ export default function Header() {
           {isOwner && (
             <Link
               href="/owner/orders"
-              className="flex items-center justify-between uppercase text-black/70 hover:text-[#123E38]"
+              className="flex items-center justify-between uppercase text-white/80 hover:text-[#B08D57]"
               onClick={() => setIsOpen(false)}
             >
               <span>Orders</span>
               {newOrdersCount > 0 && (
                 <span
                   className="text-white text-[10px] min-w-[18px] h-[18px] px-[6px] flex items-center justify-center rounded-full"
-                  style={{ backgroundColor: PRIMARY }}
+                  style={{ backgroundColor: GOLD, color: PRIMARY }}
                 >
                   {newOrdersCount}
                 </span>
@@ -374,7 +408,7 @@ export default function Header() {
           {isOwner && (
             <Link
               href="/owner-dashboard"
-              className="block uppercase text-black/70 hover:text-[#123E38]"
+              className="block uppercase text-white/80 hover:text-[#B08D57]"
               onClick={() => setIsOpen(false)}
             >
               Owner Dashboard
@@ -385,22 +419,22 @@ export default function Header() {
           {!authLoading && !userId ? (
             <Link
               href="/login"
-              className="inline-flex items-center justify-center w-full px-4 py-3 rounded-xl text-white uppercase tracking-wide"
-              style={{ backgroundColor: PRIMARY }}
+              className="inline-flex items-center justify-center w-full px-4 py-3 rounded-xl text-[#182B2A] uppercase tracking-wide"
+              style={{ backgroundColor: GOLD }}
               onClick={() => setIsOpen(false)}
             >
               Login
             </Link>
           ) : (
             <div className="space-y-3">
-              <div className="text-center text-sm text-black/60">
+              <div className="text-center text-sm text-white/60">
                 {authLoading ? "..." : displayName}
               </div>
 
               <button
                 type="button"
-                className="inline-flex items-center justify-center w-full px-4 py-3 rounded-xl text-white uppercase tracking-wide"
-                style={{ backgroundColor: PRIMARY }}
+                className="inline-flex items-center justify-center w-full px-4 py-3 rounded-xl text-[#182B2A] uppercase tracking-wide"
+                style={{ backgroundColor: GOLD }}
                 onClick={handleLogout}
                 disabled={authLoading}
               >
