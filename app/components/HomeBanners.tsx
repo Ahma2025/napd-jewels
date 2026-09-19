@@ -3,8 +3,17 @@ import Link from "next/link";
 
 export default function HomeBanners() {
   return (
-    <section className="w-full bg-[#f5f5f5] py-12">
+    <section className="w-full py-16" style={{ backgroundColor: "#FAF7F1" }}>
       <div className="max-w-[1200px] mx-auto px-5">
+        <div className="text-center mb-10">
+          <span className="text-[11px] uppercase tracking-[0.3em]" style={{ color: "#B08D57" }}>
+            The Edit
+          </span>
+          <h2 className="mt-3 text-4xl md:text-5xl italic" style={{ color: "#182B2A" }}>
+            Shop by Category
+          </h2>
+        </div>
+
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Rings */}
           <Link
@@ -18,12 +27,23 @@ export default function HomeBanners() {
               className="object-cover transition-transform duration-500 group-hover:scale-110"
             />
 
-            <div className="absolute inset-0 bg-black/35 group-hover:bg-black/20 transition-all duration-500" />
+            <div
+              className="absolute inset-0 transition-all duration-500"
+              style={{
+                background:
+                  "linear-gradient(0deg, rgba(14,27,26,0.80) 0%, rgba(14,27,26,0.05) 60%)",
+              }}
+            />
 
-            <div className="absolute inset-0 flex flex-col items-center justify-center text-white">
-              <h2 className="text-3xl md:text-4xl font-serif mb-5">Rings</h2>
+            <div className="absolute inset-0 flex flex-col items-center justify-end pb-8 text-white">
+              <h3 className="text-3xl md:text-4xl italic mb-4" style={{ color: "#FAF7F1" }}>
+                Rings
+              </h3>
 
-              <span className="px-7 py-2 border border-white uppercase tracking-widest text-sm transition-all duration-300 group-hover:bg-white group-hover:text-black">
+              <span
+                className="px-7 py-2 border uppercase tracking-widest text-[11px] transition-all duration-300"
+                style={{ borderColor: "#B08D57", color: "#D9C6A0" }}
+              >
                 Shop Now
               </span>
             </div>
@@ -41,14 +61,23 @@ export default function HomeBanners() {
               className="object-cover transition-transform duration-500 group-hover:scale-110"
             />
 
-            <div className="absolute inset-0 bg-black/35 group-hover:bg-black/20 transition-all duration-500" />
+            <div
+              className="absolute inset-0 transition-all duration-500"
+              style={{
+                background:
+                  "linear-gradient(0deg, rgba(14,27,26,0.80) 0%, rgba(14,27,26,0.05) 60%)",
+              }}
+            />
 
-            <div className="absolute inset-0 flex flex-col items-center justify-center text-white">
-              <h2 className="text-3xl md:text-4xl font-serif mb-5">
+            <div className="absolute inset-0 flex flex-col items-center justify-end pb-8 text-white">
+              <h3 className="text-3xl md:text-4xl italic mb-4" style={{ color: "#FAF7F1" }}>
                 Necklaces
-              </h2>
+              </h3>
 
-              <span className="px-7 py-2 border border-white uppercase tracking-widest text-sm transition-all duration-300 group-hover:bg-white group-hover:text-black">
+              <span
+                className="px-7 py-2 border uppercase tracking-widest text-[11px] transition-all duration-300"
+                style={{ borderColor: "#B08D57", color: "#D9C6A0" }}
+              >
                 Shop Now
               </span>
             </div>
@@ -66,14 +95,23 @@ export default function HomeBanners() {
               className="object-cover transition-transform duration-500 group-hover:scale-110"
             />
 
-            <div className="absolute inset-0 bg-black/35 group-hover:bg-black/20 transition-all duration-500" />
+            <div
+              className="absolute inset-0 transition-all duration-500"
+              style={{
+                background:
+                  "linear-gradient(0deg, rgba(14,27,26,0.80) 0%, rgba(14,27,26,0.05) 60%)",
+              }}
+            />
 
-            <div className="absolute inset-0 flex flex-col items-center justify-center text-white">
-              <h2 className="text-3xl md:text-4xl font-serif mb-5">
+            <div className="absolute inset-0 flex flex-col items-center justify-end pb-8 text-white">
+              <h3 className="text-3xl md:text-4xl italic mb-4" style={{ color: "#FAF7F1" }}>
                 The Moissanite Edit
-              </h2>
+              </h3>
 
-              <span className="px-7 py-2 border border-white uppercase tracking-widest text-sm transition-all duration-300 group-hover:bg-white group-hover:text-black">
+              <span
+                className="px-7 py-2 border uppercase tracking-widest text-[11px] transition-all duration-300"
+                style={{ borderColor: "#B08D57", color: "#D9C6A0" }}
+              >
                 Shop Now
               </span>
             </div>

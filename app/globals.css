@@ -5,6 +5,13 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+
+  /* NAPD brand tokens */
+  --napd-ivory: #faf7f1;
+  --napd-green: #182b2a;
+  --napd-green-deep: #0e1b1a;
+  --napd-gold: #b08d57;
+  --napd-gold-light: #d9c6a0;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -17,7 +24,14 @@
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-dm-sans), "DM Sans", Arial, Helvetica, sans-serif;
+  letter-spacing: 0.2px;
+}
+
+h1,
+h2,
+h3 {
+  font-family: Georgia, "Times New Roman", serif;
 }
 
 .homeBanners {
@@ -99,4 +113,22 @@ body {
 .scrollbar-hide {
   -ms-overflow-style: none;
   scrollbar-width: none;
+}
+
+/* ---- NAPD marquee ---- */
+@keyframes napd-marquee {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+.napd-marquee-track {
+  display: flex;
+  width: max-content;
+  animation: napd-marquee 26s linear infinite;
+}
+.napd-marquee-track.reverse {
+  animation-direction: reverse;
 }
