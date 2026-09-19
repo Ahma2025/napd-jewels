@@ -97,7 +97,7 @@ export default function CheckoutPage() {
 
       const itemsPayload = cart.map((item: any) => ({
         product_id: item.id,
-        title: item.name,
+        title: item.size ? `${item.name} (Size ${item.size})` : item.name,
         unit_price: item.price,
         quantity: item.quantity,
         line_total: Number(item.price) * Number(item.quantity),
@@ -308,11 +308,12 @@ export default function CheckoutPage() {
 
           {cart.map((item: any) => (
             <div
-              key={item.id}
+              key={`${item.id}-${item.size ?? ""}`}
               className="flex justify-between mb-3 text-sm"
             >
               <div>
-                {item.name} × {item.quantity}
+                {item.name}
+                {item.size ? ` (Size ${item.size})` : ""} × {item.quantity}
               </div>
               <div>
                 ₪ {formatMoney(Number(item.price) * Number(item.quantity))}
