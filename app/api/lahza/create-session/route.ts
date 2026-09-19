@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { supabase } from "@/lib/supabase";
 
 export async function POST(req: Request) {
   try {
@@ -8,10 +9,11 @@ export async function POST(req: Request) {
     const email = String(body.email || "").trim();
     const mobile = String(body.mobile || "").trim();
     const reference = String(body.reference || "").trim();
+    const orderId = String(body.orderId || "").trim();
 
-    if (!amount || !email || !reference) {
+    if (!amount || !email || !reference || !orderId) {
       return NextResponse.json(
-        { error: "amount, email, and reference are required" },
+        { error: "amount, email, reference, and orderId are required" },
         { status: 400 }
       );
     }
@@ -32,6 +34,7 @@ export async function POST(req: Request) {
         metadata: JSON.stringify({
           source: "napd-jewels",
           payment_method: "card",
+          order_id: orderId,
         }),
       }),
     });
@@ -54,6 +57,19 @@ export async function POST(req: Request) {
         },
         { status: 400 }
       );
+    }
+
+    // Record the reference we issued for this order so the webhook can only
+    // mark it "paid" if it comes back with the exact same reference — this
+    // stops the (publicly callable) mark_order_paid RPC from being used to
+    // fraudulently flag an arbitrary order as paid.
+    const { error: refError } = await supabase.rpc(
+      "set_order_payment_reference",
+      { p_order_id: orderId, p_reference: reference }
+    );
+
+    if (refError) {
+      console.error("set_order_payment_reference error:", refError.message);
     }
 
     return NextResponse.json({
