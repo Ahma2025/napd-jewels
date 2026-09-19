@@ -98,7 +98,7 @@ export default function MoissanitePage() {
                 href={`/product/${product.id}`}
                 className="group block"
               >
-                <div className="relative w-full aspect-[3/4] bg-[#f6f6f6] rounded-lg overflow-hidden">
+                <div className="relative w-full aspect-[3/4] bg-white rounded-lg overflow-hidden">
                   <div className="absolute inset-3 md:inset-4">
                     <Image
                       src={product.image_url || "/hero.jpeg"}
