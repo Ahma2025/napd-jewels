@@ -20,6 +20,12 @@ const CATEGORIES = [
     image:
       "https://otkgofsblfouiauwqlbj.supabase.co/storage/v1/object/public/product-images/products/BRACELETS/8fc61f4873d52819cd5282393.jpg",
   },
+  {
+    href: "/sets",
+    label: "Sets",
+    image:
+      "https://otkgofsblfouiauwqlbj.supabase.co/storage/v1/object/public/product-images/products/SETS/c430bd6594d72819cac3cdf2d.jpg",
+  },
 ];
 
 function CategoryTile({
@@ -43,7 +49,7 @@ function CategoryTile({
           src={image}
           alt={label}
           fill
-          sizes="(min-width: 640px) 33vw, 100vw"
+          sizes="(min-width: 640px) 25vw, 50vw"
           className="object-contain transition-transform duration-700 group-hover:scale-110"
         />
       </div>
@@ -83,7 +89,7 @@ export default function HomeBanners() {
           </h2>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 md:gap-6">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-5 md:gap-6">
           {CATEGORIES.map((cat) => (
             <CategoryTile key={cat.label} {...cat} />
           ))}
