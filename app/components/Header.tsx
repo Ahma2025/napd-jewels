@@ -206,7 +206,6 @@ export default function Header() {
                 "1 Year Warranty on Every Piece",
                 "Imported Sterling Silver 925",
                 "Order Directly on WhatsApp",
-                "Free Delivery Over 300₪",
               ].map((t) => (
                 <div key={t} className="flex items-center gap-3 px-7 whitespace-nowrap">
                   <span

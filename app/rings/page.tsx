@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
+import { useIsOwner } from "@/lib/useIsOwner";
 
 type Product = {
   id: string;
@@ -14,6 +15,7 @@ type Product = {
   discount_percentage: number | null;
   image_url: string | null;
   created_at: string;
+  quantity: number | null;
 };
 
 function formatMoney(n: number) {
@@ -23,6 +25,7 @@ function formatMoney(n: number) {
 export default function RingsPage() {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
+  const { isOwner } = useIsOwner();
 
   useEffect(() => {
     let mounted = true;
@@ -42,14 +45,17 @@ export default function RingsPage() {
       const { data, error } = await supabase
         .from("products")
         .select(
-          "id,title,price,final_price,has_discount,discount_percentage,image_url,created_at"
+          "id,title,price,final_price,has_discount,discount_percentage,image_url,created_at,quantity"
         )
         .eq("category_id", category.id)
         .eq("is_active", true)
         .order("created_at", { ascending: false });
 
       if (!error && mounted) {
-        setProducts(data || []);
+        const rows = data || [];
+        setProducts(
+          isOwner ? rows : rows.filter((p) => Number(p.quantity || 0) > 0)
+        );
       }
 
       setLoading(false);
@@ -60,7 +66,7 @@ export default function RingsPage() {
     return () => {
       mounted = false;
     };
-  }, []);
+  }, [isOwner]);
 
   return (
     <section className="max-w-[1200px] mx-auto px-6 py-12">

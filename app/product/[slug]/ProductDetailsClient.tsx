@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { useCart } from "../../context/CartContext";
+import { useIsOwner } from "@/lib/useIsOwner";
 
 type DbProduct = {
   id: string;
@@ -65,6 +66,7 @@ export default function ProductDetailsClient({ id }: { id: string }) {
   const [sizeTouched, setSizeTouched] = useState(false);
 
   const { addToCart } = useCart();
+  const { isOwner, loading: ownerLoading } = useIsOwner();
 
   const [product, setProduct] = useState<DbProduct | null>(null);
   const [images, setImages] = useState<string[]>([]);
@@ -198,6 +200,11 @@ export default function ProductDetailsClient({ id }: { id: string }) {
     return active && Number(product.quantity || 0) > 0;
   }, [product]);
 
+  // Out-of-stock products stay hidden from regular customers (direct link
+  // or otherwise) — only the owner can still open them, to edit later.
+  const visibleToViewer = isOwner || inStock;
+  const pageLoading = loading || ownerLoading;
+
   const maxQty = useMemo(() => {
     const q = Number(product?.quantity || 0);
     if (!Number.isFinite(q) || q < 0) return 0;
@@ -290,9 +297,9 @@ ${priceLine}
           <span className="text-gray-900">{title}</span>
         </div>
 
-        {loading ? (
+        {pageLoading ? (
           <div className="text-black/50">Loading...</div>
-        ) : !product ? (
+        ) : !product || !visibleToViewer ? (
           <div className="text-black/60">Product not found.</div>
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
