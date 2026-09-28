@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/lib/supabase";
+import { useIsOwner } from "@/lib/useIsOwner";
 
 type DbCategory = {
   id: string;
@@ -22,7 +23,12 @@ type DbProduct = {
   category_id: string;
   created_at: string;
   is_active: boolean | null;
+  quantity: number | null;
 };
+
+function inStock(p: { quantity: number | null }) {
+  return Number(p.quantity || 0) > 0;
+}
 
 function formatMoney(n: number) {
   return Number(n || 0).toFixed(2);
@@ -37,11 +43,13 @@ function displayCategoryName(name: string) {
 export default function HomeSections() {
   const [categories, setCategories] = useState<DbCategory[]>([]);
   const [products, setProducts] = useState<DbProduct[]>([]);
+  const { isOwner } = useIsOwner();
 
   const productsByCategory = useMemo(() => {
     const map: Record<string, DbProduct[]> = {};
+    const visible = isOwner ? products : products.filter(inStock);
 
-    for (const p of products) {
+    for (const p of visible) {
       if (!map[p.category_id]) {
         map[p.category_id] = [];
       }
@@ -57,7 +65,7 @@ export default function HomeSections() {
     }
 
     return map;
-  }, [products]);
+  }, [products, isOwner]);
 
   useEffect(() => {
     let mounted = true;
@@ -81,7 +89,7 @@ export default function HomeSections() {
       const { data: prods, error: prodErr } = await supabase
         .from("products")
         .select(
-          "id,title,price,final_price,has_discount,discount_percentage,image_url,category_id,created_at,is_active"
+          "id,title,price,final_price,has_discount,discount_percentage,image_url,category_id,created_at,is_active,quantity"
         )
         .eq("is_active", true)
         .order("created_at", { ascending: false });
