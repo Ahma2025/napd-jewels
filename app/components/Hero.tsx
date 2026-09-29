@@ -43,37 +43,39 @@ export default function Hero() {
         }}
       />
 
-      <div className="relative w-full h-[260px] sm:h-[340px] md:h-[420px] lg:h-[480px] napd-hero-zoom">
-        <Image
-          src="/hero-green.jpeg"
-          alt="NAPD Jewels"
-          fill
-          priority
-          sizes="100vw"
-          className="object-cover object-center"
-        />
-      </div>
-
-      {/* a few faint twinkles, confined to the dark upper portion so they
-          never sit over the rings or the white text panel below */}
-      <div
-        className="pointer-events-none absolute inset-x-0 top-0"
-        style={{ height: "56%" }}
-      >
-        {SPARKLES.map((s, i) => (
-          <span
-            key={i}
-            className="napd-hero-twinkle"
-            style={{
-              left: s.left,
-              top: s.top,
-              width: `${s.size}px`,
-              height: `${s.size}px`,
-              animationDelay: s.delay,
-              animationDuration: s.duration,
-            }}
+      <div className="relative w-[90%] max-w-[1600px] mx-auto">
+        <div className="relative w-full napd-hero-zoom">
+          <Image
+            src="/hero-green.jpeg"
+            alt="NAPD Jewels"
+            width={1920}
+            height={1080}
+            priority
+            className="w-full h-auto"
           />
-        ))}
+        </div>
+
+        {/* a few faint twinkles, confined to the dark upper portion so they
+            never sit over the rings or the white text panel below */}
+        <div
+          className="pointer-events-none absolute inset-x-0 top-0"
+          style={{ height: "56%" }}
+        >
+          {SPARKLES.map((s, i) => (
+            <span
+              key={i}
+              className="napd-hero-twinkle"
+              style={{
+                left: s.left,
+                top: s.top,
+                width: `${s.size}px`,
+                height: `${s.size}px`,
+                animationDelay: s.delay,
+                animationDuration: s.duration,
+              }}
+            />
+          ))}
+        </div>
       </div>
     </section>
   );
