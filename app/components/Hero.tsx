@@ -43,14 +43,14 @@ export default function Hero() {
         }}
       />
 
-      <div className="relative w-full napd-hero-zoom">
+      <div className="relative w-full h-[260px] sm:h-[340px] md:h-[420px] lg:h-[480px] napd-hero-zoom">
         <Image
           src="/hero-green.jpeg"
           alt="NAPD Jewels"
-          width={1920}
-          height={1080}
+          fill
           priority
-          className="w-full h-auto"
+          sizes="100vw"
+          className="object-cover object-center"
         />
       </div>
 
