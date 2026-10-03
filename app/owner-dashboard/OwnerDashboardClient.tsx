@@ -3,7 +3,6 @@
 import Image from "next/image";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { supabase } from "@/lib/supabase";
-import CrmPanel from "./CrmPanel";
 
 type Category =
   | "CHAINS"
@@ -136,7 +135,6 @@ function normalizeCategory(v: string | null | undefined): Category | null {
 const EMPTY_PREVIEWS = ["", "", "", ""] as const;
 
 export default function OwnerDashboardClient() {
-  const [activeTab, setActiveTab] = useState<"products" | "crm">("products");
   const [activeCat, setActiveCat] = useState<Category>("CHAINS");
 
   // DB-backed products (all categories)
@@ -819,47 +817,22 @@ export default function OwnerDashboardClient() {
         <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 border-b pb-6">
           <div>
             <h1 className="text-2xl tracking-widest font-medium">OWNER DASHBOARD</h1>
-            <p className="text-sm text-black/55 mt-2">
-              {activeTab === "products"
-                ? "Add and manage products by category"
-                : "Log sales and track customers"}
-            </p>
+            <p className="text-sm text-black/55 mt-2">Add and manage products by category</p>
           </div>
 
-          <div className="flex items-center gap-2">
-            <button
-              type="button"
-              onClick={() => setActiveTab("products")}
-              className="px-4 py-2 rounded-full text-xs uppercase tracking-widest border transition-all bg-white"
-              style={{
-                borderColor: activeTab === "products" ? PRIMARY : "rgba(0,0,0,0.15)",
-                boxShadow: activeTab === "products" ? "0 0 0 2px rgba(18,62,56,0.10)" : "none",
-                color: activeTab === "products" ? PRIMARY : "rgba(0,0,0,0.70)",
-              }}
+          <div className="flex items-center gap-3">
+            <span className="text-xs uppercase tracking-widest text-black/50">
+              Active Category
+            </span>
+            <span
+              className="text-xs uppercase tracking-widest px-3 py-2 rounded-full border bg-white"
+              style={{ borderColor: "rgba(0,0,0,0.15)" }}
             >
-              Products
-            </button>
-            <button
-              type="button"
-              onClick={() => setActiveTab("crm")}
-              className="px-4 py-2 rounded-full text-xs uppercase tracking-widest border transition-all bg-white"
-              style={{
-                borderColor: activeTab === "crm" ? PRIMARY : "rgba(0,0,0,0.15)",
-                boxShadow: activeTab === "crm" ? "0 0 0 2px rgba(18,62,56,0.10)" : "none",
-                color: activeTab === "crm" ? PRIMARY : "rgba(0,0,0,0.70)",
-              }}
-            >
-              CRM
-            </button>
+              {displayCategoryLabel(activeCat)}
+            </span>
           </div>
         </div>
 
-        {activeTab === "crm" ? (
-          <div className="mt-6 sm:mt-8">
-            <CrmPanel />
-          </div>
-        ) : (
-          <>
         {/* Mobile category tabs */}
         <div className="lg:hidden mt-5 -mx-4 sm:-mx-6 px-4 sm:px-6">
           <div className="flex gap-2 overflow-x-auto pb-2">
@@ -1327,8 +1300,6 @@ export default function OwnerDashboardClient() {
             </div>
           </section>
         </div>
-          </>
-        )}
       </div>
     </main>
   );
