@@ -404,3 +404,119 @@ html {
     display: none;
   }
 }
+
+/* ================= Life: tilt, light, depth ================= */
+.napd-tilt {
+  perspective: 900px;
+}
+.napd-tilt-inner {
+  transform: rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg)) translateZ(var(--tz, 0px));
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+/* a highlight that follows the pointer across the piece */
+.napd-shine {
+  background: radial-gradient(
+    circle at var(--mx, 50%) var(--my, 30%),
+    rgba(255, 255, 255, 0.75) 0%,
+    rgba(255, 248, 230, 0.25) 22%,
+    rgba(255, 255, 255, 0) 48%
+  );
+  mix-blend-mode: soft-light;
+  opacity: 0;
+  transition: opacity 400ms cubic-bezier(0.23, 1, 0.32, 1);
+}
+.napd-tilt[data-tilting] .napd-shine {
+  opacity: 1;
+}
+
+/* the hero piece breathes */
+@keyframes napd-float {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(-10px);
+  }
+}
+.napd-float {
+  animation: napd-float 4.8s ease-in-out 1.4s infinite alternate;
+}
+@keyframes napd-halo {
+  from {
+    opacity: 0.55;
+    transform: scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1.04);
+  }
+}
+.napd-halo {
+  background: radial-gradient(ellipse 50% 45% at 50% 45%, rgba(217, 198, 160, 0.28) 0%, rgba(217, 198, 160, 0) 70%);
+  animation: napd-halo 4.8s ease-in-out 1.4s infinite alternate;
+}
+@keyframes napd-frame-in {
+  from {
+    opacity: 0;
+    transform: scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.napd-frame-draw {
+  animation: napd-frame-in 900ms cubic-bezier(0.23, 1, 0.32, 1) 1000ms both;
+}
+
+/* scroll depth inside the hero (uses `translate`, so it stacks with the entrance) */
+.napd-depth-fast {
+  translate: 0 calc(var(--hp, 0) * -140px);
+}
+.napd-depth-slow {
+  translate: 0 calc(var(--hp, 0) * 70px);
+}
+
+/* warm light that follows the pointer over dark sections */
+.napd-spotlight {
+  opacity: 0;
+  background: radial-gradient(
+    600px circle at var(--sx, 50%) var(--sy, 30%),
+    rgba(217, 198, 160, 0.13),
+    rgba(217, 198, 160, 0) 60%
+  );
+}
+
+/* headings rise out of their own slot */
+.napd-mask-slot {
+  display: block;
+  overflow: hidden;
+  padding-bottom: 0.14em;
+  margin-bottom: -0.14em;
+}
+.napd-mask-line {
+  display: inline-block;
+  transition: transform 1100ms cubic-bezier(0.77, 0, 0.175, 1);
+}
+.napd-mask.is-armed .napd-mask-line {
+  transform: translateY(110%);
+}
+.napd-mask.is-armed.is-in .napd-mask-line {
+  transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .napd-float,
+  .napd-halo,
+  .napd-frame-draw {
+    animation: none;
+  }
+  .napd-depth-fast,
+  .napd-depth-slow {
+    translate: none;
+  }
+  .napd-tilt-inner {
+    transform: none;
+  }
+}

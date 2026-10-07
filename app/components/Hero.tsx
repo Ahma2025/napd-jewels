@@ -2,9 +2,10 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ArrowDown, MessageCircle } from "lucide-react";
 import GoldDust from "./GoldDust";
+import Tilt from "./Tilt";
 import { useCollection } from "@/lib/useCollection";
 import { displayTitle, formatPrice, priceInfo } from "@/lib/productDisplay";
 
@@ -27,11 +28,36 @@ export default function Hero() {
     return () => window.clearInterval(t);
   }, [pieces.length, paused]);
 
+  // scroll depth: the words drift up faster than the niche as you leave the hero
+  const heroRef = useRef<HTMLElement>(null);
+  useEffect(() => {
+    const el = heroRef.current;
+    if (!el) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    let raf = 0;
+    const update = () => {
+      raf = 0;
+      const r = el.getBoundingClientRect();
+      const p = Math.min(1, Math.max(0, -r.top / Math.max(1, r.height)));
+      el.style.setProperty("--hp", p.toFixed(4));
+    };
+    const onScroll = () => {
+      if (!raf) raf = requestAnimationFrame(update);
+    };
+    update();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      cancelAnimationFrame(raf);
+    };
+  }, []);
+
   const current = pieces[active];
   const price = current ? priceInfo(current) : null;
 
   return (
     <section
+      ref={heroRef}
       className="napd-hero relative isolate overflow-hidden text-[#FAF7F1]"
       aria-label="NAPD Jewels"
     >
@@ -42,21 +68,23 @@ export default function Hero() {
       <div className="mx-auto grid max-w-[1280px] items-center gap-y-10 px-5 pb-16 pt-12 md:px-8 lg:min-h-[calc(100svh-112px)] lg:grid-cols-[1fr_auto_1fr] lg:gap-x-12 lg:pb-20 lg:pt-14">
         {/* Line one, set against the top of the niche */}
         <h1 className="sr-only">A small ring, a big love.</h1>
-        <p aria-hidden="true" className="napd-display napd-rise text-center text-[clamp(3.1rem,8.4vw,7.4rem)] leading-[0.92] lg:self-start lg:pt-[8vh] lg:text-right">
+        <p aria-hidden="true" className="napd-display napd-rise napd-depth-fast text-center text-[clamp(3.1rem,8.4vw,7.4rem)] leading-[0.92] lg:self-start lg:pt-[8vh] lg:text-right">
           <span className="block">A small</span>
           <span className="block">ring,</span>
         </p>
 
         {/* The vitrine niche */}
         <div
-          className="relative mx-auto w-[min(76vw,360px)] lg:w-[clamp(300px,27vw,400px)]"
+          className="napd-depth-slow relative mx-auto w-[min(76vw,360px)] lg:w-[clamp(300px,27vw,400px)]"
           onMouseEnter={() => setPaused(true)}
           onMouseLeave={() => setPaused(false)}
         >
+          <div aria-hidden="true" className="napd-halo pointer-events-none absolute -inset-16 -z-10" />
           <div
             aria-hidden="true"
-            className="absolute -inset-3 rounded-t-[999px] rounded-b-[6px] border border-[#B08D57]/35"
+            className="napd-frame-draw absolute -inset-3 rounded-t-[999px] rounded-b-[6px] border border-[#B08D57]/35"
           />
+          <Tilt max={10} lift={18} className="napd-float">
           <Link
             href={current ? `/product/${current.id}` : "/moissanite"}
             className="napd-niche napd-arch-reveal relative block aspect-[3/4] overflow-hidden rounded-t-[999px] rounded-b-[4px] bg-white"
@@ -86,7 +114,9 @@ export default function Hero() {
               aria-hidden="true"
               className="napd-niche-sweep pointer-events-none absolute inset-0"
             />
+            <span aria-hidden="true" className="napd-shine pointer-events-none absolute inset-0" />
           </Link>
+          </Tilt>
 
           {/* plinth caption */}
           <div className="mt-6 text-center" aria-live="polite">
@@ -127,7 +157,7 @@ export default function Hero() {
         {/* Line two + the offer */}
         <div className="text-center lg:self-end lg:pb-[10vh] lg:text-left">
           <p
-            className="napd-display napd-rise text-[clamp(3.1rem,8.4vw,7.4rem)] leading-[0.92]"
+            className="napd-display napd-rise napd-depth-fast text-[clamp(3.1rem,8.4vw,7.4rem)] leading-[0.92]"
             style={{ animationDelay: "120ms" }}
             aria-hidden="true"
           >

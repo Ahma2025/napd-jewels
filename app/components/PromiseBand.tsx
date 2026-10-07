@@ -1,5 +1,7 @@
 import { Gem, MessageCircle, ShieldCheck } from "lucide-react";
 import Reveal from "./Reveal";
+import Spotlight from "./Spotlight";
+import MaskHeading from "./MaskHeading";
 
 const WHATSAPP_URL = "https://wa.me/972593255260";
 
@@ -24,7 +26,8 @@ const PROMISES = [
 export default function PromiseBand() {
   return (
     <section className="relative overflow-hidden bg-[#182B2A] py-20 text-[#FAF7F1] md:py-24">
-      <div className="mx-auto max-w-[1100px] px-5 md:px-8">
+      <Spotlight />
+      <div className="relative mx-auto max-w-[1100px] px-5 md:px-8">
         <div className="grid gap-12 md:grid-cols-3 md:gap-10">
           {PROMISES.map(({ icon: Icon, title, body }, i) => (
             <Reveal key={title} delay={i * 90} className="text-center md:text-left">
@@ -38,9 +41,9 @@ export default function PromiseBand() {
         </div>
 
         <Reveal className="mt-16 flex flex-col items-center gap-6 border-t border-[#FAF7F1]/10 pt-14 text-center">
-          <p className="napd-display text-[clamp(2rem,4.5vw,3.25rem)] leading-tight">
+          <MaskHeading className="napd-display text-[clamp(2rem,4.5vw,3.25rem)] leading-tight">
             Looking for <span className="italic text-[#D9C6A0]">the one?</span>
-          </p>
+          </MaskHeading>
           <a
             href={WHATSAPP_URL}
             target="_blank"
