@@ -1,32 +1,36 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import Reveal from "./Reveal";
 import Tilt from "./Tilt";
 import MaskHeading from "./MaskHeading";
+import { useLang } from "../context/LangContext";
+import type { DictKey } from "@/lib/i18n";
 
 const CATEGORIES = [
   {
     href: "/rings",
-    label: "Rings",
+    label: "cat.RINGS" as DictKey,
     image:
       "https://otkgofsblfouiauwqlbj.supabase.co/storage/v1/object/public/product-images/products/RINGS/7d34e3af3c1c0819cabf6c5c2.jpg",
   },
   {
     href: "/chains",
-    label: "Necklaces",
+    label: "cat.CHAINS" as DictKey,
     image:
       "https://otkgofsblfouiauwqlbj.supabase.co/storage/v1/object/public/product-images/products/CHAINS/cb3e2e616f796819cd52db4f5.jpg",
   },
   {
     href: "/bracelets",
-    label: "Bracelets",
+    label: "cat.BRACELETS" as DictKey,
     image:
       "https://otkgofsblfouiauwqlbj.supabase.co/storage/v1/object/public/product-images/products/BRACELETS/8fc61f4873d52819cd5282393.jpg",
   },
   {
     href: "/moissanite",
-    label: "Moissanite",
+    label: "cat.MOISSANITE" as DictKey,
     image:
       "https://otkgofsblfouiauwqlbj.supabase.co/storage/v1/object/public/product-images/products/MOISSANITE/882145ed4040e19ccb273db4.jpg",
   },
@@ -39,9 +43,10 @@ function CategoryNiche({
   image,
 }: {
   href: string;
-  label: string;
+  label: DictKey;
   image: string;
 }) {
+  const { t } = useLang();
   return (
     <Link href={href} className="napd-cat group block text-center">
       <Tilt max={8} lift={10} className="relative mx-auto w-full">
@@ -67,14 +72,14 @@ function CategoryNiche({
       </Tilt>
 
       <h3 className="napd-display mt-7 text-[1.6rem] leading-none text-[#182B2A] md:text-[1.85rem]">
-        {label}
+        {t(label)}
       </h3>
       <span className="mt-2.5 inline-flex items-center gap-1.5 text-[11px] uppercase tracking-[0.22em] text-[#86663A]">
-        Explore
+        {t("col.explore")}
         <ArrowRight
           aria-hidden="true"
           strokeWidth={1.5}
-          className="h-3.5 w-3.5 transition-transform duration-300 ease-out group-hover:translate-x-1"
+          className="napd-flip h-3.5 w-3.5 transition-transform duration-300 ease-out group-hover:translate-x-1"
         />
       </span>
     </Link>
@@ -82,6 +87,7 @@ function CategoryNiche({
 }
 
 export default function HomeBanners() {
+  const { t } = useLang();
   return (
     <section
       id="collection"
@@ -101,7 +107,8 @@ export default function HomeBanners() {
       <div className="relative mx-auto max-w-[1120px] px-5 md:px-8">
         <div className="mb-14 text-center md:mb-16">
           <MaskHeading className="napd-display text-[clamp(2.6rem,5.5vw,4.25rem)] leading-[0.95] text-[#182B2A]">
-            Shop by <span className="napd-script napd-foil napd-foil-deep napd-flourish">collection</span>
+            {t("col.before")}{" "}
+            <span className="napd-script napd-foil napd-foil-deep napd-flourish">{t("col.flourish")}</span>
           </MaskHeading>
         </div>
 

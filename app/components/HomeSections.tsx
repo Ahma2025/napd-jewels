@@ -6,6 +6,8 @@ import { supabase } from "@/lib/supabase";
 import { useIsOwner } from "@/lib/useIsOwner";
 import { homepageOrder, inStock, type ListingProduct } from "@/lib/productDisplay";
 import ProductCard, { ProductCardSkeleton } from "./ProductCard";
+import { useLang } from "../context/LangContext";
+import type { DictKey } from "@/lib/i18n";
 
 type DbCategory = {
   id: string;
@@ -46,6 +48,12 @@ export default function HomeSections() {
   const [products, setProducts] = useState<ListingProduct[]>([]);
   const [loading, setLoading] = useState(true);
   const { isOwner } = useIsOwner();
+  const { t } = useLang();
+  const sectionTitle = (name: string, fallback: string) => {
+    const key = `cat.${(name || "").trim().toUpperCase()}` as DictKey;
+    const v = t(key);
+    return v && v !== key ? v : fallback;
+  };
 
   const sections = useMemo(() => {
     const visible = isOwner ? products : products.filter(inStock);
@@ -82,7 +90,7 @@ export default function HomeSections() {
           supabase
             .from("products")
             .select(
-              "id,title,price,final_price,has_discount,discount_percentage,image_url,category_id,created_at,is_active,quantity,is_featured,featured_at"
+              "id,title,title_ar,price,final_price,has_discount,discount_percentage,image_url,category_id,created_at,is_active,quantity,is_featured,featured_at"
             )
             .eq("is_active", true)
             .order("created_at", { ascending: false }),
@@ -180,14 +188,14 @@ export default function HomeSections() {
                     href={`/${category.slug}`}
                     className="napd-display napd-heading-link text-3xl md:text-[2.5rem] italic text-[#182B2A]"
                   >
-                    {meta.title}
+                    {sectionTitle(category.name, meta.title)}
                   </Link>
 
                   <Link
                     href={`/${category.slug}`}
                     className="napd-link shrink-0 text-[11px] uppercase tracking-[0.2em] text-[#86663A]"
                   >
-                    View All
+                    {t("sections.viewAll")}
                   </Link>
                 </div>
 

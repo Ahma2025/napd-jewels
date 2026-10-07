@@ -14,6 +14,7 @@ export type ListingProduct = {
   is_active?: boolean | null;
   is_featured?: boolean | null;
   featured_at?: string | null;
+  title_ar?: string | null;
 };
 
 /** Owner-picked pieces first (in the order they were picked), then newest. */
@@ -81,4 +82,35 @@ export function displayTitle(raw: string | null | undefined) {
   // All-caps titles read as shouting in a listing; soften them.
   if (t === t.toUpperCase() && /[A-Z]/.test(t)) return titleCase(t);
   return t;
+}
+
+// Arabic fallbacks for pieces that only have a category as their name.
+const GENERIC_TITLES_AR: Record<string, string> = {
+  RINGS: "خاتم فضة",
+  RING: "خاتم فضة",
+  NECKLACES: "قلادة فضة",
+  NECLACES: "قلادة فضة",
+  NECKLACE: "قلادة فضة",
+  CHAINS: "قلادة فضة",
+  BRACELETS: "سوار فضة",
+  BRACELETES: "سوار فضة",
+  BRACELET: "سوار فضة",
+  EARRINGS: "أقراط فضة",
+  MOISSANITE: "خاتم مويسانيت",
+  "MOISSANITE RING": "خاتم مويسانيت",
+  "MIOSSANITE RING": "خاتم مويسانيت",
+};
+
+/** The product's name in the visitor's language. */
+export function productName(
+  p: { title: string | null | undefined; title_ar?: string | null },
+  lang: "en" | "ar" = "en"
+) {
+  if (lang === "ar") {
+    const ar = (p.title_ar || "").trim();
+    if (ar) return ar;
+    const key = (p.title || "").trim().toUpperCase().replace(/\s+/g, " ");
+    if (GENERIC_TITLES_AR[key]) return GENERIC_TITLES_AR[key];
+  }
+  return displayTitle(p.title);
 }
