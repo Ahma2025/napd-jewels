@@ -359,3 +359,48 @@ html {
     transition: none;
   }
 }
+
+/* ---- Collection niches ---- */
+.napd-cat-niche {
+  box-shadow:
+    0 30px 60px -32px rgba(24, 43, 42, 0.45),
+    0 0 0 1px rgba(176, 141, 87, 0.18);
+  transition: box-shadow 500ms cubic-bezier(0.23, 1, 0.32, 1);
+}
+.napd-cat-frame {
+  transition: border-color 500ms cubic-bezier(0.23, 1, 0.32, 1), inset 500ms cubic-bezier(0.23, 1, 0.32, 1);
+}
+.napd-cat-sweep {
+  background: linear-gradient(100deg, transparent 30%, rgba(255, 255, 255, 0.6) 50%, transparent 70%);
+  transform: translateX(-120%) skewX(-12deg);
+  mix-blend-mode: soft-light;
+}
+@media (hover: hover) {
+  .napd-cat:hover .napd-cat-niche {
+    box-shadow:
+      0 40px 70px -30px rgba(24, 43, 42, 0.55),
+      0 0 0 1px rgba(176, 141, 87, 0.45),
+      0 0 60px -18px rgba(217, 198, 160, 0.7);
+  }
+  .napd-cat:hover .napd-cat-frame {
+    border-color: rgba(176, 141, 87, 0.7);
+  }
+  .napd-cat:hover .napd-card-img {
+    transform: scale(1.05);
+  }
+  .napd-cat:hover .napd-cat-sweep {
+    animation: napd-niche-sweep 1100ms cubic-bezier(0.23, 1, 0.32, 1) both;
+  }
+}
+.napd-cat:focus-visible {
+  outline: none;
+}
+.napd-cat:focus-visible .napd-cat-frame {
+  border-color: var(--napd-gold);
+  border-width: 2px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .napd-cat-sweep {
+    display: none;
+  }
+}
