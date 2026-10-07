@@ -95,7 +95,7 @@ function CategoryTile({
 
 export default function HomeBanners() {
   return (
-    <section className="w-full py-16" style={{ backgroundColor: "#FAF7F1" }}>
+    <section id="collection" className="w-full scroll-mt-24 py-20 md:py-24" style={{ backgroundColor: "#FAF7F1" }}>
       <style
         dangerouslySetInnerHTML={{
           __html: `
