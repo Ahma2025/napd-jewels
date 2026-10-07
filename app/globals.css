@@ -14,11 +14,10 @@
   --napd-gold-light: #d9c6a0;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* The storefront is designed light-only. A dark-mode override here used to
+   turn body text near-white on the white page for phones in dark mode. */
+:root {
+  color-scheme: light;
 }
 
 body {
@@ -30,8 +29,120 @@ body {
 
 h1,
 h2,
-h3 {
-  font-family: Georgia, "Times New Roman", serif;
+h3,
+.napd-display {
+  font-family: var(--font-cormorant), Georgia, "Times New Roman", serif;
+  font-weight: 500;
+  letter-spacing: -0.005em;
+  text-wrap: balance;
+}
+
+.napd-display {
+  line-height: 1.05;
+}
+
+/* ---- Browser surfaces in brand colors ---- */
+::selection {
+  background: rgba(176, 141, 87, 0.28);
+  color: #182b2a;
+}
+
+:focus-visible {
+  outline: 2px solid var(--napd-gold);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+/* ---- Links ---- */
+.napd-link {
+  position: relative;
+  transition: color 200ms ease-out;
+}
+.napd-link::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -3px;
+  height: 1px;
+  background: currentColor;
+  transform: scaleX(0);
+  transform-origin: right;
+  transition: transform 300ms cubic-bezier(0.23, 1, 0.32, 1);
+}
+@media (hover: hover) {
+  .napd-link:hover::after {
+    transform: scaleX(1);
+    transform-origin: left;
+  }
+  .napd-heading-link {
+    transition: opacity 200ms ease-out;
+  }
+  .napd-heading-link:hover {
+    opacity: 0.75;
+  }
+}
+
+/* ---- Product cards ---- */
+.napd-card-media {
+  transition: border-color 300ms ease-out;
+}
+.napd-card-img {
+  transition: transform 600ms cubic-bezier(0.23, 1, 0.32, 1);
+}
+@media (hover: hover) {
+  .napd-card:hover .napd-card-media {
+    border-color: rgba(176, 141, 87, 0.45);
+  }
+  .napd-card:hover .napd-card-img {
+    transform: scale(1.04);
+  }
+}
+.napd-card:focus-visible .napd-card-media {
+  outline: 2px solid var(--napd-gold);
+  outline-offset: 3px;
+}
+
+.napd-btn {
+  transition: transform 160ms ease-out, background-color 200ms ease-out;
+}
+.napd-btn:active {
+  transform: scale(0.97);
+}
+@media (hover: hover) {
+  .napd-btn:hover {
+    background-color: #0e1b1a;
+  }
+}
+
+/* ---- Loading skeleton ---- */
+@keyframes napd-shimmer {
+  from {
+    background-position: 150% 0;
+  }
+  to {
+    background-position: -50% 0;
+  }
+}
+.napd-skeleton {
+  background: linear-gradient(
+    100deg,
+    #f4efe5 30%,
+    #faf7f1 50%,
+    #f4efe5 70%
+  );
+  background-size: 200% 100%;
+  animation: napd-shimmer 1.6s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .napd-skeleton {
+    animation: none;
+  }
+  .napd-card-img,
+  .napd-link::after {
+    transition: none;
+  }
 }
 
 .homeBanners {
