@@ -520,3 +520,155 @@ html {
     transform: none;
   }
 }
+
+/* ================= Hero typography ================= */
+.napd-hero-serif {
+  font-family: var(--font-bodoni), var(--font-cormorant), Georgia, serif;
+  font-weight: 400;
+  font-variation-settings: "opsz" 96;
+  letter-spacing: -0.025em;
+}
+.napd-script {
+  font-family: var(--font-script), var(--font-cormorant), cursive;
+  font-weight: 400;
+  letter-spacing: 0;
+}
+/* gold-leaf flourish: the foil catches the light slowly */
+@keyframes napd-foil {
+  from {
+    background-position: 100% 50%;
+  }
+  to {
+    background-position: 0% 50%;
+  }
+}
+.napd-foil {
+  background: linear-gradient(
+    100deg,
+    #9a7743 0%,
+    #e9d5a6 18%,
+    #b08d57 34%,
+    #fbf2da 48%,
+    #b08d57 62%,
+    #8a6a3a 80%,
+    #d9c6a0 100%
+  );
+  background-size: 260% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  padding: 0.08em 0.12em 0.22em 0.12em;
+  margin: -0.08em -0.12em -0.22em -0.12em;
+  animation: napd-foil 7s ease-in-out 2.6s infinite alternate;
+}
+/* the script word is written in, left to right */
+@keyframes napd-write {
+  from {
+    clip-path: inset(-30% 100% -30% -10%);
+  }
+  to {
+    clip-path: inset(-30% -10% -30% -10%);
+  }
+}
+.napd-write {
+  animation: napd-write 1600ms cubic-bezier(0.65, 0, 0.35, 1) 1050ms both,
+    napd-foil 7s ease-in-out 2.6s infinite alternate;
+}
+
+/* letters arrive one after another */
+@keyframes napd-char-in {
+  from {
+    opacity: 0;
+    transform: translateY(0.42em) rotate(5deg);
+    filter: blur(10px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+    filter: none;
+  }
+}
+.napd-char {
+  display: inline-block;
+  animation: napd-char-in 1000ms cubic-bezier(0.23, 1, 0.32, 1) both;
+}
+
+/* the NAPD monogram, faint as a watermark on the velvet */
+.napd-hero-mark {
+  background: url("/napd-mark.png") no-repeat center / contain;
+  width: min(54vw, 760px);
+  aspect-ratio: 1136 / 992;
+  left: -5vw;
+  bottom: -9vw;
+  opacity: 0.06;
+}
+@media (max-width: 1023px) {
+  .napd-hero-mark {
+    width: 125vw;
+    left: -12vw;
+    bottom: auto;
+    top: 30%;
+    opacity: 0.05;
+  }
+}
+
+.napd-hero-side {
+  transform: translateY(-50%) rotate(-90deg) translateX(-50%);
+  transform-origin: left top;
+}
+.napd-hero-side::before {
+  content: "";
+  display: inline-block;
+  width: 40px;
+  height: 1px;
+  margin-right: 14px;
+  vertical-align: middle;
+  background: rgba(176, 141, 87, 0.6);
+}
+
+@keyframes napd-caption-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.napd-caption-in {
+  animation: napd-caption-in 700ms cubic-bezier(0.23, 1, 0.32, 1) both;
+}
+
+@keyframes napd-drip {
+  0% {
+    transform: scaleY(0);
+    transform-origin: top;
+  }
+  45% {
+    transform: scaleY(1);
+    transform-origin: top;
+  }
+  55% {
+    transform: scaleY(1);
+    transform-origin: bottom;
+  }
+  100% {
+    transform: scaleY(0);
+    transform-origin: bottom;
+  }
+}
+.napd-scroll-line {
+  background: linear-gradient(rgba(217, 198, 160, 0.8), rgba(217, 198, 160, 0));
+  animation: napd-drip 2.4s cubic-bezier(0.65, 0, 0.35, 1) infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .napd-char,
+  .napd-write,
+  .napd-foil,
+  .napd-caption-in,
+  .napd-scroll-line {
+    animation: none;
+  }
+}
