@@ -65,11 +65,14 @@ export default function CategoryPage({ dbName, title }: Props) {
     <section className="max-w-[1200px] mx-auto px-5 md:px-6 pt-12 pb-20">
       <div className="flex items-end justify-between gap-4 border-b border-[#182B2A]/10 pb-5 mb-10">
         <div>
-          <h1 className="napd-display text-4xl md:text-5xl text-[#182B2A]">
+          <h1 className="napd-display text-[clamp(2.8rem,6vw,4.75rem)] leading-[0.95] text-[#182B2A]">
             {title}
           </h1>
+          <div aria-hidden="true" className="napd-divider mt-4">
+            <i />
+          </div>
           {!loading && products.length > 0 && (
-            <p className="mt-2 text-[13px] text-[#5E6B69] tabular-nums">
+            <p className="mt-3 text-[11px] uppercase tracking-[0.22em] text-[#5E6B69] tabular-nums">
               {products.length} {products.length === 1 ? "piece" : "pieces"}
             </p>
           )}

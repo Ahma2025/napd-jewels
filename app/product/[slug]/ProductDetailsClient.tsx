@@ -420,9 +420,12 @@ ${priceLine}
 
             {/* Right: Details */}
             <div className="lg:pt-4">
-              <h1 className="napd-display text-4xl md:text-5xl text-[#182B2A]">
+              <h1 className="napd-display text-[clamp(2.4rem,4.2vw,3.6rem)] leading-[1] text-[#182B2A]">
                 {title}
               </h1>
+              <div aria-hidden="true" className="napd-divider mt-5">
+                <i />
+              </div>
 
               <div className="mt-5 flex items-baseline gap-3 tabular-nums">
                 <p className="text-2xl font-semibold text-[#182B2A]">

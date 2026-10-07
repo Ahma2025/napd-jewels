@@ -31,9 +31,10 @@ h1,
 h2,
 h3,
 .napd-display {
-  font-family: var(--font-cormorant), Georgia, "Times New Roman", serif;
-  font-weight: 500;
-  letter-spacing: -0.005em;
+  font-family: var(--font-bodoni), var(--font-cormorant), Georgia, "Times New Roman", serif;
+  font-weight: 400;
+  font-optical-sizing: auto;
+  letter-spacing: -0.02em;
   text-wrap: balance;
 }
 
@@ -492,8 +493,8 @@ html {
 .napd-mask-slot {
   display: block;
   overflow: hidden;
-  padding-bottom: 0.14em;
-  margin-bottom: -0.14em;
+  padding: 0.18em 0.2em 0.26em;
+  margin: -0.18em -0.2em -0.26em;
 }
 .napd-mask-line {
   display: inline-block;
@@ -671,4 +672,43 @@ html {
   .napd-scroll-line {
     animation: none;
   }
+}
+
+/* gold leaf on a light ground: deeper so it holds contrast on ivory */
+.napd-foil-deep {
+  background-image: linear-gradient(
+    100deg,
+    #6f5330 0%,
+    #b08d57 22%,
+    #86663a 40%,
+    #c9a96e 52%,
+    #86663a 66%,
+    #5e4526 84%,
+    #9a7743 100%
+  );
+}
+.napd-flourish {
+  display: inline-block;
+  font-size: 1.45em;
+  line-height: 0.8;
+  vertical-align: -0.08em;
+}
+/* the same gold divider used under the hero headline */
+.napd-divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.napd-divider::before,
+.napd-divider::after {
+  content: "";
+  height: 1px;
+  width: 48px;
+  background: rgba(176, 141, 87, 0.6);
+}
+.napd-divider > i {
+  width: 6px;
+  height: 6px;
+  transform: rotate(45deg);
+  background: #b08d57;
 }
