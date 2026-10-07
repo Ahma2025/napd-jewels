@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import { ArrowRight, ArrowUpRight } from "lucide-react";
 
 const CATEGORIES = [
   {
@@ -21,12 +22,6 @@ const CATEGORIES = [
       "https://otkgofsblfouiauwqlbj.supabase.co/storage/v1/object/public/product-images/products/BRACELETS/8fc61f4873d52819cd5282393.jpg",
   },
   {
-    href: "/sets",
-    label: "Sets",
-    image:
-      "https://otkgofsblfouiauwqlbj.supabase.co/storage/v1/object/public/product-images/products/SETS/c430bd6594d72819cac3cdf2d.jpg",
-  },
-  {
     href: "/moissanite",
     label: "The Moissanite Edit",
     image:
@@ -38,23 +33,20 @@ function CategoryTile({
   href,
   label,
   image,
-  delay,
 }: {
   href: string;
   label: string;
   image: string;
-  delay: string;
 }) {
   return (
     <Link
       href={href}
-      className="napd-tile-glow group relative block overflow-hidden rounded-xl aspect-[4/3] w-full sm:w-[calc(50%-13px)] lg:w-[calc(33.333%-17px)] ring-1 ring-[#B08D57]/25 hover:ring-[#B08D57]/60 shadow-[0_8px_24px_rgba(24,43,42,0.18)] transition-all duration-500"
+      className="napd-tile group relative block overflow-hidden rounded-xl aspect-[4/3] w-full sm:w-[calc(50%-12px)] ring-1 ring-[#B08D57]/25 hover:ring-[#B08D57]/60 shadow-[0_8px_24px_rgba(24,43,42,0.18)] transition-all duration-500"
       style={{
         background: "linear-gradient(160deg, #182B2A 0%, #0E1B1A 100%)",
-        animationDelay: delay,
       }}
     >
-      <div className="absolute inset-0 p-8 md:p-10 napd-tile-breathe" style={{ animationDelay: delay }}>
+      <div className="absolute inset-0 p-8 md:p-10">
         <Image
           src={image}
           alt={label}
@@ -65,10 +57,7 @@ function CategoryTile({
       </div>
 
       {/* diagonal light sweep */}
-      <span
-        className="napd-tile-sweep pointer-events-none absolute inset-0"
-        style={{ animationDelay: delay }}
-      />
+      <span className="napd-tile-sweep pointer-events-none absolute inset-0" />
 
       {/* gradient scrim so the label stays legible over any product photo */}
       <div
@@ -89,16 +78,16 @@ function CategoryTile({
           style={{ color: "#D9C6A0" }}
         >
           Shop Now
-          <span className="transition-transform duration-300 group-hover:translate-x-1">
-            &rarr;
-          </span>
+          <ArrowRight
+            aria-hidden="true"
+            strokeWidth={1.5}
+            className="h-3.5 w-3.5 transition-transform duration-300 ease-out group-hover:translate-x-1"
+          />
         </span>
       </div>
 
-      <div className="napd-tile-badge absolute right-4 bottom-4 w-9 h-9 rounded-full bg-white/90 flex items-center justify-center transition-transform duration-300 group-hover:scale-110" style={{ animationDelay: delay }}>
-        <span style={{ color: "#182B2A" }} className="text-sm leading-none">
-          &#8599;
-        </span>
+      <div className="absolute right-4 bottom-4 w-9 h-9 rounded-full bg-white/90 flex items-center justify-center transition-transform duration-300 ease-out group-hover:scale-110">
+        <ArrowUpRight aria-hidden="true" strokeWidth={1.5} className="h-4 w-4 text-[#182B2A]" />
       </div>
     </Link>
   );
@@ -110,62 +99,39 @@ export default function HomeBanners() {
       <style
         dangerouslySetInnerHTML={{
           __html: `
-        @keyframes napdTileBreathe {
-          0%, 100% { transform: scale(1); }
-          50% { transform: scale(1.045); }
-        }
-        @keyframes napdTileGlow {
-          0%, 100% { box-shadow: 0 8px 24px rgba(24,43,42,0.18), 0 0 0 rgba(176,141,87,0); }
-          50% { box-shadow: 0 8px 24px rgba(24,43,42,0.18), 0 0 22px rgba(176,141,87,0.35); }
-        }
         @keyframes napdTileSweep {
-          0% { transform: translateX(-120%) translateY(-120%) rotate(20deg); opacity: 0; }
-          8% { opacity: 0.35; }
-          22% { opacity: 0; }
-          100% { transform: translateX(120%) translateY(120%) rotate(20deg); opacity: 0; }
-        }
-        @keyframes napdBadgePulse {
-          0%, 100% { box-shadow: 0 0 0 0 rgba(176,141,87,0.45); }
-          50% { box-shadow: 0 0 0 6px rgba(176,141,87,0); }
-        }
-        .napd-tile-breathe {
-          animation: napdTileBreathe 9s ease-in-out infinite;
-        }
-        .napd-tile-glow {
-          animation: napdTileGlow 6s ease-in-out infinite;
+          from { transform: translateX(-110%); }
+          to { transform: translateX(110%); }
         }
         .napd-tile-sweep {
-          background: linear-gradient(115deg, transparent 40%, rgba(250,247,241,0.16) 50%, transparent 60%);
-          animation: napdTileSweep 7s ease-in-out infinite;
+          background: linear-gradient(115deg, transparent 35%, rgba(250,247,241,0.14) 50%, transparent 65%);
+          transform: translateX(-110%);
         }
-        .napd-tile-badge {
-          animation: napdBadgePulse 3.5s ease-in-out infinite;
+        @media (hover: hover) {
+          a:hover > .napd-tile-sweep {
+            animation: napdTileSweep 900ms cubic-bezier(0.23, 1, 0.32, 1) both;
+          }
+        }
+        a:focus-visible > .napd-tile-sweep {
+          animation: napdTileSweep 900ms cubic-bezier(0.23, 1, 0.32, 1) both;
         }
         @media (prefers-reduced-motion: reduce) {
-          .napd-tile-breathe,
-          .napd-tile-glow,
-          .napd-tile-sweep,
-          .napd-tile-badge {
-            animation: none;
-          }
+          .napd-tile-sweep { display: none; }
         }
       `,
         }}
       />
 
-      <div className="max-w-[1100px] mx-auto px-5">
+      <div className="max-w-[920px] mx-auto px-5">
         <div className="text-center mb-10">
-          <span className="text-[11px] uppercase tracking-[0.3em]" style={{ color: "#B08D57" }}>
-            The Edit
-          </span>
-          <h2 className="mt-3 text-3xl md:text-4xl italic" style={{ color: "#182B2A" }}>
+          <h2 className="napd-display text-4xl md:text-5xl italic" style={{ color: "#182B2A" }}>
             Shop by Category
           </h2>
         </div>
 
         <div className="flex flex-wrap justify-center gap-6">
-          {CATEGORIES.map((cat, i) => (
-            <CategoryTile key={cat.label} {...cat} delay={`${i * 0.6}s`} />
+          {CATEGORIES.map((cat) => (
+            <CategoryTile key={cat.label} {...cat} />
           ))}
         </div>
       </div>

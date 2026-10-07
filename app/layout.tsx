@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { DM_Sans } from "next/font/google";
+import localFont from "next/font/local";
 import "./globals.css";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
@@ -9,6 +10,16 @@ const dmSans = DM_Sans({
   variable: "--font-dm-sans",
   subsets: ["latin"],
   weight: ["300", "400", "500", "600", "700"],
+});
+
+// Self-hosted display serif for headings (SIL Open Font License).
+const cormorant = localFont({
+  variable: "--font-cormorant",
+  display: "swap",
+  src: [
+    { path: "./fonts/CormorantGaramond-Variable.ttf", weight: "300 700", style: "normal" },
+    { path: "./fonts/CormorantGaramond-Italic-Variable.ttf", weight: "300 700", style: "italic" },
+  ],
 });
 
 export const metadata: Metadata = {
@@ -24,7 +35,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${dmSans.variable} antialiased bg-white min-h-screen flex flex-col`}
+        className={`${dmSans.variable} ${cormorant.variable} antialiased bg-white min-h-screen flex flex-col`}
       >
         <CartProvider>
           <Header />
