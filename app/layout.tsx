@@ -22,6 +22,22 @@ const cormorant = localFont({
   ],
 });
 
+// Fashion-house display serif and a script for single flourish words.
+const bodoni = localFont({
+  variable: "--font-bodoni",
+  display: "swap",
+  src: [
+    { path: "./fonts/BodoniModa.woff", weight: "400 900", style: "normal" },
+    { path: "./fonts/BodoniModa-Italic.woff", weight: "400 900", style: "italic" },
+  ],
+});
+
+const pinyon = localFont({
+  variable: "--font-script",
+  display: "swap",
+  src: [{ path: "./fonts/PinyonScript-Regular.woff", weight: "400", style: "normal" }],
+});
+
 export const metadata: Metadata = {
   title: "NAPD Jewels",
   description: "Luxury Silver Jewelry Store",
@@ -35,7 +51,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${dmSans.variable} ${cormorant.variable} antialiased bg-white min-h-screen flex flex-col`}
+        className={`${dmSans.variable} ${cormorant.variable} ${bodoni.variable} ${pinyon.variable} antialiased bg-white min-h-screen flex flex-col`}
       >
         <CartProvider>
           <Header />
