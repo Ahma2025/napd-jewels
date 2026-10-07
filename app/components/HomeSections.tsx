@@ -25,9 +25,9 @@ const SECTION_META: Record<string, { title: string; order: number }> = {
   EARRINGS: { title: "Earrings", order: 5 },
 };
 
-// Moissanite has its own page and is shown on the homepage even though its
-// category is not part of the main navigation.
-const ALWAYS_SHOW = ["MOISSANITE"];
+// Moissanite has its own showcase right under the hero, so it is not
+// repeated here.
+const ALWAYS_SHOW: string[] = [];
 
 const ITEMS_PER_SECTION = 8;
 
