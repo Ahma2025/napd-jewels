@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { supabase } from "./supabase";
-import { inStock, type ListingProduct } from "./productDisplay";
+import { homepageOrder, inStock, type ListingProduct } from "./productDisplay";
 
 const cache = new Map<string, Promise<ListingProduct[]>>();
 
@@ -21,7 +21,7 @@ function fetchCollection(categoryName: string) {
         const { data, error } = await supabase
           .from("products")
           .select(
-            "id,title,price,final_price,has_discount,discount_percentage,image_url,created_at,quantity"
+            "id,title,price,final_price,has_discount,discount_percentage,image_url,created_at,quantity,is_featured,featured_at"
           )
           .eq("category_id", cat.id)
           .eq("is_active", true)
@@ -30,7 +30,7 @@ function fetchCollection(categoryName: string) {
           console.error(`Failed to load ${key}:`, error.message);
           return [];
         }
-        return ((data as ListingProduct[]) || []).filter(inStock);
+        return ((data as ListingProduct[]) || []).filter(inStock).sort(homepageOrder);
       })()
     );
   }

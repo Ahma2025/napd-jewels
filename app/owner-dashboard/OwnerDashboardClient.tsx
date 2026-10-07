@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { supabase } from "@/lib/supabase";
+import { Star } from "lucide-react";
 
 type Category =
   | "CHAINS"
@@ -23,6 +24,8 @@ type Product = {
   quantity: number;
   isActive: boolean;
   createdAt: number; // for ordering (newest)
+  featured: boolean; // shown first in its homepage section
+  featuredAt: number | null;
 };
 
 type DbCategory = {
@@ -48,6 +51,8 @@ type DbProductView = {
   category_id: string;
   is_active: boolean | null;
   created_at: string;
+  is_featured: boolean | null;
+  featured_at: string | null;
 };
 
 type DbProductImage = {
@@ -202,7 +207,12 @@ export default function OwnerDashboardClient() {
   const catProducts = useMemo(() => {
     return products
       .filter((p) => p.category === activeCat)
-      .sort((a, b) => b.createdAt - a.createdAt);
+      .sort((a, b) => {
+        // homepage picks first, in the order they were picked
+        if (a.featured !== b.featured) return a.featured ? -1 : 1;
+        if (a.featured && b.featured) return (a.featuredAt ?? 0) - (b.featuredAt ?? 0);
+        return b.createdAt - a.createdAt;
+      });
   }, [products, activeCat]);
 
   const finalPricePreview = useMemo(() => {
@@ -246,7 +256,7 @@ export default function OwnerDashboardClient() {
       const { data, error } = await supabase
         .from("products_with_main_image")
         .select(
-          "id,title,price,quantity,has_discount,discount_percentage,final_price,image_url,main_image_url,category_id,is_active,created_at"
+          "id,title,price,quantity,has_discount,discount_percentage,final_price,image_url,main_image_url,category_id,is_active,created_at,is_featured,featured_at"
         )
         .order("created_at", { ascending: false });
 
@@ -285,6 +295,8 @@ export default function OwnerDashboardClient() {
             quantity: Number(r.quantity || 0),
             isActive: r.is_active !== false,
             createdAt: new Date(r.created_at).getTime(),
+            featured: !!r.is_featured,
+            featuredAt: r.featured_at ? new Date(r.featured_at).getTime() : null,
           } as Product;
         })
         .filter(Boolean) as Product[];
@@ -517,7 +529,7 @@ export default function OwnerDashboardClient() {
     const { data, error } = await supabase
       .from("products_with_main_image")
       .select(
-        "id,title,price,quantity,has_discount,discount_percentage,final_price,image_url,main_image_url,category_id,is_active,created_at"
+        "id,title,price,quantity,has_discount,discount_percentage,final_price,image_url,main_image_url,category_id,is_active,created_at,is_featured,featured_at"
       )
       .order("created_at", { ascending: false });
 
@@ -556,6 +568,8 @@ export default function OwnerDashboardClient() {
           quantity: Number(r.quantity || 0),
           isActive: r.is_active !== false,
           createdAt: new Date(r.created_at).getTime(),
+          featured: !!r.is_featured,
+          featuredAt: r.featured_at ? new Date(r.featured_at).getTime() : null,
         } as Product;
       })
       .filter(Boolean) as Product[];
@@ -666,6 +680,30 @@ export default function OwnerDashboardClient() {
     await reloadProducts();
   }
 
+  async function toggleFeatured(id: string) {
+    const current = products.find((p) => p.id === id);
+    if (!current) return;
+    const next = !current.featured;
+    const now = Date.now();
+
+    // show the change immediately, then save
+    setProducts((prev) =>
+      prev.map((p) =>
+        p.id === id ? { ...p, featured: next, featuredAt: next ? now : null } : p
+      )
+    );
+
+    const { error } = await supabase
+      .from("products")
+      .update({ is_featured: next, featured_at: next ? new Date(now).toISOString() : null })
+      .eq("id", id);
+
+    if (error) {
+      alert(error.message || "Failed to update homepage pick");
+      await reloadProducts();
+    }
+  }
+
   async function loadImagesForEdit(productId: string) {
     const { data, error } = await supabase
       .from("product_images")
@@ -717,6 +755,32 @@ export default function OwnerDashboardClient() {
     setImagePreviews(hasAny ? imgs : [p.imageUrl || "", "", "", ""]);
 
     window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  function FeatureButton({ p, block = false }: { p: Product; block?: boolean }) {
+    return (
+      <button
+        type="button"
+        onClick={() => toggleFeatured(p.id)}
+        aria-pressed={p.featured}
+        title={p.featured ? "Remove from homepage" : "Show on homepage"}
+        className={`${block ? "flex-1 justify-center" : ""} inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-xs uppercase tracking-widest border transition-colors`}
+        style={{
+          borderColor: p.featured ? "#B08D57" : "rgba(0,0,0,0.15)",
+          background: p.featured ? "rgba(176,141,87,0.12)" : "transparent",
+          color: p.featured ? "#86663A" : undefined,
+        }}
+      >
+        <Star
+          aria-hidden="true"
+          strokeWidth={1.5}
+          className="h-3.5 w-3.5"
+          fill={p.featured ? "#B08D57" : "none"}
+          color={p.featured ? "#B08D57" : "currentColor"}
+        />
+        Home
+      </button>
+    );
   }
 
   function ProductCardsMobile({ items }: { items: Product[] }) {
@@ -776,6 +840,7 @@ export default function OwnerDashboardClient() {
               </div>
 
               <div className="border-t p-4 flex flex-wrap gap-2">
+                <FeatureButton p={p} block />
                 <button
                   type="button"
                   onClick={() => quickEditTitle(p.id)}
@@ -1172,8 +1237,16 @@ export default function OwnerDashboardClient() {
             <div className="border rounded-2xl overflow-hidden bg-white">
               <div className="px-4 sm:px-6 py-5 flex items-center justify-between gap-4 border-b">
                 <h2 className="text-lg tracking-widest font-medium">PRODUCTS</h2>
-                <div className="text-xs uppercase tracking-widest text-black/50">
-                  {catProducts.length} items
+                <div className="text-right">
+                  <div className="text-xs uppercase tracking-widest text-black/50">
+                    {catProducts.length} items
+                  </div>
+                  <div className="mt-1 text-[11px] text-black/45">
+                    <span className="text-[#86663A]">
+                      ★ {catProducts.filter((p) => p.featured).length} picked
+                    </span>{" "}
+                    · picked pieces show first on the homepage (4 on desktop)
+                  </div>
                 </div>
               </div>
 
@@ -1222,6 +1295,9 @@ export default function OwnerDashboardClient() {
                                     <div className="text-sm font-medium">{p.title}</div>
                                     <div className="text-xs text-black/45 mt-1">
                                       {displayCategoryLabel(p.category)}
+                                      {p.featured && (
+                                        <span className="ml-2 text-[#86663A]">★ On homepage</span>
+                                      )}
                                     </div>
                                   </div>
                                 </div>
@@ -1261,6 +1337,7 @@ export default function OwnerDashboardClient() {
 
                               <td className="px-6 py-4">
                                 <div className="flex justify-end gap-2">
+                                  <FeatureButton p={p} />
                                   <button
                                     type="button"
                                     onClick={() => quickEditTitle(p.id)}

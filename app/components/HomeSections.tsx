@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { useIsOwner } from "@/lib/useIsOwner";
-import { inStock, type ListingProduct } from "@/lib/productDisplay";
+import { homepageOrder, inStock, type ListingProduct } from "@/lib/productDisplay";
 import ProductCard, { ProductCardSkeleton } from "./ProductCard";
 
 type DbCategory = {
@@ -61,11 +61,7 @@ export default function HomeSections() {
         meta: sectionMeta(c.name),
         items: (byCat[c.id] || [])
           .slice()
-          .sort(
-            (a, b) =>
-              new Date(b.created_at).getTime() -
-              new Date(a.created_at).getTime()
-          )
+          .sort(homepageOrder)
           .slice(0, ITEMS_PER_SECTION),
       }))
       // An empty section only tells customers the shop is out of stock.
@@ -86,7 +82,7 @@ export default function HomeSections() {
           supabase
             .from("products")
             .select(
-              "id,title,price,final_price,has_discount,discount_percentage,image_url,category_id,created_at,is_active,quantity"
+              "id,title,price,final_price,has_discount,discount_percentage,image_url,category_id,created_at,is_active,quantity,is_featured,featured_at"
             )
             .eq("is_active", true)
             .order("created_at", { ascending: false }),
