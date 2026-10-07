@@ -3,6 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
+import Tilt from "./Tilt";
 import {
   displayTitle,
   formatPrice,
@@ -30,6 +31,7 @@ export default function ProductCard({
       href={`/product/${product.id}`}
       className={`napd-card group block rounded-md focus-visible:outline-none ${className}`}
     >
+      <Tilt max={6} lift={6}>
       <div
         className={`napd-card-media relative w-full aspect-square overflow-hidden rounded-md border border-[#182B2A]/[0.08] ${
           loaded ? "bg-white" : "napd-skeleton"
@@ -51,7 +53,9 @@ export default function ProductCard({
             −{pct}%
           </span>
         )}
+        <span aria-hidden="true" className="napd-shine pointer-events-none absolute inset-0" />
       </div>
+      </Tilt>
 
       <div className="mt-3.5 space-y-1 text-left">
         <p className="truncate text-[13px] leading-snug text-[#182B2A]/80">

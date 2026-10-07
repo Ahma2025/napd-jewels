@@ -5,6 +5,8 @@ import { useEffect, useRef } from "react";
 type Mote = {
   x: number;
   y: number;
+  px: number;
+  py: number;
   r: number;
   vy: number;
   vx: number;
@@ -41,10 +43,12 @@ export default function GoldDust({ className = "" }: { className?: string }) {
       canvas.width = Math.round(w * dpr);
       canvas.height = Math.round(h * dpr);
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      const count = Math.round(Math.min(70, Math.max(24, (w * h) / 22000)));
+      const count = Math.round(Math.min(110, Math.max(36, (w * h) / 14000)));
       motes = Array.from({ length: count }, () => ({
         x: Math.random() * w,
         y: Math.random() * h,
+        px: 0,
+        py: 0,
         r: 0.5 + Math.random() * 1.4,
         vy: 0.06 + Math.random() * 0.18,
         vx: (Math.random() - 0.5) * 0.06,
@@ -69,10 +73,26 @@ export default function GoldDust({ className = "" }: { className?: string }) {
       }
     };
 
+    const pointer = { x: -9999, y: -9999 };
+    const R = 130;
     const step = () => {
       for (const m of motes) {
-        m.y -= m.vy;
-        m.x += m.vx;
+        // a gentle push away from the hand, which then eases off
+        const dx = m.x - pointer.x;
+        const dy = m.y - pointer.y;
+        const d2 = dx * dx + dy * dy;
+        if (d2 < R * R && d2 > 0.01) {
+          const d = Math.sqrt(d2);
+          const f = (1 - d / R) * 0.9;
+          m.px += (dx / d) * f;
+          m.py += (dy / d) * f;
+        }
+        m.px *= 0.92;
+        m.py *= 0.92;
+        m.y -= m.vy - m.py;
+        m.x += m.vx + m.px;
+        if (m.x < -10) m.x = w + 10;
+        if (m.x > w + 10) m.x = -10;
         m.phase += m.speed;
         if (m.y < -8) {
           m.y = h + 8;
@@ -102,6 +122,19 @@ export default function GoldDust({ className = "" }: { className?: string }) {
     });
     io.observe(canvas);
 
+    const onPointer = (e: PointerEvent) => {
+      const r = canvas.getBoundingClientRect();
+      pointer.x = e.clientX - r.left;
+      pointer.y = e.clientY - r.top;
+    };
+    const onPointerLeave = () => {
+      pointer.x = -9999;
+      pointer.y = -9999;
+    };
+    const host = canvas.parentElement;
+    host?.addEventListener("pointermove", onPointer);
+    host?.addEventListener("pointerleave", onPointerLeave);
+
     const onVis = () => (document.hidden ? cancelAnimationFrame(raf) : start());
     document.addEventListener("visibilitychange", onVis);
 
@@ -116,6 +149,8 @@ export default function GoldDust({ className = "" }: { className?: string }) {
       io.disconnect();
       ro.disconnect();
       document.removeEventListener("visibilitychange", onVis);
+      host?.removeEventListener("pointermove", onPointer);
+      host?.removeEventListener("pointerleave", onPointerLeave);
     };
   }, []);
 

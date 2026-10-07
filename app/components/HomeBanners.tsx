@@ -2,6 +2,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import Reveal from "./Reveal";
+import Tilt from "./Tilt";
+import MaskHeading from "./MaskHeading";
 
 const CATEGORIES = [
   {
@@ -42,7 +44,7 @@ function CategoryNiche({
 }) {
   return (
     <Link href={href} className="napd-cat group block text-center">
-      <div className="relative mx-auto w-full">
+      <Tilt max={8} lift={10} className="relative mx-auto w-full">
         {/* outer gold hairline, set off the niche like a display case frame */}
         <span
           aria-hidden="true"
@@ -60,8 +62,9 @@ function CategoryNiche({
           </div>
           <span aria-hidden="true" className="napd-niche-glow pointer-events-none absolute inset-0" />
           <span aria-hidden="true" className="napd-cat-sweep pointer-events-none absolute inset-0" />
+          <span aria-hidden="true" className="napd-shine pointer-events-none absolute inset-0" />
         </div>
-      </div>
+      </Tilt>
 
       <h3 className="napd-display mt-7 text-[1.6rem] leading-none text-[#182B2A] md:text-[1.85rem]">
         {label}
@@ -96,11 +99,11 @@ export default function HomeBanners() {
       />
 
       <div className="relative mx-auto max-w-[1120px] px-5 md:px-8">
-        <Reveal className="mb-14 text-center md:mb-16">
-          <h2 className="napd-display text-[clamp(2.6rem,5.5vw,4.25rem)] leading-[0.95] text-[#182B2A]">
+        <div className="mb-14 text-center md:mb-16">
+          <MaskHeading className="napd-display text-[clamp(2.6rem,5.5vw,4.25rem)] leading-[0.95] text-[#182B2A]">
             Shop by <span className="italic text-[#86663A]">collection</span>
-          </h2>
-        </Reveal>
+          </MaskHeading>
+        </div>
 
         <div className="grid grid-cols-2 gap-x-6 gap-y-14 md:gap-x-10 lg:grid-cols-4">
           {CATEGORIES.map((cat, i) => (
