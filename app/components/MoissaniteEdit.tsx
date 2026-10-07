@@ -22,7 +22,7 @@ export default function MoissaniteEdit() {
         <Reveal className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
           <div>
             <MaskHeading className="napd-display text-[clamp(2.6rem,5.5vw,4.5rem)] leading-[0.95]">
-              The Moissanite <span className="italic text-[#D9C6A0]">Edit</span>
+              The Moissanite <span className="napd-script napd-foil napd-flourish">Edit</span>
             </MaskHeading>
             <p className="mt-4 max-w-[46ch] text-[15px] leading-relaxed text-[#FAF7F1]/70">
               A stone with more fire than a diamond, set in sterling silver.

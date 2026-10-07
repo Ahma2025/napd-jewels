@@ -42,7 +42,7 @@ export default function PromiseBand() {
 
         <Reveal className="mt-16 flex flex-col items-center gap-6 border-t border-[#FAF7F1]/10 pt-14 text-center">
           <MaskHeading className="napd-display text-[clamp(2rem,4.5vw,3.25rem)] leading-tight">
-            Looking for <span className="italic text-[#D9C6A0]">the one?</span>
+            Looking for <span className="napd-script napd-foil napd-flourish">the one?</span>
           </MaskHeading>
           <a
             href={WHATSAPP_URL}

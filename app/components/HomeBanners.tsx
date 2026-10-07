@@ -101,7 +101,7 @@ export default function HomeBanners() {
       <div className="relative mx-auto max-w-[1120px] px-5 md:px-8">
         <div className="mb-14 text-center md:mb-16">
           <MaskHeading className="napd-display text-[clamp(2.6rem,5.5vw,4.25rem)] leading-[0.95] text-[#182B2A]">
-            Shop by <span className="italic text-[#86663A]">collection</span>
+            Shop by <span className="napd-script napd-foil napd-foil-deep napd-flourish">collection</span>
           </MaskHeading>
         </div>
 
