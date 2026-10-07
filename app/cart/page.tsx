@@ -2,21 +2,23 @@
 
 import Link from "next/link";
 import { useCart } from "../context/CartContext";
+import { useLang } from "../context/LangContext";
 const PRIMARY = "#123E38";
 export default function CartPage() {
   const { cart, removeFromCart, increase, decrease, subtotal } = useCart();
+  const { t } = useLang();
 
   if (cart.length === 0) {
     return (
       <div className="max-w-5xl mx-auto p-10 text-center">
-        <h1 className="text-3xl font-serif mb-4">Your Cart</h1>
-        <p className="text-black/60">Your cart is empty.</p>
+        <h1 className="text-3xl font-serif mb-4">{t("cart.title")}</h1>
+        <p className="text-black/60">{t("cart.empty")}</p>
 
         <Link
           href="/"
           className="inline-block mt-6 px-6 py-3 rounded-full border border-black/15 hover:border-black/30 transition"
         >
-          Continue Shopping
+          {t("cart.continue")}
         </Link>
       </div>
     );
@@ -25,12 +27,12 @@ export default function CartPage() {
   return (
     <div className="max-w-5xl mx-auto p-8">
       <div className="flex items-end justify-between gap-4 mb-6">
-        <h1 className="text-3xl font-serif">Your Cart</h1>
+        <h1 className="text-3xl font-serif">{t("cart.title")}</h1>
         <Link
           href="/"
           className="text-sm uppercase tracking-wide text-black/60 hover:text-black"
         >
-          Continue Shopping
+          {t("cart.continue")}
         </Link>
       </div>
 
@@ -88,7 +90,7 @@ export default function CartPage() {
               onClick={() => removeFromCart(item.id, item.size)}
               className="text-sm text-red-600 hover:underline"
             >
-              Remove
+              {t("cart.remove")}
             </button>
           </div>
         ))}
@@ -97,7 +99,7 @@ export default function CartPage() {
       {/* Summary */}
       <div className="mt-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div className="text-black/70">
-          Subtotal:{" "}
+          {t("cart.subtotal")}:{" "}
           <span className="font-semibold text-black">₪ {subtotal}</span>
         </div>
 
@@ -106,7 +108,7 @@ export default function CartPage() {
           className="inline-flex items-center justify-center px-8 py-3 rounded-full text-white uppercase tracking-wide"
           style={{ backgroundColor: PRIMARY }}
         >
-          Proceed to Checkout
+          {t("cart.checkout")}
         </Link>
       </div>
     </div>

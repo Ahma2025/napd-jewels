@@ -4,7 +4,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { useCollection } from "@/lib/useCollection";
-import { displayTitle, formatPrice, priceInfo } from "@/lib/productDisplay";
+import { formatPrice, priceInfo, productName } from "@/lib/productDisplay";
+import { useLang } from "../context/LangContext";
 import Reveal from "./Reveal";
 import Tilt from "./Tilt";
 import Spotlight from "./Spotlight";
@@ -13,6 +14,7 @@ import MaskHeading from "./MaskHeading";
 /** The vitrine continues below the hero: every Moissanite piece in its own niche. */
 export default function MoissaniteEdit() {
   const { items, loading } = useCollection("MOISSANITE");
+  const { lang, t } = useLang();
   if (!loading && items.length === 0) return null;
 
   return (
@@ -22,19 +24,18 @@ export default function MoissaniteEdit() {
         <Reveal className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
           <div>
             <MaskHeading className="napd-display text-[clamp(2.6rem,5.5vw,4.5rem)] leading-[0.95]">
-              The Moissanite <span className="napd-script napd-foil napd-flourish">Edit</span>
+              {t("edit.before")} <span className="napd-script napd-foil napd-flourish">{t("edit.flourish")}</span>
             </MaskHeading>
             <p className="mt-4 max-w-[46ch] text-[15px] leading-relaxed text-[#FAF7F1]/70">
-              A stone with more fire than a diamond, set in sterling silver.
-              Made to be noticed across the room.
+              {t("edit.body")}
             </p>
           </div>
           <Link
             href="/moissanite"
             className="napd-link inline-flex shrink-0 items-center gap-2 self-start text-[11px] uppercase tracking-[0.2em] text-[#D9C6A0] md:self-auto"
           >
-            View the edit
-            <ArrowRight aria-hidden="true" strokeWidth={1.5} className="h-3.5 w-3.5" />
+            {t("edit.cta")}
+            <ArrowRight aria-hidden="true" strokeWidth={1.5} className="napd-flip h-3.5 w-3.5" />
           </Link>
         </Reveal>
       </div>
@@ -60,7 +61,7 @@ export default function MoissaniteEdit() {
                       <div className="absolute inset-[12%]">
                         <Image
                           src={p.image_url || "/hero.jpeg"}
-                          alt={displayTitle(p.title)}
+                          alt={productName(p, lang)}
                           fill
                           sizes="260px"
                           className="napd-card-img object-contain"
@@ -71,7 +72,7 @@ export default function MoissaniteEdit() {
                     </div>
                     </Tilt>
                     <p className="napd-display mt-5 text-center text-[1.2rem] italic leading-snug">
-                      {displayTitle(p.title)}
+                      {productName(p, lang)}
                     </p>
                     <p className="mt-1 flex justify-center gap-2 text-[13px] tracking-[0.08em] tabular-nums">
                       <span className="text-[#D9C6A0]">{formatPrice(final)}</span>

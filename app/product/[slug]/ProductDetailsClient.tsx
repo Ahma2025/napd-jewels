@@ -6,12 +6,15 @@ import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { useCart } from "../../context/CartContext";
 import { useIsOwner } from "@/lib/useIsOwner";
-import { displayTitle, formatPrice } from "@/lib/productDisplay";
+import { displayTitle, formatPrice, productName } from "@/lib/productDisplay";
+import { useLang } from "../../context/LangContext";
+import { onlyLeftLabel, type DictKey } from "@/lib/i18n";
 import { MessageCircle, ShieldCheck, Gem, Truck, RefreshCw } from "lucide-react";
 
 type DbProduct = {
   id: string;
   title: string;
+  title_ar?: string | null;
   price: number;
   quantity: number;
   has_discount: boolean | null;
@@ -51,24 +54,23 @@ function formatMoney(n: number) {
   return formatPrice(n);
 }
 
-const CATEGORY_LINKS: Record<string, { href: string; label: string }> = {
-  RINGS: { href: "/rings", label: "Rings" },
-  CHAINS: { href: "/chains", label: "Necklaces" },
-  BRACELETS: { href: "/bracelets", label: "Bracelets" },
-  EARRINGS: { href: "/earrings", label: "Earrings" },
-  MOISSANITE: { href: "/moissanite", label: "The Moissanite Edit" },
-  SETS: { href: "/sets", label: "Sets" },
+const CATEGORY_LINKS: Record<string, { href: string; label: DictKey }> = {
+  RINGS: { href: "/rings", label: "cat.RINGS" },
+  CHAINS: { href: "/chains", label: "cat.CHAINS" },
+  BRACELETS: { href: "/bracelets", label: "cat.BRACELETS" },
+  EARRINGS: { href: "/earrings", label: "cat.EARRINGS" },
+  MOISSANITE: { href: "/moissanite", label: "cat.MOISSANITE_EDIT" },
+  SETS: { href: "/sets", label: "cat.SETS" },
 };
 
-function paramLabel(key: string) {
-  if (key === "zircon_grade") return "Zircon Grade";
-  if (key === "main_stone_size") return "Main stone size";
-  if (key === "main_stone_shape") return "Main stone shape";
-  if (key === "main_stone_cut") return "Main stone cut";
-  if (key === "plating_color") return "Plating color";
-  if (key === "main_stone_carat") return "Main stone carat";
-  return key;
-}
+const PARAM_KEYS = new Set([
+  "zircon_grade",
+  "main_stone_size",
+  "main_stone_shape",
+  "main_stone_cut",
+  "plating_color",
+  "main_stone_carat",
+]);
 
 export default function ProductDetailsClient({ id }: { id: string }) {
   const safeId = id || "";
@@ -77,6 +79,9 @@ export default function ProductDetailsClient({ id }: { id: string }) {
   const [sizeTouched, setSizeTouched] = useState(false);
 
   const { addToCart } = useCart();
+  const { lang, t } = useLang();
+  const paramLabel = (key: string) =>
+    PARAM_KEYS.has(key) ? t(`param.${key}` as DictKey) : key;
   const { isOwner, loading: ownerLoading } = useIsOwner();
 
   const [product, setProduct] = useState<DbProduct | null>(null);
@@ -111,7 +116,7 @@ export default function ProductDetailsClient({ id }: { id: string }) {
         supabase
           .from("products")
           .select(
-            "id,title,price,quantity,has_discount,discount_percentage,final_price,image_url,is_active,created_at,category_id,categories(name)"
+            "id,title,title_ar,price,quantity,has_discount,discount_percentage,final_price,image_url,is_active,created_at,category_id,categories(name)"
           )
           .eq("id", safeId)
           .single(),
@@ -177,7 +182,10 @@ export default function ProductDetailsClient({ id }: { id: string }) {
     };
   }, [safeId]);
 
-  const title = useMemo(() => displayTitle(product?.title), [product?.title]);
+  const title = useMemo(
+    () => (product ? productName(product, lang) : ""),
+    [product, lang]
+  );
 
   const categoryName = useMemo(() => {
     const cats = product?.categories;
@@ -240,21 +248,26 @@ export default function ProductDetailsClient({ id }: { id: string }) {
   }, [images, activeIndex]);
 
   const waText = useMemo(() => {
-    const t = displayTitle(product?.title);
+    const en = displayTitle(product?.title);
+    const shown = product ? productName(product, lang) : en;
+    const piece = lang === "ar" && shown !== en ? `${shown} (${en})` : en;
     const priceLine = hasDiscount
-      ? `السعر: ${formatMoney(finalPriceNumber)} (قبل الخصم: ${formatMoney(
+      ? `${t("wa.price")}: ${formatMoney(finalPriceNumber)} (${t("wa.before")}: ${formatMoney(
           basePriceNumber
-        )}, خصم: ${product?.discount_percentage || 0}%)`
-      : `السعر: ${formatMoney(basePriceNumber)}`;
+        )}, ${t("wa.discount")}: ${product?.discount_percentage || 0}%)`
+      : `${t("wa.price")}: ${formatMoney(basePriceNumber)}`;
 
-    const sizeLine = isRing && size ? `\nالمقاس: ${size}` : "";
+    const sizeLine = isRing && size ? `\n${t("wa.size")}: ${size}` : "";
 
-    return `مرحبا ، بدي أطلب:
-المنتج: ${t}${sizeLine}
+    return `${t("wa.hello")}
+${t("wa.piece")}: ${piece}${sizeLine}
 ${priceLine}
-الكمية: ${qty}
-رابط المنتج: ${productUrl}`;
+${t("wa.qty")}: ${qty}
+${t("wa.link")}: ${productUrl}`;
   }, [
+    product,
+    lang,
+    t,
     product?.title,
     product?.discount_percentage,
     qty,
@@ -307,13 +320,13 @@ ${priceLine}
           className="mb-8 flex flex-wrap items-center gap-x-2 text-[11px] uppercase tracking-[0.18em] text-[#5E6B69]"
         >
           <Link href="/" className="napd-link">
-            Home
+            {t("pdp.home")}
           </Link>
           {categoryLink && (
             <>
               <span aria-hidden="true">/</span>
               <Link href={categoryLink.href} className="napd-link">
-                {categoryLink.label}
+                {t(categoryLink.label)}
               </Link>
             </>
           )}
@@ -339,18 +352,17 @@ ${priceLine}
         ) : !product || !visibleToViewer ? (
           <div className="mx-auto max-w-md py-20 text-center">
             <p className="napd-display text-3xl text-[#182B2A]">
-              This piece is no longer available
+              {t("pdp.goneTitle")}
             </p>
             <p className="mt-3 text-sm leading-relaxed text-[#5E6B69]">
-              It may have sold out. Browse the collection or ask us on WhatsApp
-              for something similar.
+              {t("pdp.goneBody")}
             </p>
             <div className="mt-7 flex flex-wrap justify-center gap-3">
               <Link
                 href="/"
                 className="napd-btn inline-flex h-12 items-center rounded-full bg-[#182B2A] px-6 text-[12px] uppercase tracking-[0.18em] text-[#FAF7F1]"
               >
-                Browse the collection
+                {t("pdp.browse")}
               </Link>
               <a
                 href={`https://wa.me/${WHATSAPP_NUMBER}`}
@@ -358,7 +370,7 @@ ${priceLine}
                 rel="noopener noreferrer"
                 className="inline-flex h-12 items-center rounded-full border border-[#182B2A]/20 px-6 text-[12px] uppercase tracking-[0.18em] text-[#182B2A]"
               >
-                Ask on WhatsApp
+                {t("pdp.ask")}
               </a>
             </div>
           </div>
@@ -378,7 +390,7 @@ ${priceLine}
                   />
                 </div>
                 {hasDiscount && (
-                  <span className="absolute left-4 top-4 rounded-sm bg-[#182B2A] px-2 py-1 text-[11px] font-medium tracking-[0.08em] text-[#FAF7F1] tabular-nums">
+                  <span className="absolute start-4 top-4 rounded-sm bg-[#182B2A] px-2 py-1 text-[11px] font-medium tracking-[0.08em] text-[#FAF7F1] tabular-nums">
                     −{pct}%
                   </span>
                 )}
@@ -393,7 +405,7 @@ ${priceLine}
                         key={`${img}-${i}`}
                         type="button"
                         onClick={() => setActiveIndex(i)}
-                        aria-label={`Show image ${i + 1}`}
+                        aria-label={`${t("pdp.showImage")} ${i + 1}`}
                         aria-pressed={active}
                         className={[
                           "relative h-[76px] w-[76px] flex-shrink-0 overflow-hidden rounded-md border bg-white transition-colors duration-200",
@@ -444,25 +456,25 @@ ${priceLine}
                   className={`h-1.5 w-1.5 rounded-full ${inStock ? "bg-[#2F7A5B]" : "bg-[#B4483C]"}`}
                 />
                 {!inStock
-                  ? "Out of stock"
+                  ? t("pdp.outOfStock")
                   : lowStock
-                  ? `Only ${maxQty} left`
-                  : "In stock, ready to ship"}
+                  ? onlyLeftLabel(lang, maxQty)
+                  : t("pdp.inStock")}
               </p>
 
               {/* Ring Size */}
               {isRing && (
                 <div className="mt-9">
                   <p className="mb-3 text-[11px] uppercase tracking-[0.2em] text-[#5E6B69]">
-                    Ring size
+                    {t("pdp.ringSize")}
                     {needsSize && sizeTouched ? (
-                      <span className="ml-2 normal-case tracking-normal text-[13px] text-[#B4483C]">
-                        Please choose a size
+                      <span className="ms-2 normal-case tracking-normal text-[13px] text-[#B4483C]">
+                        {t("pdp.chooseSize")}
                       </span>
                     ) : null}
                   </p>
 
-                  <div className="flex flex-wrap gap-2" role="radiogroup" aria-label="Ring size">
+                  <div className="flex flex-wrap gap-2" role="radiogroup" aria-label={t("pdp.ringSize")}>
                     {RING_SIZES.map((s) => {
                       const active = size === s;
                       return (
@@ -494,7 +506,7 @@ ${priceLine}
               {/* Quantity */}
               <div className="mt-8">
                 <p className="mb-3 text-[11px] uppercase tracking-[0.2em] text-[#5E6B69]">
-                  Quantity
+                  {t("pdp.quantity")}
                 </p>
 
                 <div className="inline-flex items-center overflow-hidden rounded-full border border-[#182B2A]/15 text-[#182B2A]">
@@ -502,7 +514,7 @@ ${priceLine}
                     type="button"
                     onClick={() => setQty((q) => Math.max(1, q - 1))}
                     className="flex h-11 w-11 items-center justify-center hover:bg-[#FAF7F1] disabled:opacity-40"
-                    aria-label="Decrease quantity"
+                    aria-label={t("pdp.decrease")}
                     disabled={!inStock || qty <= 1}
                   >
                     −
@@ -516,7 +528,7 @@ ${priceLine}
                       setQty((q) => Math.min(Math.max(1, q + 1), Math.max(1, maxQty)))
                     }
                     className="flex h-11 w-11 items-center justify-center hover:bg-[#FAF7F1] disabled:opacity-40"
-                    aria-label="Increase quantity"
+                    aria-label={t("pdp.increase")}
                     disabled={!inStock || qty >= maxQty}
                   >
                     +
@@ -545,7 +557,7 @@ ${priceLine}
                   ].join(" ")}
                 >
                   <MessageCircle aria-hidden="true" strokeWidth={1.5} className="h-[18px] w-[18px]" />
-                  Order on WhatsApp
+                  {t("pdp.order")}
                 </a>
 
                 <button
@@ -554,11 +566,11 @@ ${priceLine}
                   disabled={!inStock}
                   className="napd-btn h-12 w-full rounded-full border border-[#182B2A]/20 text-[12px] uppercase tracking-[0.2em] text-[#182B2A] transition-colors duration-200 hover:border-[#182B2A]/50 disabled:opacity-40"
                 >
-                  Add to cart
+                  {t("pdp.addToCart")}
                 </button>
 
                 <p className="pt-1 text-center text-[12px] text-[#5E6B69]">
-                  Your WhatsApp message will include this piece, size and quantity.
+                  {t("pdp.note")}
                 </p>
               </div>
 
@@ -566,26 +578,26 @@ ${priceLine}
               <ul className="mt-9 grid grid-cols-2 gap-x-6 gap-y-4 border-t border-[#182B2A]/10 pt-7 text-[13px] text-[#182B2A]/80">
                 <li className="flex items-center gap-2.5">
                   <ShieldCheck aria-hidden="true" strokeWidth={1.5} className="h-[18px] w-[18px] shrink-0 text-[#86663A]" />
-                  1-year warranty
+                  {t("pdp.p.warranty")}
                 </li>
                 <li className="flex items-center gap-2.5">
                   <Gem aria-hidden="true" strokeWidth={1.5} className="h-[18px] w-[18px] shrink-0 text-[#86663A]" />
-                  Sterling silver 925
+                  {t("pdp.p.silver")}
                 </li>
                 <li className="flex items-center gap-2.5">
                   <Truck aria-hidden="true" strokeWidth={1.5} className="h-[18px] w-[18px] shrink-0 text-[#86663A]" />
-                  Delivery available
+                  {t("pdp.p.delivery")}
                 </li>
                 <li className="flex items-center gap-2.5">
                   <RefreshCw aria-hidden="true" strokeWidth={1.5} className="h-[18px] w-[18px] shrink-0 text-[#86663A]" />
-                  Easy exchange
+                  {t("pdp.p.exchange")}
                 </li>
               </ul>
 
               {/* Product details */}
               {hasParameters && (
                 <div className="mt-9 border-t border-[#182B2A]/10 pt-7">
-                  <h2 className="napd-display text-2xl text-[#182B2A]">Details</h2>
+                  <h2 className="napd-display text-2xl text-[#182B2A]">{t("pdp.details")}</h2>
                   <dl className="mt-4 divide-y divide-[#182B2A]/[0.07]">
                     {parameters
                       .filter((p) => (p.value || "").trim())

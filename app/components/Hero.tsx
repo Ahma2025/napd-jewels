@@ -7,7 +7,8 @@ import { ArrowDown, MessageCircle } from "lucide-react";
 import GoldDust from "./GoldDust";
 import Tilt from "./Tilt";
 import { useCollection } from "@/lib/useCollection";
-import { displayTitle, formatPrice, priceInfo } from "@/lib/productDisplay";
+import { formatPrice, priceInfo, productName } from "@/lib/productDisplay";
+import { useLang } from "../context/LangContext";
 
 const WHATSAPP_URL = "https://wa.me/972593255260";
 const ROTATE_MS = 5200;
@@ -15,6 +16,9 @@ const MAX_PIECES = 6;
 
 export default function Hero() {
   const { items: moissanite, loading } = useCollection("MOISSANITE");
+  const { lang, t } = useLang();
+  const ar = lang === "ar";
+  const name = (p: (typeof moissanite)[number]) => productName(p, lang);
   const pieces = moissanite.slice(0, MAX_PIECES);
   const [active, setActive] = useState(0);
   const [paused, setPaused] = useState(false);
@@ -70,22 +74,22 @@ export default function Hero() {
         aria-hidden="true"
         className="napd-hero-side pointer-events-none absolute left-7 top-1/2 hidden text-[10px] uppercase tracking-[0.42em] text-[#D9C6A0]/55 xl:block"
       >
-        NAPD Jewels &nbsp;·&nbsp; Sterling Silver 925
+        {t("hero.side")}
       </p>
 
       <div className="mx-auto grid max-w-[1280px] items-center gap-y-9 px-5 pb-20 pt-10 md:px-8 lg:min-h-[calc(100svh-112px)] lg:grid-cols-[1fr_auto_1fr] lg:gap-x-14 lg:pb-24 lg:pt-14">
-        <h1 className="sr-only">A small ring, a big love.</h1>
+        <h1 className="sr-only">{t("hero.sr")}</h1>
 
         {/* Line one, set against the top of the niche */}
         <p
           aria-hidden="true"
-          className="napd-hero-serif napd-depth-fast text-center text-[clamp(3.2rem,6.4vw,6.8rem)] whitespace-nowrap leading-[0.9] lg:self-start lg:pt-[9vh] lg:text-right"
+          className="napd-hero-serif napd-depth-fast text-center text-[clamp(3.2rem,6.4vw,6.8rem)] whitespace-nowrap leading-[0.9] lg:self-start lg:pt-[9vh] lg:text-end"
         >
           <span className="block">
-            <Chars text="A small" start={250} />
+            <Chars text={ar ? "خاتمٌ" : "A small"} start={250} words={ar} />
           </span>
           <span className="block italic">
-            <Chars text="ring," start={520} />
+            <Chars text={ar ? "صغير،" : "ring,"} start={520} words={ar} />
           </span>
         </p>
 
@@ -108,7 +112,7 @@ export default function Hero() {
               <Link
                 href={current ? `/product/${current.id}` : "/moissanite"}
                 className="napd-niche napd-arch-reveal relative block aspect-[3/4] overflow-hidden rounded-t-[999px] rounded-b-[4px] bg-white"
-                aria-label={current ? `View ${displayTitle(current.title)}` : "View the Moissanite Edit"}
+                aria-label={current ? `${t("hero.view")} ${name(current)}` : t("hero.edit")}
               >
                 {loading && <div className="napd-skeleton absolute inset-0" />}
                 {pieces.map((p, i) => (
@@ -119,7 +123,7 @@ export default function Hero() {
                   >
                     <Image
                       src={p.image_url || "/hero.jpeg"}
-                      alt={i === active ? displayTitle(p.title) : ""}
+                      alt={i === active ? name(p) : ""}
                       fill
                       priority={i === 0}
                       sizes="(min-width: 1024px) 400px, 74vw"
@@ -149,7 +153,7 @@ export default function Hero() {
             {current && price ? (
               <div key={current.id} className="napd-caption-in">
                 <p className="napd-hero-serif mt-2 text-[1.3rem] italic leading-snug text-[#FAF7F1] md:text-[1.4rem]">
-                  {displayTitle(current.title)}
+                  {name(current)}
                 </p>
                 <p className="mt-1.5 text-[12px] tracking-[0.24em] text-[#D9C6A0] tabular-nums">
                   {formatPrice(price.final)}
@@ -157,18 +161,18 @@ export default function Hero() {
               </div>
             ) : (
               <p className="napd-hero-serif mt-2 text-[1.3rem] italic text-[#FAF7F1]/70">
-                The Moissanite Edit
+                {t("hero.edit")}
               </p>
             )}
             {pieces.length > 1 && (
-              <div className="mt-4 flex justify-center gap-2" role="tablist" aria-label="Featured pieces">
+              <div className="mt-4 flex justify-center gap-2" role="tablist" aria-label={t("hero.featured")}>
                 {pieces.map((p, i) => (
                   <button
                     key={p.id}
                     type="button"
                     role="tab"
                     aria-selected={i === active}
-                    aria-label={`Show ${displayTitle(p.title)}`}
+                    aria-label={`${t("hero.show")} ${name(p)}`}
                     onClick={() => setActive(i)}
                     className={`h-[3px] rounded-full transition-all duration-500 ease-out ${
                       i === active ? "w-7 bg-[#D9C6A0]" : "w-3 bg-[#FAF7F1]/25 hover:bg-[#FAF7F1]/50"
@@ -181,15 +185,26 @@ export default function Hero() {
         </div>
 
         {/* Line two, the flourish, and the offer */}
-        <div className="text-center lg:self-end lg:pb-[8vh] lg:text-left">
-          <p aria-hidden="true" className="napd-depth-fast">
-            <span className="napd-hero-serif block text-[clamp(3.2rem,6.4vw,6.8rem)] whitespace-nowrap leading-[0.9]">
-              <Chars text="a big" start={780} />
-            </span>
-            <span className="napd-script napd-foil napd-write block text-[clamp(6.4rem,12vw,11.5rem)] leading-[0.8] lg:ml-[0.2em]">
-              love.
-            </span>
-          </p>
+        <div className="text-center lg:self-end lg:pb-[8vh] lg:text-start">
+          {ar ? (
+            <p aria-hidden="true" className="napd-depth-fast">
+              <span className="napd-script napd-foil napd-write block text-[clamp(5rem,8.5vw,8.5rem)] leading-[1.15]">
+                وحبٌّ
+              </span>
+              <span className="napd-hero-serif block text-[clamp(3.2rem,6.4vw,6.8rem)] whitespace-nowrap leading-[1.1]">
+                <Chars text="كبير." start={1500} words />
+              </span>
+            </p>
+          ) : (
+            <p aria-hidden="true" className="napd-depth-fast">
+              <span className="napd-hero-serif block text-[clamp(3.2rem,6.4vw,6.8rem)] whitespace-nowrap leading-[0.9]">
+                <Chars text="a big" start={780} />
+              </span>
+              <span className="napd-script napd-foil napd-write block text-[clamp(6.4rem,12vw,11.5rem)] leading-[0.8] lg:ms-[0.2em]">
+                love.
+              </span>
+            </p>
+          )}
 
           <div
             aria-hidden="true"
@@ -205,8 +220,7 @@ export default function Hero() {
             className="napd-rise mx-auto mt-6 max-w-[34ch] text-[15px] leading-[1.75] text-[#FAF7F1]/72 lg:mx-0"
             style={{ animationDelay: "1600ms" }}
           >
-            Sterling silver 925 and moissanite, chosen piece by piece for the
-            moments she will remember.
+            {t("hero.sub")}
           </p>
 
           <div
@@ -217,7 +231,7 @@ export default function Hero() {
               href="#collection"
               className="napd-btn inline-flex h-12 items-center justify-center gap-2 whitespace-nowrap rounded-full bg-[#FAF7F1] px-7 text-[12px] uppercase tracking-[0.18em] text-[#182B2A]"
             >
-              Shop the collection
+              {t("hero.shop")}
               <ArrowDown aria-hidden="true" strokeWidth={1.5} className="h-4 w-4" />
             </a>
             <a
@@ -227,7 +241,7 @@ export default function Hero() {
               className="inline-flex h-12 items-center justify-center gap-2 whitespace-nowrap rounded-full border border-[#FAF7F1]/30 px-7 text-[12px] uppercase tracking-[0.18em] text-[#FAF7F1] transition-colors duration-200 hover:border-[#FAF7F1]/70"
             >
               <MessageCircle aria-hidden="true" strokeWidth={1.5} className="h-4 w-4" />
-              WhatsApp
+              {t("hero.whatsapp")}
             </a>
           </div>
         </div>
@@ -236,10 +250,10 @@ export default function Hero() {
       {/* scroll cue */}
       <a
         href="#collection"
-        aria-label="Scroll to the collection"
+        aria-label={t("hero.scrollLabel")}
         className="napd-scroll-cue absolute bottom-5 left-1/2 hidden -translate-x-1/2 flex-col items-center gap-2.5 text-[9px] uppercase tracking-[0.4em] text-[#D9C6A0]/60 lg:flex"
       >
-        Scroll
+        {t("hero.scroll")}
         <span aria-hidden="true" className="napd-scroll-line block h-10 w-px" />
       </a>
     </section>
@@ -247,7 +261,29 @@ export default function Hero() {
 }
 
 /** Splits a line into letters that rise in one after another. */
-function Chars({ text, start = 0 }: { text: string; start?: number }) {
+function Chars({
+  text,
+  start = 0,
+  words = false,
+}: {
+  text: string;
+  start?: number;
+  /** Animate whole words (Arabic letters join, so they must not be split). */
+  words?: boolean;
+}) {
+  if (words) {
+    const parts = text.split(" ");
+    return (
+      <>
+        {parts.map((w, i) => (
+          <span key={i} className="napd-char" style={{ animationDelay: `${start + i * 140}ms` }}>
+            {w}
+            {i < parts.length - 1 ? "\u00a0" : ""}
+          </span>
+        ))}
+      </>
+    );
+  }
   return (
     <>
       {Array.from(text).map((c, i) => (

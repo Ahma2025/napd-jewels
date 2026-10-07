@@ -1,6 +1,9 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
 import { Facebook, Instagram, Phone } from "lucide-react";
+import { useLang } from "../context/LangContext";
 
 const SOCIAL = {
   instagram: "https://instagram.com/napd.ps",
@@ -9,6 +12,7 @@ const SOCIAL = {
 };
 
 export default function Footer() {
+  const { t } = useLang();
   return (
     <footer className="pt-20 pb-12 border-t border-white/10" style={{ backgroundColor: "#182B2A" }}>
       <div className="max-w-[1200px] mx-auto px-6 text-center">
@@ -72,29 +76,29 @@ export default function Footer() {
         {/* Links */}
         <nav className="mt-12 flex flex-wrap items-center justify-center gap-x-10 gap-y-4 text-[14px] uppercase tracking-wide text-white/75">
           <Link href="/contact" className="hover:text-[#B08D57]">
-            Contact Us
+            {t("footer.contact")}
           </Link>
           <Link href="/about" className="hover:text-[#B08D57]">
-            About Us
+            {t("footer.about")}
           </Link>
           <Link href="/faqs" className="hover:text-[#B08D57]">
-            FAQs
+            {t("footer.faqs")}
           </Link>
           <Link href="/shipping-policy" className="hover:text-[#B08D57]">
-            Shipping Policy
+            {t("footer.shipping")}
           </Link>
           <Link href="/exchange-policy" className="hover:text-[#B08D57]">
-            Exchange Policy
+            {t("footer.exchange")}
           </Link>
           <Link href="/privacy-policy" className="hover:text-[#B08D57]">
-            Privacy Policy
+            {t("footer.privacy")}
           </Link>
         </nav>
 
         {/* Copyright */}
         <div className="mt-16 pt-6 border-t border-white/10 flex items-center justify-between text-[11px] text-white/40">
-          <span>© 2026 NAPD Jewels. All rights reserved.</span>
-          <span>Sterling Silver 925</span>
+          <span>{t("footer.rights")}</span>
+          <span>{t("footer.silver")}</span>
         </div>
       </div>
     </footer>

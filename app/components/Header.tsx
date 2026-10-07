@@ -7,6 +7,7 @@ import { useRouter, usePathname } from "next/navigation";
 import { ShoppingBag, Menu, X } from "lucide-react";
 import { useCart } from "../context/CartContext";
 import { supabase } from "@/lib/supabase";
+import { useLang } from "../context/LangContext";
 
 const PRIMARY = "#182B2A";
 const GOLD = "#B08D57";
@@ -15,7 +16,7 @@ const navLinkClass =
   "relative uppercase text-[13px] tracking-[0.15em] text-white/80 transition-all duration-300 " +
   "hover:text-[#B08D57] " +
   "hover:drop-shadow-[0_0_10px_rgba(176,141,87,0.35)] " +
-  "after:content-[''] after:absolute after:left-0 after:-bottom-2 after:h-[1px] after:w-0 after:bg-[#B08D57] " +
+  "after:content-[''] after:absolute after:start-0 after:-bottom-2 after:h-[1px] after:w-0 after:bg-[#B08D57] " +
   "after:transition-all after:duration-300 hover:after:w-full";
 
 type Profile = {
@@ -30,6 +31,7 @@ export default function Header() {
   const [isOpen, setIsOpen] = useState(false);
 
   const { cart } = useCart();
+  const { lang, setLang, t } = useLang();
   const totalItems = cart.reduce((acc, item) => acc + item.quantity, 0);
 
   const [authLoading, setAuthLoading] = useState(true);
@@ -41,8 +43,8 @@ export default function Header() {
   const displayName = useMemo(() => {
     const name = profile?.full_name?.trim();
     if (name) return name;
-    return userId ? "Account" : "Login";
-  }, [profile?.full_name, userId]);
+    return userId ? t("nav.account") : t("nav.login");
+  }, [profile?.full_name, userId, t]);
 
   const isOwner = profile?.role === "owner";
 
@@ -203,16 +205,17 @@ export default function Header() {
           {[0, 1].map((rep) => (
             <div key={rep} className="flex items-center">
               {[
-                "1 Year Warranty on Every Piece",
-                "Imported Sterling Silver 925",
-                "Order Directly on WhatsApp",
-              ].map((t) => (
-                <div key={t} className="flex items-center gap-3 px-7 whitespace-nowrap">
+                t("announce.warranty"),
+                t("announce.silver"),
+                t("announce.whatsapp"),
+              ].map((label) => (
+                <div key={label} className="flex items-center gap-3 px-7 whitespace-nowrap">
                   <span
+                    dir="auto"
                     className="text-[11px] uppercase tracking-[0.2em]"
                     style={{ color: "#D9C6A0" }}
                   >
-                    {t}
+                    {label}
                   </span>
                   <span style={{ color: GOLD }}>✦</span>
                 </div>
@@ -227,25 +230,25 @@ export default function Header() {
           {/* LEFT - DESKTOP NAV */}
           <nav className="hidden md:flex items-center gap-10">
             <Link href="/chains" className={navLinkClass}>
-              Necklaces
+              {t("nav.necklaces")}
             </Link>
             <Link href="/earrings" className={navLinkClass}>
-              Earrings
+              {t("nav.earrings")}
             </Link>
             <Link href="/bracelets" className={navLinkClass}>
-              Bracelets
+              {t("nav.bracelets")}
             </Link>
             <Link href="/rings" className={navLinkClass}>
-              Rings
+              {t("nav.rings")}
             </Link>
 
             {/* Orders يظهر فقط للـ owner */}
             {isOwner && (
               <Link href="/owner/orders" className={navLinkClass + " relative"}>
-                Orders
+                {t("nav.orders")}
                 {newOrdersCount > 0 && (
                   <span
-                    className="absolute -top-2 -right-4 text-white text-[10px] min-w-[18px] h-[18px] px-[6px] flex items-center justify-center rounded-full"
+                    className="absolute -top-2 -end-4 text-white text-[10px] min-w-[18px] h-[18px] px-[6px] flex items-center justify-center rounded-full"
                     style={{ backgroundColor: GOLD, color: PRIMARY }}
                   >
                     {newOrdersCount}
@@ -257,13 +260,18 @@ export default function Header() {
             {/* Owner Dashboard يظهر فقط للـ owner */}
             {isOwner && (
               <Link href="/owner-dashboard" className={navLinkClass}>
-                Owner Dashboard
+                {t("nav.dashboard")}
               </Link>
             )}
           </nav>
 
           {/* MOBILE MENU BUTTON */}
-          <button className="md:hidden text-white" onClick={() => setIsOpen(!isOpen)}>
+          <button
+            className="md:hidden text-white"
+            onClick={() => setIsOpen(!isOpen)}
+            aria-label={t("nav.menu")}
+            aria-expanded={isOpen}
+          >
             {isOpen ? (
               <X size={26} strokeWidth={1.5} />
             ) : (
@@ -272,14 +280,28 @@ export default function Header() {
           </button>
 
           {/* RIGHT SIDE */}
-          <div className="flex items-center gap-6 md:gap-8">
+          <div className="flex items-center gap-5 md:gap-8">
+            {/* Language */}
+            <button
+              type="button"
+              onClick={() => setLang(lang === "ar" ? "en" : "ar")}
+              aria-label={t("lang.switchLabel")}
+              lang={lang === "ar" ? "en" : "ar"}
+              className={`inline-flex h-9 min-w-[3rem] items-center justify-center rounded-full border border-[#B08D57]/40 px-3 text-[#D9C6A0] transition-colors duration-200 hover:border-[#B08D57] hover:text-[#FBF2DA] ${
+                lang === "ar"
+                  ? "text-[11px] tracking-[0.18em] font-medium [font-family:var(--font-dm-sans)]"
+                  : "text-[14px] [font-family:var(--font-ar-sans)]"
+              }`}
+            >
+              {t("lang.switch")}
+            </button>
             {/* Account / Login (desktop only) */}
             {!authLoading && !userId ? (
               <Link
                 href="/login"
                 className="hidden md:inline-flex items-center justify-center px-4 py-2 rounded-full border border-white/20 text-[12px] uppercase tracking-wide text-white/80 transition-all duration-200 hover:text-[#B08D57] hover:border-[#B08D57]/50"
               >
-                Login
+                {t("nav.login")}
               </Link>
             ) : (
               <div className="hidden md:block relative" ref={accountWrapRef}>
@@ -294,22 +316,22 @@ export default function Header() {
                     }
                     setIsAccountOpen((v) => !v);
                   }}
-                  title={userId ? "Account" : "Login"}
+                  title={userId ? t("nav.account") : t("nav.login")}
                 >
                   {authLoading ? "..." : displayName}
                 </button>
 
                 {userId && isAccountOpen && (
                   <div
-                    className="absolute right-0 mt-2 w-44 rounded-xl border border-white/10 shadow-lg overflow-hidden"
+                    className="absolute end-0 mt-2 w-44 rounded-xl border border-white/10 shadow-lg overflow-hidden"
                     style={{ backgroundColor: PRIMARY }}
                   >
                     <button
                       type="button"
-                      className="w-full text-left px-4 py-3 text-[13px] uppercase tracking-wide text-white/80 hover:text-[#B08D57] hover:bg-white/[0.04] transition-all"
+                      className="w-full text-start px-4 py-3 text-[13px] uppercase tracking-wide text-white/80 hover:text-[#B08D57] hover:bg-white/[0.04] transition-all"
                       onClick={handleLogout}
                     >
-                      Logout
+                      {t("nav.logout")}
                     </button>
                   </div>
                 )}
@@ -317,7 +339,7 @@ export default function Header() {
             )}
 
             {/* Cart */}
-            <Link href="/cart" className="relative">
+            <Link href="/cart" className="relative" aria-label={t("nav.cart")}>
               <ShoppingBag
                 size={22}
                 strokeWidth={1.5}
@@ -326,7 +348,7 @@ export default function Header() {
 
               {totalItems > 0 && (
                 <span
-                  className="absolute -top-2 -right-2 text-white text-[10px] w-5 h-5 flex items-center justify-center rounded-full"
+                  className="absolute -top-2 -end-2 text-white text-[10px] w-5 h-5 flex items-center justify-center rounded-full"
                   style={{ backgroundColor: GOLD, color: PRIMARY }}
                 >
                   {totalItems}
@@ -360,28 +382,28 @@ export default function Header() {
             className="block uppercase text-white/80 hover:text-[#B08D57]"
             onClick={() => setIsOpen(false)}
           >
-            Necklaces
+            {t("nav.necklaces")}
           </Link>
           <Link
             href="/earrings"
             className="block uppercase text-white/80 hover:text-[#B08D57]"
             onClick={() => setIsOpen(false)}
           >
-            Earrings
+            {t("nav.earrings")}
           </Link>
           <Link
             href="/bracelets"
             className="block uppercase text-white/80 hover:text-[#B08D57]"
             onClick={() => setIsOpen(false)}
           >
-            Bracelets
+            {t("nav.bracelets")}
           </Link>
           <Link
             href="/rings"
             className="block uppercase text-white/80 hover:text-[#B08D57]"
             onClick={() => setIsOpen(false)}
           >
-            Rings
+            {t("nav.rings")}
           </Link>
 
           {/* Orders يظهر فقط للـ owner */}
@@ -391,7 +413,7 @@ export default function Header() {
               className="flex items-center justify-between uppercase text-white/80 hover:text-[#B08D57]"
               onClick={() => setIsOpen(false)}
             >
-              <span>Orders</span>
+              <span>{t("nav.orders")}</span>
               {newOrdersCount > 0 && (
                 <span
                   className="text-white text-[10px] min-w-[18px] h-[18px] px-[6px] flex items-center justify-center rounded-full"
@@ -410,7 +432,7 @@ export default function Header() {
               className="block uppercase text-white/80 hover:text-[#B08D57]"
               onClick={() => setIsOpen(false)}
             >
-              Owner Dashboard
+              {t("nav.dashboard")}
             </Link>
           )}
 
@@ -422,7 +444,7 @@ export default function Header() {
               style={{ backgroundColor: GOLD }}
               onClick={() => setIsOpen(false)}
             >
-              Login
+              {t("nav.login")}
             </Link>
           ) : (
             <div className="space-y-3">
@@ -437,7 +459,7 @@ export default function Header() {
                 onClick={handleLogout}
                 disabled={authLoading}
               >
-                Logout
+                {t("nav.logout")}
               </button>
             </div>
           )}

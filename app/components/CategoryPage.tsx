@@ -6,6 +6,8 @@ import { supabase } from "@/lib/supabase";
 import { useIsOwner } from "@/lib/useIsOwner";
 import { inStock, type ListingProduct } from "@/lib/productDisplay";
 import ProductCard, { ProductCardSkeleton } from "./ProductCard";
+import { useLang } from "../context/LangContext";
+import { piecesLabel, type DictKey } from "@/lib/i18n";
 
 const WHATSAPP_URL = "https://wa.me/972593255260";
 
@@ -17,6 +19,9 @@ type Props = {
 };
 
 export default function CategoryPage({ dbName, title }: Props) {
+  const { lang, t } = useLang();
+  const key = (dbName === "MOISSANITE" ? "cat.MOISSANITE_EDIT" : `cat.${dbName}`) as DictKey;
+  const heading = t(key) || title;
   const [products, setProducts] = useState<ListingProduct[]>([]);
   const [loading, setLoading] = useState(true);
   const { isOwner } = useIsOwner();
@@ -39,7 +44,7 @@ export default function CategoryPage({ dbName, title }: Props) {
       const { data, error } = await supabase
         .from("products")
         .select(
-          "id,title,price,final_price,has_discount,discount_percentage,image_url,created_at,quantity"
+          "id,title,title_ar,price,final_price,has_discount,discount_percentage,image_url,created_at,quantity"
         )
         .eq("category_id", category.id)
         .eq("is_active", true)
@@ -66,14 +71,14 @@ export default function CategoryPage({ dbName, title }: Props) {
       <div className="flex items-end justify-between gap-4 border-b border-[#182B2A]/10 pb-5 mb-10">
         <div>
           <h1 className="napd-display text-[clamp(2.8rem,6vw,4.75rem)] leading-[0.95] text-[#182B2A]">
-            {title}
+            {heading}
           </h1>
           <div aria-hidden="true" className="napd-divider mt-4">
             <i />
           </div>
           {!loading && products.length > 0 && (
             <p className="mt-3 text-[11px] uppercase tracking-[0.22em] text-[#5E6B69] tabular-nums">
-              {products.length} {products.length === 1 ? "piece" : "pieces"}
+              {piecesLabel(lang, products.length)}
             </p>
           )}
         </div>
@@ -82,7 +87,7 @@ export default function CategoryPage({ dbName, title }: Props) {
           href="/"
           className="napd-link text-[11px] uppercase tracking-[0.2em] text-[#86663A]"
         >
-          Back Home
+          {t("catpage.back")}
         </Link>
       </div>
 
@@ -95,11 +100,10 @@ export default function CategoryPage({ dbName, title }: Props) {
       ) : products.length === 0 ? (
         <div className="mx-auto max-w-md py-16 text-center">
           <p className="napd-display text-2xl text-[#182B2A]">
-            New pieces are on their way
+            {t("catpage.emptyTitle")}
           </p>
           <p className="mt-3 text-sm leading-relaxed text-[#5E6B69]">
-            This collection is being restocked. Message us on WhatsApp and we
-            will tell you what is available right now.
+            {t("catpage.emptyBody")}
           </p>
           <a
             href={WHATSAPP_URL}
@@ -107,7 +111,7 @@ export default function CategoryPage({ dbName, title }: Props) {
             rel="noopener noreferrer"
             className="napd-btn mt-7 inline-flex items-center justify-center rounded-full bg-[#182B2A] px-6 py-3 text-[12px] uppercase tracking-[0.18em] text-[#FAF7F1]"
           >
-            Ask on WhatsApp
+            {t("catpage.ask")}
           </a>
         </div>
       ) : (

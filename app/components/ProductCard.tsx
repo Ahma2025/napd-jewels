@@ -4,8 +4,9 @@ import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 import Tilt from "./Tilt";
+import { useLang } from "../context/LangContext";
 import {
-  displayTitle,
+  productName,
   formatPrice,
   priceInfo,
   type ListingProduct,
@@ -23,7 +24,8 @@ export default function ProductCard({
   className = "",
 }: Props) {
   const [loaded, setLoaded] = useState(false);
-  const name = displayTitle(product.title);
+  const { lang } = useLang();
+  const name = productName(product, lang);
   const { hasDiscount, pct, original, final } = priceInfo(product);
 
   return (
@@ -49,7 +51,7 @@ export default function ProductCard({
         </div>
 
         {hasDiscount && (
-          <span className="absolute left-2.5 top-2.5 rounded-sm bg-[#182B2A] px-1.5 py-0.5 text-[10px] font-medium tracking-[0.08em] text-[#FAF7F1] tabular-nums">
+          <span className="absolute start-2.5 top-2.5 rounded-sm bg-[#182B2A] px-1.5 py-0.5 text-[10px] font-medium tracking-[0.08em] text-[#FAF7F1] tabular-nums">
             −{pct}%
           </span>
         )}
@@ -57,7 +59,7 @@ export default function ProductCard({
       </div>
       </Tilt>
 
-      <div className="mt-3.5 space-y-1 text-left">
+      <div className="mt-3.5 space-y-1 text-start">
         <p className="truncate text-[13px] leading-snug text-[#182B2A]/80">
           {name}
         </p>

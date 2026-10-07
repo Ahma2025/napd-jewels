@@ -21,7 +21,7 @@ function fetchCollection(categoryName: string) {
         const { data, error } = await supabase
           .from("products")
           .select(
-            "id,title,price,final_price,has_discount,discount_percentage,image_url,created_at,quantity,is_featured,featured_at"
+            "id,title,title_ar,price,final_price,has_discount,discount_percentage,image_url,created_at,quantity,is_featured,featured_at"
           )
           .eq("category_id", cat.id)
           .eq("is_active", true)
