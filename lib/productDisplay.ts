@@ -12,7 +12,22 @@ export type ListingProduct = {
   quantity: number | null;
   category_id?: string;
   is_active?: boolean | null;
+  is_featured?: boolean | null;
+  featured_at?: string | null;
 };
+
+/** Owner-picked pieces first (in the order they were picked), then newest. */
+export function homepageOrder(a: ListingProduct, b: ListingProduct) {
+  const fa = !!a.is_featured;
+  const fb = !!b.is_featured;
+  if (fa !== fb) return fa ? -1 : 1;
+  if (fa && fb) {
+    return (
+      new Date(a.featured_at || 0).getTime() - new Date(b.featured_at || 0).getTime()
+    );
+  }
+  return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+}
 
 export function inStock(p: { quantity: number | null }) {
   return Number(p.quantity || 0) > 0;
