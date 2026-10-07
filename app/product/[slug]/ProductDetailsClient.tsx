@@ -6,6 +6,8 @@ import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { useCart } from "../../context/CartContext";
 import { useIsOwner } from "@/lib/useIsOwner";
+import { displayTitle, formatPrice } from "@/lib/productDisplay";
+import { MessageCircle, ShieldCheck, Gem, Truck, RefreshCw } from "lucide-react";
 
 type DbProduct = {
   id: string;
@@ -46,8 +48,17 @@ const WHATSAPP_NUMBER = "972593255260";
 const RING_SIZES = ["15", "16", "17", "18", "19", "20", "21"];
 
 function formatMoney(n: number) {
-  return Number(n || 0).toFixed(2);
+  return formatPrice(n);
 }
+
+const CATEGORY_LINKS: Record<string, { href: string; label: string }> = {
+  RINGS: { href: "/rings", label: "Rings" },
+  CHAINS: { href: "/chains", label: "Necklaces" },
+  BRACELETS: { href: "/bracelets", label: "Bracelets" },
+  EARRINGS: { href: "/earrings", label: "Earrings" },
+  MOISSANITE: { href: "/moissanite", label: "The Moissanite Edit" },
+  SETS: { href: "/sets", label: "Sets" },
+};
 
 function paramLabel(key: string) {
   if (key === "zircon_grade") return "Zircon Grade";
@@ -166,15 +177,18 @@ export default function ProductDetailsClient({ id }: { id: string }) {
     };
   }, [safeId]);
 
-  const title = useMemo(() => {
-    return (product?.title || "Product").toUpperCase();
-  }, [product?.title]);
+  const title = useMemo(() => displayTitle(product?.title), [product?.title]);
 
-  const isRing = useMemo(() => {
+  const categoryName = useMemo(() => {
     const cats = product?.categories;
     const catName = Array.isArray(cats) ? cats[0]?.name : cats?.name;
-    return (catName || "").toUpperCase() === "RINGS";
+    return (catName || "").toUpperCase();
   }, [product?.categories]);
+
+  const categoryLink = CATEGORY_LINKS[categoryName] ?? null;
+
+  // Moissanite pieces are rings too and need a size.
+  const isRing = categoryName === "RINGS" || categoryName === "MOISSANITE";
 
   const needsSize = isRing && !size;
 
@@ -226,7 +240,7 @@ export default function ProductDetailsClient({ id }: { id: string }) {
   }, [images, activeIndex]);
 
   const waText = useMemo(() => {
-    const t = product?.title || "Product";
+    const t = displayTitle(product?.title);
     const priceLine = hasDiscount
       ? `السعر: ${formatMoney(finalPriceNumber)} (قبل الخصم: ${formatMoney(
           basePriceNumber
@@ -269,7 +283,7 @@ ${priceLine}
     for (let i = 0; i < allowedQty; i++) {
       addToCart({
         id: product.id,
-        name: product.title,
+        name: displayTitle(product.title),
         price: finalPriceNumber,
         image: activeImage,
         size: isRing && size ? size : undefined,
@@ -281,162 +295,189 @@ ${priceLine}
     return parameters.some((p) => (p.value || "").trim());
   }, [parameters]);
 
+  const pct = Number(product?.discount_percentage || 0);
+  const lowStock = inStock && maxQty > 0 && maxQty <= 2;
+
   return (
-    <section className="bg-white py-10">
-      <div className="max-w-[1200px] mx-auto px-6">
+    <section className="bg-white pt-8 pb-20 md:pt-10">
+      <div className="max-w-[1200px] mx-auto px-5 md:px-6">
         {/* Breadcrumbs */}
-        <div className="text-sm tracking-widest text-gray-500 mb-8">
-          <Link href="/" className="hover:underline">
-            HOME
+        <nav
+          aria-label="Breadcrumb"
+          className="mb-8 flex flex-wrap items-center gap-x-2 text-[11px] uppercase tracking-[0.18em] text-[#5E6B69]"
+        >
+          <Link href="/" className="napd-link">
+            Home
           </Link>
-          <span className="mx-2">/</span>
-          <Link href="/" className="hover:underline">
-            SHOP
-          </Link>
-          <span className="mx-2">/</span>
-          <span className="text-gray-900">{title}</span>
-        </div>
+          {categoryLink && (
+            <>
+              <span aria-hidden="true">/</span>
+              <Link href={categoryLink.href} className="napd-link">
+                {categoryLink.label}
+              </Link>
+            </>
+          )}
+          {product && visibleToViewer && (
+            <>
+              <span aria-hidden="true">/</span>
+              <span className="text-[#182B2A] normal-case tracking-normal text-[13px]">
+                {title}
+              </span>
+            </>
+          )}
+        </nav>
 
         {pageLoading ? (
-          <div className="text-black/50">Loading...</div>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16" aria-hidden="true">
+            <div className="napd-skeleton aspect-square w-full rounded-md" />
+            <div className="space-y-4 lg:pt-4">
+              <div className="napd-skeleton h-10 w-3/4 rounded-sm" />
+              <div className="napd-skeleton h-6 w-1/3 rounded-sm" />
+              <div className="napd-skeleton mt-10 h-14 w-full rounded-full" />
+            </div>
+          </div>
         ) : !product || !visibleToViewer ? (
-          <div className="text-black/60">Product not found.</div>
+          <div className="mx-auto max-w-md py-20 text-center">
+            <p className="napd-display text-3xl text-[#182B2A]">
+              This piece is no longer available
+            </p>
+            <p className="mt-3 text-sm leading-relaxed text-[#5E6B69]">
+              It may have sold out. Browse the collection or ask us on WhatsApp
+              for something similar.
+            </p>
+            <div className="mt-7 flex flex-wrap justify-center gap-3">
+              <Link
+                href="/"
+                className="napd-btn inline-flex h-12 items-center rounded-full bg-[#182B2A] px-6 text-[12px] uppercase tracking-[0.18em] text-[#FAF7F1]"
+              >
+                Browse the collection
+              </Link>
+              <a
+                href={`https://wa.me/${WHATSAPP_NUMBER}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex h-12 items-center rounded-full border border-[#182B2A]/20 px-6 text-[12px] uppercase tracking-[0.18em] text-[#182B2A]"
+              >
+                Ask on WhatsApp
+              </a>
+            </div>
+          </div>
         ) : (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16">
             {/* Left: Images */}
             <div>
-              <div className="relative w-full h-[420px] md:h-[520px] bg-[#f6f6f6] rounded-xl overflow-hidden">
-                <Image
-                  src={activeImage}
-                  alt={product.title}
-                  fill
-                  priority
-                  className="object-cover"
-                />
-              </div>
-
-              {/* Thumbnails */}
-              <div className="mt-4 flex gap-3 overflow-x-auto pb-2">
-                {images.map((img, i) => {
-                  const active = i === activeIndex;
-                  return (
-                    <button
-                      key={`${img}-${i}`}
-                      type="button"
-                      onClick={() => setActiveIndex(i)}
-                      className={[
-                        "relative w-[86px] h-[86px] bg-[#f6f6f6] rounded-lg overflow-hidden flex-shrink-0 border transition",
-                        active ? "border-gray-400" : "border-transparent hover:border-gray-300",
-                      ].join(" ")}
-                      aria-label={`Thumbnail ${i + 1}`}
-                    >
-                      <Image
-                        src={img}
-                        alt={`${product.title} thumbnail ${i + 1}`}
-                        fill
-                        className="object-cover"
-                      />
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-
-            {/* Right: Details */}
-            <div className="lg:pt-2">
-              <h1 className="text-2xl md:text-3xl tracking-widest font-medium">
-                {title}
-              </h1>
-
-              <div className="mt-4 flex items-center gap-4 flex-wrap">
-                {hasDiscount ? (
-                  <div className="flex items-center gap-3">
-                    <p className="text-base md:text-lg text-black/40 line-through tracking-wide">
-                      {formatMoney(basePriceNumber)}
-                    </p>
-                    <p className="text-xl md:text-2xl font-medium tracking-wide text-[#123E38]">
-                      {formatMoney(finalPriceNumber)}
-                    </p>
-                  </div>
-                ) : (
-                  <p className="text-xl md:text-2xl font-medium tracking-wide">
-                    {formatMoney(basePriceNumber)}
-                  </p>
-                )}
-
-                <span
-                  className={[
-                    "text-sm px-3 py-1 rounded-full border",
-                    inStock
-                      ? "bg-green-50 text-green-700 border-green-200"
-                      : "bg-red-50 text-red-700 border-red-200",
-                  ].join(" ")}
-                >
-                  {inStock ? "IN STOCK" : "OUT OF STOCK"}
-                </span>
-
-                {inStock && (
-                  <span className="text-xs text-black/45 tracking-widest">
-                    AVAILABLE: {maxQty}
+              <div className="relative w-full aspect-square overflow-hidden rounded-md border border-[#182B2A]/[0.08] bg-white">
+                <div className="absolute inset-4 md:inset-8">
+                  <Image
+                    src={activeImage}
+                    alt={title}
+                    fill
+                    priority
+                    sizes="(min-width: 1024px) 560px, 100vw"
+                    className="object-contain"
+                  />
+                </div>
+                {hasDiscount && (
+                  <span className="absolute left-4 top-4 rounded-sm bg-[#182B2A] px-2 py-1 text-[11px] font-medium tracking-[0.08em] text-[#FAF7F1] tabular-nums">
+                    −{pct}%
                   </span>
                 )}
               </div>
 
-              {/* ✅ NEW: Product Parameters */}
-              {hasParameters && (
-                <div className="mt-8 max-w-[420px] border rounded-xl overflow-hidden">
-                  <div className="px-4 py-4 bg-[#f6f6f6] border-b">
-                    <div className="text-sm tracking-widest text-gray-700">
-                      Product Parameters
-                    </div>
-                  </div>
-
-                  <div className="divide-y">
-                    {parameters
-                      .filter((p) => (p.value || "").trim())
-                      .map((p) => (
-                        <div
-                          key={p.id}
-                          className="grid grid-cols-1 sm:grid-cols-2 gap-2 px-4 py-4"
-                        >
-                          <div className="text-sm text-gray-600">
-                            {paramLabel(p.key)}
-                          </div>
-                          <div className="text-sm text-gray-900">{p.value}</div>
-                        </div>
-                      ))}
-                  </div>
+              {images.length > 1 && (
+                <div className="mt-4 flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
+                  {images.map((img, i) => {
+                    const active = i === activeIndex;
+                    return (
+                      <button
+                        key={`${img}-${i}`}
+                        type="button"
+                        onClick={() => setActiveIndex(i)}
+                        aria-label={`Show image ${i + 1}`}
+                        aria-pressed={active}
+                        className={[
+                          "relative h-[76px] w-[76px] flex-shrink-0 overflow-hidden rounded-md border bg-white transition-colors duration-200",
+                          active
+                            ? "border-[#B08D57]"
+                            : "border-[#182B2A]/10 hover:border-[#182B2A]/30",
+                        ].join(" ")}
+                      >
+                        <span className="absolute inset-1.5">
+                          <Image
+                            src={img}
+                            alt=""
+                            fill
+                            sizes="76px"
+                            className="object-contain"
+                          />
+                        </span>
+                      </button>
+                    );
+                  })}
                 </div>
               )}
+            </div>
+
+            {/* Right: Details */}
+            <div className="lg:pt-4">
+              <h1 className="napd-display text-4xl md:text-5xl text-[#182B2A]">
+                {title}
+              </h1>
+
+              <div className="mt-5 flex items-baseline gap-3 tabular-nums">
+                <p className="text-2xl font-semibold text-[#182B2A]">
+                  {formatMoney(finalPriceNumber)}
+                </p>
+                {hasDiscount && (
+                  <p className="text-base text-[#5E6B69] line-through">
+                    {formatMoney(basePriceNumber)}
+                  </p>
+                )}
+              </div>
+
+              <p className="mt-3 flex items-center gap-2 text-[13px] text-[#5E6B69]">
+                <span
+                  aria-hidden="true"
+                  className={`h-1.5 w-1.5 rounded-full ${inStock ? "bg-[#2F7A5B]" : "bg-[#B4483C]"}`}
+                />
+                {!inStock
+                  ? "Out of stock"
+                  : lowStock
+                  ? `Only ${maxQty} left`
+                  : "In stock, ready to ship"}
+              </p>
 
               {/* Ring Size */}
               {isRing && (
-                <div className="mt-8">
-                  <p className="text-sm tracking-widest text-gray-500 mb-3">
-                    RING SIZE {needsSize && sizeTouched ? (
-                      <span className="text-red-600 normal-case tracking-normal">
-                        — please select a size
+                <div className="mt-9">
+                  <p className="mb-3 text-[11px] uppercase tracking-[0.2em] text-[#5E6B69]">
+                    Ring size
+                    {needsSize && sizeTouched ? (
+                      <span className="ml-2 normal-case tracking-normal text-[13px] text-[#B4483C]">
+                        Please choose a size
                       </span>
                     ) : null}
                   </p>
 
-                  <div className="flex flex-wrap gap-2">
+                  <div className="flex flex-wrap gap-2" role="radiogroup" aria-label="Ring size">
                     {RING_SIZES.map((s) => {
                       const active = size === s;
                       return (
                         <button
                           key={s}
                           type="button"
+                          role="radio"
+                          aria-checked={active}
                           onClick={() => {
                             setSize(s);
                             setSizeTouched(false);
                           }}
                           disabled={!inStock}
                           className={[
-                            "w-12 h-12 rounded-lg border text-sm transition disabled:opacity-50",
+                            "napd-btn h-11 w-11 rounded-full border text-sm tabular-nums transition-colors duration-200 disabled:opacity-50",
                             active
-                              ? "bg-black text-white border-black"
-                              : "border-black/15 hover:border-black/40",
+                              ? "border-[#182B2A] bg-[#182B2A] text-[#FAF7F1]"
+                              : "border-[#182B2A]/15 text-[#182B2A] hover:border-[#182B2A]/40",
                           ].join(" ")}
                         >
                           {s}
@@ -447,86 +488,113 @@ ${priceLine}
                 </div>
               )}
 
-              {/* Quick info */}
-              <div className="mt-6 border-t pt-6">
-                <ul className="text-sm text-gray-600 space-y-2">
-                  <li className="flex gap-2">
-                    <span className="text-gray-900">•</span>
-                    <span>Silver jewelry — premium finish</span>
-                  </li>
-                  <li className="flex gap-2">
-                    <span className="text-gray-900">•</span>
-                    <span>Delivery available</span>
-                  </li>
-                  <li className="flex gap-2">
-                    <span className="text-gray-900">•</span>
-                    <span>Easy exchange policy</span>
-                  </li>
-                </ul>
-              </div>
-
               {/* Quantity */}
               <div className="mt-8">
-                <p className="text-sm tracking-widest text-gray-500 mb-3">QUANTITY</p>
+                <p className="mb-3 text-[11px] uppercase tracking-[0.2em] text-[#5E6B69]">
+                  Quantity
+                </p>
 
-                <div className="inline-flex items-center border rounded-lg overflow-hidden">
+                <div className="inline-flex items-center overflow-hidden rounded-full border border-[#182B2A]/15 text-[#182B2A]">
                   <button
                     type="button"
                     onClick={() => setQty((q) => Math.max(1, q - 1))}
-                    className="w-12 h-12 flex items-center justify-center hover:bg-gray-50 disabled:opacity-50"
+                    className="flex h-11 w-11 items-center justify-center hover:bg-[#FAF7F1] disabled:opacity-40"
                     aria-label="Decrease quantity"
-                    disabled={!inStock}
+                    disabled={!inStock || qty <= 1}
                   >
-                    -
+                    −
                   </button>
-
-                  <div className="w-14 h-12 flex items-center justify-center text-base">
+                  <div className="flex h-11 w-10 items-center justify-center tabular-nums" aria-live="polite">
                     {qty}
                   </div>
-
                   <button
                     type="button"
                     onClick={() =>
                       setQty((q) => Math.min(Math.max(1, q + 1), Math.max(1, maxQty)))
                     }
-                    className="w-12 h-12 flex items-center justify-center hover:bg-gray-50 disabled:opacity-50"
+                    className="flex h-11 w-11 items-center justify-center hover:bg-[#FAF7F1] disabled:opacity-40"
                     aria-label="Increase quantity"
-                    disabled={!inStock}
+                    disabled={!inStock || qty >= maxQty}
                   >
                     +
                   </button>
                 </div>
               </div>
 
-              {/* Buttons */}
-              <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {/* Actions: WhatsApp is where orders actually close */}
+              <div className="mt-9 space-y-3">
+                <a
+                  href={isRing && !size ? undefined : waLink}
+                  onClick={(e) => {
+                    if (isRing && !size) {
+                      e.preventDefault();
+                      setSizeTouched(true);
+                    }
+                  }}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-disabled={!inStock}
+                  className={[
+                    "napd-btn flex h-14 w-full items-center justify-center gap-2.5 rounded-full text-[12px] uppercase tracking-[0.2em]",
+                    inStock
+                      ? "cursor-pointer bg-[#182B2A] text-[#FAF7F1]"
+                      : "pointer-events-none bg-[#182B2A]/30 text-[#FAF7F1]",
+                  ].join(" ")}
+                >
+                  <MessageCircle aria-hidden="true" strokeWidth={1.5} className="h-[18px] w-[18px]" />
+                  Order on WhatsApp
+                </a>
+
                 <button
                   type="button"
                   onClick={handleAddToCart}
                   disabled={!inStock}
-                  className="h-12 rounded-lg bg-black text-white tracking-widest text-sm hover:bg-black/90 transition disabled:opacity-50 disabled:hover:bg-black"
+                  className="napd-btn h-12 w-full rounded-full border border-[#182B2A]/20 text-[12px] uppercase tracking-[0.2em] text-[#182B2A] transition-colors duration-200 hover:border-[#182B2A]/50 disabled:opacity-40"
                 >
-                  ADD TO CART
+                  Add to cart
                 </button>
 
-                <a
-                  href={waLink}
-                  target="_blank"
-                  rel="noreferrer"
-                  className={[
-                    "h-12 rounded-lg tracking-widest text-sm flex items-center justify-center transition",
-                    inStock
-                      ? "bg-[#25D366] text-white hover:opacity-90"
-                      : "bg-gray-200 text-gray-500 pointer-events-none",
-                  ].join(" ")}
-                >
-                  BUY VIA WHATSAPP
-                </a>
+                <p className="pt-1 text-center text-[12px] text-[#5E6B69]">
+                  Your WhatsApp message will include this piece, size and quantity.
+                </p>
               </div>
 
-              <p className="mt-6 text-xs text-gray-500 tracking-wide">
-                WhatsApp message will include product link and quantity.
-              </p>
+              {/* Promises */}
+              <ul className="mt-9 grid grid-cols-2 gap-x-6 gap-y-4 border-t border-[#182B2A]/10 pt-7 text-[13px] text-[#182B2A]/80">
+                <li className="flex items-center gap-2.5">
+                  <ShieldCheck aria-hidden="true" strokeWidth={1.5} className="h-[18px] w-[18px] shrink-0 text-[#86663A]" />
+                  1-year warranty
+                </li>
+                <li className="flex items-center gap-2.5">
+                  <Gem aria-hidden="true" strokeWidth={1.5} className="h-[18px] w-[18px] shrink-0 text-[#86663A]" />
+                  Sterling silver 925
+                </li>
+                <li className="flex items-center gap-2.5">
+                  <Truck aria-hidden="true" strokeWidth={1.5} className="h-[18px] w-[18px] shrink-0 text-[#86663A]" />
+                  Delivery available
+                </li>
+                <li className="flex items-center gap-2.5">
+                  <RefreshCw aria-hidden="true" strokeWidth={1.5} className="h-[18px] w-[18px] shrink-0 text-[#86663A]" />
+                  Easy exchange
+                </li>
+              </ul>
+
+              {/* Product details */}
+              {hasParameters && (
+                <div className="mt-9 border-t border-[#182B2A]/10 pt-7">
+                  <h2 className="napd-display text-2xl text-[#182B2A]">Details</h2>
+                  <dl className="mt-4 divide-y divide-[#182B2A]/[0.07]">
+                    {parameters
+                      .filter((p) => (p.value || "").trim())
+                      .map((p) => (
+                        <div key={p.id} className="grid grid-cols-2 gap-4 py-3 text-[13px]">
+                          <dt className="text-[#5E6B69]">{paramLabel(p.key)}</dt>
+                          <dd className="text-[#182B2A]">{p.value}</dd>
+                        </div>
+                      ))}
+                  </dl>
+                </div>
+              )}
             </div>
           </div>
         )}
