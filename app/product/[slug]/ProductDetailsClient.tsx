@@ -391,7 +391,7 @@ ${t("wa.link")}: ${productUrl}`;
                 </div>
                 {hasDiscount && (
                   <span className="absolute start-4 top-4 rounded-sm bg-[#182B2A] px-2 py-1 text-[11px] font-medium tracking-[0.08em] text-[#FAF7F1] tabular-nums">
-                    −{pct}%
+                    <bdi dir="ltr">−{pct}%</bdi>
                   </span>
                 )}
               </div>
