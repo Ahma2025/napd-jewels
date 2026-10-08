@@ -48,7 +48,7 @@ type DbProductParameter = {
 // حط رقم حميد هون بصيغة دولية بدون +
 const WHATSAPP_NUMBER = "972593255260";
 
-const RING_SIZES = ["15", "16", "17", "18", "19", "20", "21"];
+const RING_SIZES = ["15", "16", "17", "18", "19"];
 
 function formatMoney(n: number) {
   return formatPrice(n);
