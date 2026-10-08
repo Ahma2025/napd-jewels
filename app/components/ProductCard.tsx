@@ -52,7 +52,7 @@ export default function ProductCard({
 
         {hasDiscount && (
           <span className="absolute start-2.5 top-2.5 rounded-sm bg-[#182B2A] px-1.5 py-0.5 text-[10px] font-medium tracking-[0.08em] text-[#FAF7F1] tabular-nums">
-            −{pct}%
+            <bdi dir="ltr">−{pct}%</bdi>
           </span>
         )}
         <span aria-hidden="true" className="napd-shine pointer-events-none absolute inset-0" />

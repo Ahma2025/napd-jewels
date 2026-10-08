@@ -37,10 +37,10 @@ export const dict = {
     "footer.silver": "Sterling Silver 925",
 
     // hero
-    "hero.sr": "A small ring, a big love.",
+    "hero.sr": "An exceptional piece, for exceptional taste.",
     "hero.side": "NAPD Jewels · Sterling Silver 925",
     "hero.sub":
-      "Sterling silver 925 and moissanite, chosen piece by piece for the moments she will remember.",
+      "Sterling silver 925 and moissanite, hand-picked for the moments she will remember.",
     "hero.shop": "Shop the collection",
     "hero.whatsapp": "WhatsApp",
     "hero.scroll": "Scroll",
@@ -169,9 +169,9 @@ export const dict = {
     "footer.rights": "© 2026 NAPD Jewels. جميع الحقوق محفوظة.",
     "footer.silver": "فضة إسترلينية عيار 925",
 
-    "hero.sr": "خاتمٌ صغير، وحبٌّ كبير.",
-    "hero.side": "NAPD Jewels · فضة عيار 925",
-    "hero.sub": "فضة عيار 925 وأحجار مويسانيت، ننتقيها قطعةً قطعة للحظاتٍ لا تُنسى.",
+    "hero.sr": "قطعة استثنائية لذوقٍ استثنائي.",
+    "hero.side": "NAPD Jewels · فضة إسترلينية عيار 925",
+    "hero.sub": "فضة إسترلينية عيار 925 وأحجار مويسانيت، ننتقيها بعناية للحظاتٍ لا تُنسى.",
     "hero.shop": "تسوّق التشكيلة",
     "hero.whatsapp": "واتساب",
     "hero.scroll": "اكتشف",
@@ -204,8 +204,8 @@ export const dict = {
 
     "promise.warranty.title": "ضمان لمدة عام",
     "promise.warranty.body": "كل قطعة مضمونة لعامٍ كامل من يوم استلامها.",
-    "promise.silver.title": "فضة إسترلينية 925",
-    "promise.silver.body": "فضة عيار 925 مستوردة وأحجار مويسانيت، نفحص كل قطعة بعناية.",
+    "promise.silver.title": "فضة إسترلينية عيار 925",
+    "promise.silver.body": "فضة إسترلينية مستوردة وأحجار مويسانيت، نفحص كل قطعة بعناية قبل أن تصلك.",
     "promise.personal.title": "خدمة شخصية",
     "promise.personal.body": "راسلنا على واتساب، وسيساعدك فريقنا في اختيار القطعة المناسبة.",
     "promise.before": "تبحث عن",
@@ -235,7 +235,7 @@ export const dict = {
     "pdp.addToCart": "أضف إلى السلة",
     "pdp.note": "ستتضمن رسالة واتساب القطعة والمقاس والكمية.",
     "pdp.p.warranty": "ضمان لمدة عام",
-    "pdp.p.silver": "فضة عيار 925",
+    "pdp.p.silver": "فضة إسترلينية عيار 925",
     "pdp.p.delivery": "التوصيل متاح",
     "pdp.p.exchange": "استبدال سهل",
     "pdp.details": "التفاصيل",

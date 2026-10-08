@@ -85,12 +85,25 @@ export default function Hero() {
           aria-hidden="true"
           className="napd-hero-serif napd-depth-fast text-center text-[clamp(3.2rem,6.4vw,6.8rem)] whitespace-nowrap leading-[0.9] lg:self-start lg:pt-[9vh] lg:text-end"
         >
-          <span className="block">
-            <Chars text={ar ? "خاتمٌ" : "A small"} start={250} words={ar} />
-          </span>
-          <span className="block italic">
-            <Chars text={ar ? "صغير،" : "ring,"} start={520} words={ar} />
-          </span>
+          {ar ? (
+            <>
+              <span className="block">
+                <Chars text="قطعة" start={250} words />
+              </span>
+              <span className="block">
+                <Chars text="استثنائية،" start={520} words />
+              </span>
+            </>
+          ) : (
+            <>
+              <span className="mb-[0.12em] block text-[0.6em]">
+                <Chars text="Exceptional" start={250} />
+              </span>
+              <span className="block italic">
+                <Chars text="piece," start={680} />
+              </span>
+            </>
+          )}
         </p>
 
         {/* The vitrine niche */}
@@ -189,19 +202,19 @@ export default function Hero() {
           {ar ? (
             <p aria-hidden="true" className="napd-depth-fast">
               <span className="napd-script napd-foil napd-write block text-[clamp(5rem,8.5vw,8.5rem)] leading-[1.15]">
-                وحبٌّ
+                لذوقٍ
               </span>
               <span className="napd-hero-serif block text-[clamp(3.2rem,6.4vw,6.8rem)] whitespace-nowrap leading-[1.1]">
-                <Chars text="كبير." start={1500} words />
+                <Chars text="استثنائي." start={1500} words />
               </span>
             </p>
           ) : (
             <p aria-hidden="true" className="napd-depth-fast">
-              <span className="napd-hero-serif block text-[clamp(3.2rem,6.4vw,6.8rem)] whitespace-nowrap leading-[0.9]">
-                <Chars text="a big" start={780} />
+              <span className="napd-hero-serif block text-[clamp(2.1rem,3.85vw,4.1rem)] whitespace-nowrap leading-[0.9]">
+                <Chars text="for exceptional" start={900} />
               </span>
               <span className="napd-script napd-foil napd-write block text-[clamp(6.4rem,12vw,11.5rem)] leading-[0.8] lg:ms-[0.2em]">
-                love.
+                taste.
               </span>
             </p>
           )}
