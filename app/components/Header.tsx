@@ -8,6 +8,7 @@ import { ShoppingBag, Menu, X } from "lucide-react";
 import { useCart } from "../context/CartContext";
 import { supabase } from "@/lib/supabase";
 import { useLang } from "../context/LangContext";
+import OccasionRibbon from "./OccasionRibbon";
 
 const PRIMARY = "#182B2A";
 const GOLD = "#B08D57";
@@ -199,6 +200,7 @@ export default function Header() {
 
   return (
     <header className="sticky top-0 z-50" style={{ backgroundColor: PRIMARY }}>
+      <OccasionRibbon />
       {/* ANNOUNCEMENT MARQUEE */}
       <div className="hidden md:flex h-9 items-center overflow-hidden border-b border-white/10">
         <div className="napd-marquee-track">

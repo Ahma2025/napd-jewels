@@ -6,6 +6,9 @@ import Header from "./components/Header";
 import Footer from "./components/Footer";
 import { CartProvider } from "./context/CartContext";
 import { LangProvider } from "./context/LangContext";
+import { OccasionProvider } from "./context/OccasionContext";
+import { supabase } from "@/lib/supabase";
+import { OCCASION_COLUMNS, pickOccasion, todayInPalestine, type Occasion } from "@/lib/occasion";
 import { cookies, headers } from "next/headers";
 import { detectLang, LANG_COOKIE } from "@/lib/i18n";
 
@@ -72,6 +75,23 @@ export const metadata: Metadata = {
   description: "Luxury Silver Jewelry Store",
 };
 
+/** The occasion whose storefront window includes today, if any. Never blocks the page. */
+async function currentOccasion(): Promise<Occasion | null> {
+  try {
+    const today = todayInPalestine();
+    const { data, error } = await supabase
+      .from("occasions")
+      .select(OCCASION_COLUMNS)
+      .eq("site_enabled", true)
+      .lte("site_from", today)
+      .gte("site_to", today);
+    if (error || !data) return null;
+    return pickOccasion(data as Occasion[], today);
+  } catch {
+    return null;
+  }
+}
+
 export default async function RootLayout({
   children,
 }: Readonly<{
@@ -80,6 +100,7 @@ export default async function RootLayout({
   // a saved choice wins; otherwise follow the visitor's phone/browser language
   const cookieStore = await cookies();
   const headerList = await headers();
+  const occasion = await currentOccasion();
   const lang = detectLang(
     cookieStore.get(LANG_COOKIE)?.value,
     headerList.get("accept-language")
@@ -91,11 +112,13 @@ export default async function RootLayout({
         className={`${dmSans.variable} ${cormorant.variable} ${bodoni.variable} ${pinyon.variable} ${arDisplay.variable} ${arScript.variable} ${arSans.variable} antialiased bg-white min-h-screen flex flex-col`}
       >
         <LangProvider initial={lang}>
-          <CartProvider>
-            <Header />
-            <main className="flex-1">{children}</main>
-            <Footer />
-          </CartProvider>
+          <OccasionProvider initial={occasion}>
+            <CartProvider>
+              <Header />
+              <main className="flex-1">{children}</main>
+              <Footer />
+            </CartProvider>
+          </OccasionProvider>
         </LangProvider>
       </body>
     </html>
