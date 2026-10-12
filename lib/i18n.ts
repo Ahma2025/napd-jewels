@@ -86,6 +86,13 @@ export const dict = {
     "promise.after": "",
     "promise.cta": "Ask us on WhatsApp",
 
+    // seasonal occasion
+    "occasion.today": "Today",
+    "occasion.shop": "Shop the gifts",
+    "occasion.whatsapp": "Order on WhatsApp",
+    "occasion.waText": "Hello, I'd like a gift for",
+    "occasion.discover": "Discover",
+
     // category page
     "catpage.back": "Back Home",
     "catpage.emptyTitle": "New pieces are on their way",
@@ -213,6 +220,13 @@ export const dict = {
     "promise.after": "",
     "promise.cta": "راسلنا على واتساب",
 
+    // seasonal occasion
+    "occasion.today": "اليوم",
+    "occasion.shop": "تسوّق الهدايا",
+    "occasion.whatsapp": "اطلب عبر واتساب",
+    "occasion.waText": "مرحباً، بدي هدية لـ",
+    "occasion.discover": "اكتشف",
+
     "catpage.back": "الرئيسية",
     "catpage.emptyTitle": "قطع جديدة في الطريق",
     "catpage.emptyBody": "نعمل على تجديد هذه التشكيلة. راسلنا على واتساب لنخبرك بما هو متوفر الآن.",
@@ -277,6 +291,15 @@ export function piecesLabel(lang: Lang, n: number) {
   if (n === 2) return "قطعتان";
   if (n >= 3 && n <= 10) return `${n} قطع`;
   return `${n} قطعة`;
+}
+
+/** "12 days to go" with Arabic plural forms. */
+export function daysLeftLabel(lang: Lang, n: number) {
+  if (lang === "en") return n === 1 ? "1 day to go" : `${n} days to go`;
+  if (n === 1) return "باقي يوم واحد";
+  if (n === 2) return "باقي يومان";
+  if (n >= 3 && n <= 10) return `باقي ${n} أيام`;
+  return `باقي ${n} يوماً`;
 }
 
 /** Low-stock line on the product page. */
