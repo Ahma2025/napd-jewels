@@ -87,3 +87,42 @@ export function occasionText(o: Occasion, lang: Lang) {
     subline: (ar ? o.subline_ar : o.subline_en) || "",
   };
 }
+
+/** The collection an occasion leads to, from its CTA path (e.g. "/sets" → "SETS"). */
+const CATEGORY_BY_PATH: Record<string, string> = {
+  "/moissanite": "MOISSANITE",
+  "/sets": "SETS",
+  "/rings": "RINGS",
+  "/chains": "CHAINS",
+  "/bracelets": "BRACELETS",
+  "/earrings": "EARRINGS",
+};
+
+export function occasionCategory(o: Occasion) {
+  const path = (o.cta_href || "").split(/[?#]/)[0].replace(/\/$/, "");
+  return CATEGORY_BY_PATH[path] ?? "MOISSANITE";
+}
+
+/** Midnight at the start of the occasion day, in Palestine's time zone. */
+export function occasionStart(o: Occasion) {
+  const guess = new Date(`${o.occasion_date}T00:00:00Z`);
+  const offset =
+    new Intl.DateTimeFormat("en-US", { timeZone: "Asia/Hebron", timeZoneName: "longOffset" })
+      .formatToParts(guess)
+      .find((p) => p.type === "timeZoneName")?.value ?? "GMT+02:00";
+  const m = offset.match(/GMT([+-])(\d{2}):?(\d{2})?/);
+  const mins = m ? (m[1] === "-" ? -1 : 1) * (Number(m[2]) * 60 + Number(m[3] || 0)) : 120;
+  return guess.getTime() - mins * 60_000;
+}
+
+const ROMAN: [number, string][] = [
+  [1000, "M"], [900, "CM"], [500, "D"], [400, "CD"], [100, "C"], [90, "XC"],
+  [50, "L"], [40, "XL"], [10, "X"], [9, "IX"], [5, "V"], [4, "IV"], [1, "I"],
+];
+
+/** 2026 → MMXXVI, for the engraved seal. */
+export function roman(n: number) {
+  let out = "";
+  for (const [v, s] of ROMAN) while (n >= v) (out += s), (n -= v);
+  return out;
+}

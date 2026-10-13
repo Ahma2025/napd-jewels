@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { useCart } from "../context/CartContext";
 import { supabase } from "@/lib/supabase";
 
-const PRIMARY = "#123E38";
+const PRIMARY = "rgb(var(--c-emerald))";
 
 type DeliveryArea = "West Bank" | "Jerusalem" | "Inside";
 type PaymentMethod = "cod" | "card";

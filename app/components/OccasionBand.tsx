@@ -1,100 +1,98 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowRight, MessageCircle } from "lucide-react";
+import { Gift, MessageCircle, ShieldCheck } from "lucide-react";
 import Reveal from "./Reveal";
-import Spotlight from "./Spotlight";
-import MaskHeading from "./MaskHeading";
-import OccasionMotif, { motifPattern } from "./OccasionMotif";
+import ProductCard, { ProductCardSkeleton } from "./ProductCard";
+import { OccasionDivider } from "./OccasionOrnament";
 import { useOccasion } from "../context/OccasionContext";
 import { useLang } from "../context/LangContext";
-import { daysLeftLabel } from "@/lib/i18n";
-import { THEMES, daysUntil, occasionText, todayInPalestine } from "@/lib/occasion";
+import { useCollection } from "@/lib/useCollection";
+import { THEMES, occasionCategory, occasionText } from "@/lib/occasion";
 
 const WHATSAPP_NUMBER = "972593255260";
+const PIECES = 5;
 
-/** The seasonal band under the hero: the occasion's line, a countdown, and the way to order. */
+/** The occasion's edit under the hero: the pieces its campaign leads to, and how we gift them. */
 export default function OccasionBand() {
   const occasion = useOccasion();
   const { lang, t } = useLang();
+  const { items, loading } = useCollection(occasion ? occasionCategory(occasion) : "MOISSANITE");
   if (!occasion) return null;
 
   const theme = THEMES[occasion.theme] ?? THEMES.eid;
   const text = occasionText(occasion, lang);
-  const days = daysUntil(occasion.occasion_date, todayInPalestine());
   const wa = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(`${t("occasion.waText")}${lang === "ar" ? "" : " "}${text.name}`)}`;
+  const pieces = items.slice(0, PIECES);
+  if (!loading && !pieces.length) return null;
+
+  const promises = [
+    { icon: Gift, label: t("occasion.promiseBox") },
+    { icon: ShieldCheck, label: t("occasion.promiseWarranty") },
+    { icon: MessageCircle, label: t("occasion.promiseHelp"), href: wa },
+  ];
 
   return (
-    <section
-      id="occasion"
-      aria-label={text.name}
-      className="napd-occasion relative isolate overflow-hidden py-20 text-[#FAF7F1] md:py-28"
-      style={{ backgroundColor: theme.ground, ["--occ-accent" as string]: theme.accent }}
-    >
-      {/* a faint field of the motif, and a soft light */}
-      <div
-        aria-hidden="true"
-        className="napd-occasion-field absolute inset-0 -z-10"
-        style={{ backgroundImage: motifPattern(theme.motif, theme.accent) }}
-      />
-      <div aria-hidden="true" className="napd-occasion-glow absolute inset-0 -z-10" />
-      <Spotlight />
-
-      <div className="relative mx-auto grid max-w-[1100px] items-center gap-12 px-5 md:grid-cols-[1fr_auto] md:gap-16 md:px-8">
-        <Reveal className="text-center md:text-start">
-          <div className="flex flex-wrap items-center justify-center gap-3 md:justify-start">
-            <span className="text-[11px] uppercase tracking-[0.32em]" style={{ color: theme.accent }}>
-              {text.name}
-            </span>
-            {days >= 0 && (
-              <span
-                className="rounded-full border px-3 py-1 text-[11px] tracking-[0.12em]"
-                style={{ borderColor: `${theme.accent}55`, color: `${theme.accent}` }}
-              >
-                {days === 0 ? t("occasion.today") : daysLeftLabel(lang, days)}
-              </span>
-            )}
-          </div>
-
-          <MaskHeading className="napd-display mt-6 text-[clamp(2.6rem,6vw,4.75rem)] leading-[1.02]">
-            {text.headline}{" "}
-            <span className="napd-script napd-flourish napd-occasion-flourish">{text.flourish}</span>
-          </MaskHeading>
-
+    <section id="occasion" aria-labelledby="occasion-title" className="relative bg-white pt-20 md:pt-28">
+      <div className="mx-auto max-w-[1360px] px-5 md:px-10">
+        <Reveal className="text-center">
+          <p className="napd-caps-wide text-[11px] text-napd-muted">{text.name}</p>
+          <OccasionDivider motif={theme.motif} className="mt-6 text-napd-gold" />
+          <h2 id="occasion-title" className="napd-display mt-6 text-[clamp(2.2rem,4.4vw,3.6rem)] leading-[1.05] text-napd-ink">
+            {t("occasion.editTitle")} <span className="italic text-napd-bronze">{text.name}</span>
+          </h2>
           {text.subline && (
-            <p className="mx-auto mt-5 max-w-[42ch] text-[15px] leading-relaxed text-[#FAF7F1]/70 md:mx-0">
-              {text.subline}
-            </p>
+            <p className="mx-auto mt-4 max-w-[46ch] text-[15px] leading-relaxed text-napd-muted">{text.subline}</p>
           )}
-
-          <div className="mt-9 flex flex-col items-center gap-3 sm:flex-row sm:justify-center md:justify-start">
-            <Link
-              href={occasion.cta_href || "/"}
-              className="napd-btn inline-flex h-12 items-center gap-2 rounded-full bg-[#FAF7F1] px-7 text-[12px] uppercase tracking-[0.18em] text-[#182B2A]"
-            >
-              {t("occasion.shop")}
-              <ArrowRight aria-hidden="true" strokeWidth={1.5} className="napd-flip h-4 w-4" />
-            </Link>
-            <a
-              href={wa}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex h-12 items-center gap-2 rounded-full border px-7 text-[12px] uppercase tracking-[0.18em] transition-colors hover:bg-white/[0.06]"
-              style={{ borderColor: `${theme.accent}66`, color: theme.accent }}
-            >
-              <MessageCircle aria-hidden="true" strokeWidth={1.5} className="h-4 w-4" />
-              {t("occasion.whatsapp")}
-            </a>
-          </div>
         </Reveal>
 
-        <Reveal delay={120} className="hidden justify-center md:flex">
-          <div className="napd-occasion-emblem relative grid h-[260px] w-[260px] place-items-center rounded-full border" style={{ borderColor: `${theme.accent}40` }}>
-            <span aria-hidden="true" className="absolute inset-4 rounded-full border" style={{ borderColor: `${theme.accent}26` }} />
-            <OccasionMotif motif={theme.motif} strokeWidth={0.9} className="napd-occasion-motif h-[150px] w-[150px]" />
-          </div>
-        </Reveal>
+        <div className="napd-tab-panel napd-row -mx-5 mt-14 flex snap-x snap-mandatory gap-4 overflow-x-auto scroll-px-5 px-5 pb-2 scrollbar-hide md:mx-0 md:mt-16 md:grid md:grid-cols-5 md:gap-x-8 md:overflow-visible md:px-0">
+          {loading
+            ? Array.from({ length: PIECES }, (_, i) => (
+                <ProductCardSkeleton key={i} className="w-[46vw] max-w-[230px] shrink-0 md:w-auto md:max-w-none" />
+              ))
+            : pieces.map((p) => (
+                <ProductCard
+                  key={p.id}
+                  product={p}
+                  sizes="(min-width: 768px) 240px, 46vw"
+                  className="w-[46vw] max-w-[230px] shrink-0 snap-start md:w-auto md:max-w-none"
+                />
+              ))}
+        </div>
+
+        <div className="mt-14 flex justify-center">
+          <Link href={occasion.cta_href || "/"} className="napd-pill">
+            {t("occasion.shop")}
+          </Link>
+        </div>
       </div>
+
+      {/* how every gift leaves the shop */}
+      <ul className="mt-20 grid border-y border-napd-ink/[0.08] bg-napd-paper/60 md:mt-24 md:grid-cols-3">
+        {promises.map(({ icon: Icon, label, href }, i) => {
+          const body = (
+            <>
+              <Icon aria-hidden="true" strokeWidth={1.2} className="h-5 w-5 text-napd-bronze" />
+              <span className="napd-caps text-[11.5px] text-napd-ink/80">{label}</span>
+            </>
+          );
+          return (
+            <li
+              key={label}
+              className={`flex justify-center py-6 md:py-8 ${i > 0 ? "border-t border-napd-ink/[0.08] md:border-s md:border-t-0" : ""}`}
+            >
+              {href ? (
+                <a href={href} target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 hover:opacity-70">
+                  {body}
+                </a>
+              ) : (
+                <span className="flex items-center gap-3">{body}</span>
+              )}
+            </li>
+          );
+        })}
+      </ul>
     </section>
   );
 }

@@ -4,6 +4,9 @@ import Image from "next/image";
 import Link from "next/link";
 import { Facebook, Instagram, Phone } from "lucide-react";
 import { useLang } from "../context/LangContext";
+import { useOccasion } from "../context/OccasionContext";
+import { OccasionSeal } from "./OccasionOrnament";
+import { THEMES, occasionText, roman } from "@/lib/occasion";
 
 const SOCIAL = {
   instagram: "https://instagram.com/napd.ps",
@@ -12,10 +15,22 @@ const SOCIAL = {
 };
 
 export default function Footer() {
-  const { t } = useLang();
+  const { lang, t } = useLang();
+  const occasion = useOccasion();
   return (
-    <footer className="pt-20 pb-12 border-t border-white/10" style={{ backgroundColor: "#182B2A" }}>
+    <footer className="pt-20 pb-12 border-t border-white/10" style={{ backgroundColor: "rgb(var(--c-ink))" }}>
       <div className="max-w-[1200px] mx-auto px-6 text-center">
+
+        {occasion && (
+          <div className="mb-14 flex flex-col items-center gap-5 text-napd-goldsoft">
+            <OccasionSeal
+              motif={THEMES[occasion.theme]?.motif ?? "star"}
+              text={`NAPD JEWELS · ${occasion.name_en.toUpperCase()} · ${roman(Number(occasion.occasion_date.slice(0, 4)))} · `}
+              className="relative h-36 w-36 opacity-80"
+            />
+            <p className="napd-caps text-[11px] text-napd-ivory/60">{occasionText(occasion, lang).name}</p>
+          </div>
+        )}
 
         {/* Brand */}
         <div className="flex justify-center">
@@ -40,7 +55,7 @@ export default function Footer() {
             <Facebook
               size={22}
               strokeWidth={1.5}
-              className="text-white/80 transition-all duration-300 group-hover:scale-110 group-hover:text-[#B08D57]"
+              className="text-white/80 transition-all duration-300 group-hover:scale-110 group-hover:text-napd-gold"
             />
           </a>
 
@@ -54,7 +69,7 @@ export default function Footer() {
             <Instagram
               size={22}
               strokeWidth={1.5}
-              className="text-white/80 transition-all duration-300 group-hover:scale-110 group-hover:text-[#B08D57]"
+              className="text-white/80 transition-all duration-300 group-hover:scale-110 group-hover:text-napd-gold"
             />
           </a>
 
@@ -68,29 +83,29 @@ export default function Footer() {
             <Phone
               size={22}
               strokeWidth={1.5}
-              className="text-white/80 transition-all duration-300 group-hover:scale-110 group-hover:text-[#B08D57]"
+              className="text-white/80 transition-all duration-300 group-hover:scale-110 group-hover:text-napd-gold"
             />
           </a>
         </div>
 
         {/* Links */}
-        <nav className="mt-12 flex flex-wrap items-center justify-center gap-x-10 gap-y-4 text-[14px] uppercase tracking-wide text-white/75">
-          <Link href="/contact" className="hover:text-[#B08D57]">
+        <nav className="napd-caps mt-12 flex flex-wrap items-center justify-center gap-x-10 gap-y-4 text-[12px] text-white/70">
+          <Link href="/contact" className="hover:text-napd-gold">
             {t("footer.contact")}
           </Link>
-          <Link href="/about" className="hover:text-[#B08D57]">
+          <Link href="/about" className="hover:text-napd-gold">
             {t("footer.about")}
           </Link>
-          <Link href="/faqs" className="hover:text-[#B08D57]">
+          <Link href="/faqs" className="hover:text-napd-gold">
             {t("footer.faqs")}
           </Link>
-          <Link href="/shipping-policy" className="hover:text-[#B08D57]">
+          <Link href="/shipping-policy" className="hover:text-napd-gold">
             {t("footer.shipping")}
           </Link>
-          <Link href="/exchange-policy" className="hover:text-[#B08D57]">
+          <Link href="/exchange-policy" className="hover:text-napd-gold">
             {t("footer.exchange")}
           </Link>
-          <Link href="/privacy-policy" className="hover:text-[#B08D57]">
+          <Link href="/privacy-policy" className="hover:text-napd-gold">
             {t("footer.privacy")}
           </Link>
         </nav>

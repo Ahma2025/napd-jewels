@@ -2,17 +2,234 @@
 @tailwind components;
 @tailwind utilities;
 
+/* NAPD brand tokens. Colors are RGB triplets so Tailwind's opacity steps work
+   (bg-napd-ink/90); an occasion overrides them on <html data-occasion>, which
+   re-dresses every page at once. */
 :root {
   --background: #ffffff;
   --foreground: #171717;
-
-  /* NAPD brand tokens */
-  --napd-ivory: #faf7f1;
-  --napd-green: #182b2a;
-  --napd-green-deep: #0e1b1a;
-  --napd-gold: #b08d57;
-  --napd-gold-light: #d9c6a0;
+  --c-ink: 24 43 42;
+  --c-deep: 14 27 26;
+  --c-gold: 176 141 87;
+  --c-goldsoft: 217 198 160;
+  --c-ivory: 250 247 241;
+  --c-emerald: 18 62 56;
+  --c-muted: 94 107 105;
+  --c-bronze: 134 102 58;
+  --c-paper: 244 239 229;
+  --c-accent: 176 141 87;
+  --c-velvet-light: 54 92 86;
+  --c-velvet-dark: 7 16 15;
+  --foil-1: #9a7743;
+  --foil-2: #e9d5a6;
+  --foil-3: #b08d57;
+  --foil-4: #fbf2da;
+  --foil-5: #8a6a3a;
+  --foil-6: #d9c6a0;
+  --foil-d1: #6f5330;
+  --foil-d2: #86663a;
+  --foil-d3: #c9a96e;
+  --foil-d4: #5e4526;
 }
+
+/* ---- Occasion palettes: the whole storefront takes the occasion's colors ---- */
+html[data-occasion="black_friday"] {
+  --c-ink: 17 17 18;
+  --c-deep: 6 6 7;
+  --c-gold: 201 168 106;
+  --c-goldsoft: 230 214 178;
+  --c-ivory: 245 242 236;
+  --c-emerald: 28 28 30;
+  --c-muted: 104 104 108;
+  --c-bronze: 140 110 62;
+  --c-paper: 236 232 225;
+  --c-accent: 201 168 106;
+  --c-velvet-light: 62 56 46;
+  --c-velvet-dark: 0 0 0;
+  --foil-1: #a07d45;
+  --foil-2: #f1dfb0;
+  --foil-3: #c9a86a;
+  --foil-4: #fff6dc;
+  --foil-5: #8c6c38;
+  --foil-6: #e6d6b2;
+  --foil-d1: #6f5330;
+  --foil-d2: #8c6c38;
+  --foil-d3: #c9a86a;
+  --foil-d4: #5e4526;
+}
+html[data-occasion="valentine"] {
+  --c-ink: 58 21 32;
+  --c-deep: 36 12 20;
+  --c-gold: 205 150 120;
+  --c-goldsoft: 238 200 186;
+  --c-ivory: 252 245 243;
+  --c-emerald: 92 30 46;
+  --c-muted: 122 92 98;
+  --c-bronze: 150 88 70;
+  --c-paper: 246 233 230;
+  --c-accent: 214 120 135;
+  --c-velvet-light: 124 42 64;
+  --c-velvet-dark: 20 6 10;
+  --foil-1: #9c5f4b;
+  --foil-2: #f3cdbb;
+  --foil-3: #cd9678;
+  --foil-4: #ffece3;
+  --foil-5: #85503f;
+  --foil-6: #eec8ba;
+  --foil-d1: #6e3d2f;
+  --foil-d2: #965846;
+  --foil-d3: #c98f73;
+  --foil-d4: #5a3024;
+}
+html[data-occasion="mothers"] {
+  --c-ink: 70 42 56;
+  --c-deep: 44 26 36;
+  --c-gold: 196 158 128;
+  --c-goldsoft: 236 210 198;
+  --c-ivory: 252 247 245;
+  --c-emerald: 96 58 78;
+  --c-muted: 120 100 108;
+  --c-bronze: 140 98 78;
+  --c-paper: 245 236 233;
+  --c-accent: 222 160 168;
+  --c-velvet-light: 132 84 106;
+  --c-velvet-dark: 22 12 18;
+  --foil-1: #9a6f58;
+  --foil-2: #f2d9c8;
+  --foil-3: #c49e80;
+  --foil-4: #fff1e8;
+  --foil-5: #82593f;
+  --foil-6: #ecd2c6;
+  --foil-d1: #6c4a38;
+  --foil-d2: #8c624e;
+  --foil-d3: #c3977a;
+  --foil-d4: #573a2c;
+}
+html[data-occasion="womens_day"] {
+  --c-ink: 46 34 64;
+  --c-deep: 28 20 40;
+  --c-gold: 198 166 108;
+  --c-goldsoft: 220 200 232;
+  --c-ivory: 250 247 252;
+  --c-emerald: 70 50 96;
+  --c-muted: 108 100 120;
+  --c-bronze: 132 102 64;
+  --c-paper: 241 236 245;
+  --c-accent: 190 160 220;
+  --c-velvet-light: 98 72 136;
+  --c-velvet-dark: 14 9 22;
+}
+html[data-occasion="christmas"] {
+  --c-ink: 18 48 40;
+  --c-deep: 10 28 23;
+  --c-gold: 201 160 69;
+  --c-goldsoft: 226 204 142;
+  --c-ivory: 251 248 240;
+  --c-emerald: 20 70 56;
+  --c-muted: 92 108 100;
+  --c-bronze: 140 104 40;
+  --c-paper: 243 238 226;
+  --c-accent: 168 44 52;
+  --c-velvet-light: 40 98 80;
+  --c-velvet-dark: 4 14 11;
+  --foil-1: #9a7a32;
+  --foil-2: #f0dc9c;
+  --foil-3: #c9a045;
+  --foil-4: #fff4d0;
+  --foil-5: #87692a;
+  --foil-6: #e2cc8e;
+  --foil-d1: #6b5222;
+  --foil-d2: #8c6a2a;
+  --foil-d3: #c4a050;
+  --foil-d4: #574215;
+}
+html[data-occasion="ramadan"] {
+  --c-ink: 18 36 58;
+  --c-deep: 10 22 38;
+  --c-gold: 212 175 106;
+  --c-goldsoft: 233 215 168;
+  --c-ivory: 250 246 236;
+  --c-emerald: 24 52 84;
+  --c-muted: 96 106 122;
+  --c-bronze: 146 112 56;
+  --c-paper: 242 238 228;
+  --c-accent: 212 175 106;
+  --c-velvet-light: 46 80 124;
+  --c-velvet-dark: 4 10 20;
+  --foil-1: #a1803f;
+  --foil-2: #f2e1b2;
+  --foil-3: #d4af6a;
+  --foil-4: #fff6dd;
+  --foil-5: #8a6a32;
+  --foil-6: #e9d7a8;
+  --foil-d1: #6e5426;
+  --foil-d2: #8f6d33;
+  --foil-d3: #cfa865;
+  --foil-d4: #574118;
+}
+html[data-occasion="eid"] {
+  --c-ink: 15 59 51;
+  --c-deep: 8 38 32;
+  --c-gold: 216 178 106;
+  --c-goldsoft: 235 217 166;
+  --c-ivory: 251 248 238;
+  --c-emerald: 15 70 58;
+  --c-muted: 88 108 102;
+  --c-bronze: 146 112 52;
+  --c-paper: 243 239 226;
+  --c-accent: 216 178 106;
+  --c-velvet-light: 34 112 94;
+  --c-velvet-dark: 3 18 15;
+  --foil-1: #a3823f;
+  --foil-2: #f4e2b0;
+  --foil-3: #d8b26a;
+  --foil-4: #fff6da;
+  --foil-5: #8c6b30;
+  --foil-6: #ebd9a6;
+  --foil-d1: #6f5525;
+  --foil-d2: #906e32;
+  --foil-d3: #d2ab62;
+  --foil-d4: #584117;
+}
+html[data-occasion="weddings"] {
+  --c-ink: 44 40 36;
+  --c-deep: 28 25 22;
+  --c-gold: 194 166 116;
+  --c-goldsoft: 236 224 200;
+  --c-ivory: 255 252 246;
+  --c-emerald: 60 54 48;
+  --c-muted: 112 106 98;
+  --c-bronze: 140 112 70;
+  --c-paper: 246 240 228;
+  --c-accent: 236 224 200;
+  --c-velvet-light: 96 88 76;
+  --c-velvet-dark: 12 10 8;
+  --foil-1: #98804f;
+  --foil-2: #f4ead2;
+  --foil-3: #c2a674;
+  --foil-4: #fffaf0;
+  --foil-5: #86704a;
+  --foil-6: #ece0c8;
+  --foil-d1: #6c5a3a;
+  --foil-d2: #8a734c;
+  --foil-d3: #c4a878;
+  --foil-d4: #55462c;
+}
+html[data-occasion="graduation"] {
+  --c-ink: 22 36 62;
+  --c-deep: 12 22 40;
+  --c-gold: 200 163 92;
+  --c-goldsoft: 220 201 160;
+  --c-ivory: 248 246 241;
+  --c-emerald: 28 50 86;
+  --c-muted: 96 104 120;
+  --c-bronze: 136 104 52;
+  --c-paper: 240 237 230;
+  --c-accent: 200 163 92;
+  --c-velvet-light: 46 72 118;
+  --c-velvet-dark: 4 8 18;
+}
+
 
 /* The storefront is designed light-only. A dark-mode override here used to
    turn body text near-white on the white page for phones in dark mode. */
@@ -21,17 +238,22 @@
 }
 
 body {
+  /* the house serif: a classical roman, like an engraved maison name.
+     Set on body, where next/font defines the font variables. */
+  --napd-serif: var(--font-cormorant), var(--font-bodoni), Georgia, "Times New Roman", serif;
   background: var(--background);
   color: var(--foreground);
-  font-family: var(--font-dm-sans), "DM Sans", Arial, Helvetica, sans-serif;
-  letter-spacing: 0.2px;
+  /* Jost: a geometric couture sans (Futura's lineage) for every Latin line */
+  font-family: var(--font-jost), "Jost", var(--font-dm-sans), Arial, Helvetica, sans-serif;
+  letter-spacing: 0.01em;
+  font-feature-settings: "kern", "liga";
 }
 
 h1,
 h2,
 h3,
 .napd-display {
-  font-family: var(--font-bodoni), var(--font-cormorant), Georgia, "Times New Roman", serif;
+  font-family: var(--napd-serif);
   font-weight: 400;
   font-optical-sizing: auto;
   letter-spacing: -0.02em;
@@ -44,12 +266,12 @@ h3,
 
 /* ---- Browser surfaces in brand colors ---- */
 ::selection {
-  background: rgba(176, 141, 87, 0.28);
-  color: #182b2a;
+  background: rgb(var(--c-gold) / 0.28);
+  color: rgb(var(--c-ink));
 }
 
 :focus-visible {
-  outline: 2px solid var(--napd-gold);
+  outline: 2px solid rgb(var(--c-gold));
   outline-offset: 3px;
   border-radius: 4px;
 }
@@ -93,14 +315,14 @@ h3,
 }
 @media (hover: hover) {
   .napd-card:hover .napd-card-media {
-    border-color: rgba(176, 141, 87, 0.45);
+    border-color: rgb(var(--c-gold) / 0.45);
   }
   .napd-card:hover .napd-card-img {
     transform: scale(1.04);
   }
 }
 .napd-card:focus-visible .napd-card-media {
-  outline: 2px solid var(--napd-gold);
+  outline: 2px solid rgb(var(--c-gold));
   outline-offset: 3px;
 }
 
@@ -112,7 +334,7 @@ h3,
 }
 @media (hover: hover) {
   .napd-btn:hover {
-    background-color: #0e1b1a;
+    background-color: rgb(var(--c-deep));
   }
 }
 
@@ -128,9 +350,9 @@ h3,
 .napd-skeleton {
   background: linear-gradient(
     100deg,
-    #f4efe5 30%,
-    #faf7f1 50%,
-    #f4efe5 70%
+    rgb(var(--c-paper)) 30%,
+    rgb(var(--c-ivory)) 50%,
+    rgb(var(--c-paper)) 70%
   );
   background-size: 200% 100%;
   animation: napd-shimmer 1.6s ease-in-out infinite;
@@ -259,9 +481,9 @@ html {
 /* Deep green velvet with a soft spotlight from above */
 .napd-hero-velvet {
   background:
-    radial-gradient(ellipse 60% 55% at 50% 38%, rgba(54, 92, 86, 0.55) 0%, rgba(24, 43, 42, 0) 70%),
-    radial-gradient(ellipse 120% 80% at 50% 120%, #07100f 0%, rgba(7, 16, 15, 0) 60%),
-    linear-gradient(180deg, #182b2a 0%, #0e1b1a 100%);
+    radial-gradient(ellipse 60% 55% at 50% 38%, rgb(var(--c-velvet-light) / 0.55) 0%, rgb(var(--c-ink) / 0) 70%),
+    radial-gradient(ellipse 120% 80% at 50% 120%, rgb(var(--c-velvet-dark)) 0%, rgb(var(--c-velvet-dark) / 0) 60%),
+    linear-gradient(180deg, rgb(var(--c-ink)) 0%, rgb(var(--c-deep)) 100%);
 }
 .napd-hero-velvet::after {
   /* fine grain so the gradient never bands */
@@ -277,12 +499,12 @@ html {
 .napd-niche {
   box-shadow:
     0 40px 80px -30px rgba(0, 0, 0, 0.65),
-    0 0 0 1px rgba(250, 247, 241, 0.06),
-    0 0 90px -20px rgba(217, 198, 160, 0.35);
+    0 0 0 1px rgb(var(--c-ivory) / 0.06),
+    0 0 90px -20px rgb(var(--c-goldsoft) / 0.35);
 }
 .napd-niche-glow {
-  background: radial-gradient(ellipse 70% 55% at 50% 22%, rgba(255, 255, 255, 0) 40%, rgba(24, 43, 42, 0.07) 100%);
-  box-shadow: inset 0 -30px 50px -30px rgba(24, 43, 42, 0.18);
+  background: radial-gradient(ellipse 70% 55% at 50% 22%, rgba(255, 255, 255, 0) 40%, rgb(var(--c-ink) / 0.07) 100%);
+  box-shadow: inset 0 -30px 50px -30px rgb(var(--c-ink) / 0.18);
 }
 .napd-niche-piece {
   opacity: 0;
@@ -364,8 +586,8 @@ html {
 /* ---- Collection niches ---- */
 .napd-cat-niche {
   box-shadow:
-    0 30px 60px -32px rgba(24, 43, 42, 0.45),
-    0 0 0 1px rgba(176, 141, 87, 0.18);
+    0 30px 60px -32px rgb(var(--c-ink) / 0.45),
+    0 0 0 1px rgb(var(--c-gold) / 0.18);
   transition: box-shadow 500ms cubic-bezier(0.23, 1, 0.32, 1);
 }
 .napd-cat-frame {
@@ -379,12 +601,12 @@ html {
 @media (hover: hover) {
   .napd-cat:hover .napd-cat-niche {
     box-shadow:
-      0 40px 70px -30px rgba(24, 43, 42, 0.55),
-      0 0 0 1px rgba(176, 141, 87, 0.45),
-      0 0 60px -18px rgba(217, 198, 160, 0.7);
+      0 40px 70px -30px rgb(var(--c-ink) / 0.55),
+      0 0 0 1px rgb(var(--c-gold) / 0.45),
+      0 0 60px -18px rgb(var(--c-goldsoft) / 0.7);
   }
   .napd-cat:hover .napd-cat-frame {
-    border-color: rgba(176, 141, 87, 0.7);
+    border-color: rgb(var(--c-gold) / 0.7);
   }
   .napd-cat:hover .napd-card-img {
     transform: scale(1.05);
@@ -397,7 +619,7 @@ html {
   outline: none;
 }
 .napd-cat:focus-visible .napd-cat-frame {
-  border-color: var(--napd-gold);
+  border-color: rgb(var(--c-gold));
   border-width: 2px;
 }
 @media (prefers-reduced-motion: reduce) {
@@ -454,7 +676,7 @@ html {
   }
 }
 .napd-halo {
-  background: radial-gradient(ellipse 50% 45% at 50% 45%, rgba(217, 198, 160, 0.28) 0%, rgba(217, 198, 160, 0) 70%);
+  background: radial-gradient(ellipse 50% 45% at 50% 45%, rgb(var(--c-goldsoft) / 0.28) 0%, rgb(var(--c-goldsoft) / 0) 70%);
   animation: napd-halo 4.8s ease-in-out 1.4s infinite alternate;
 }
 @keyframes napd-frame-in {
@@ -484,8 +706,8 @@ html {
   opacity: 0;
   background: radial-gradient(
     600px circle at var(--sx, 50%) var(--sy, 30%),
-    rgba(217, 198, 160, 0.13),
-    rgba(217, 198, 160, 0) 60%
+    rgb(var(--c-goldsoft) / 0.13),
+    rgb(var(--c-goldsoft) / 0) 60%
   );
 }
 
@@ -524,15 +746,17 @@ html {
 
 /* ================= Hero typography ================= */
 .napd-hero-serif {
-  font-family: var(--font-bodoni), var(--font-cormorant), Georgia, serif;
+  font-family: var(--napd-serif);
   font-weight: 400;
-  font-variation-settings: "opsz" 96;
   letter-spacing: -0.025em;
 }
+/* English flourishes are set in Bodoni italic, the formal couture voice;
+   Arabic keeps its Ruqaa script below. */
 .napd-script {
-  font-family: var(--font-script), var(--font-cormorant), cursive;
+  font-family: var(--napd-serif);
+  font-style: italic;
   font-weight: 400;
-  letter-spacing: 0;
+  letter-spacing: -0.02em;
 }
 /* gold-leaf flourish: the foil catches the light slowly */
 @keyframes napd-foil {
@@ -546,13 +770,13 @@ html {
 .napd-foil {
   background: linear-gradient(
     100deg,
-    #9a7743 0%,
-    #e9d5a6 18%,
-    #b08d57 34%,
-    #fbf2da 48%,
-    #b08d57 62%,
-    #8a6a3a 80%,
-    #d9c6a0 100%
+    var(--foil-1) 0%,
+    var(--foil-2) 18%,
+    var(--foil-3) 34%,
+    var(--foil-4) 48%,
+    var(--foil-3) 62%,
+    var(--foil-5) 80%,
+    var(--foil-6) 100%
   );
   background-size: 260% 100%;
   -webkit-background-clip: text;
@@ -624,7 +848,7 @@ html {
   height: 1px;
   margin-right: 14px;
   vertical-align: middle;
-  background: rgba(176, 141, 87, 0.6);
+  background: rgb(var(--c-gold) / 0.6);
 }
 
 @keyframes napd-caption-in {
@@ -660,7 +884,7 @@ html {
   }
 }
 .napd-scroll-line {
-  background: linear-gradient(rgba(217, 198, 160, 0.8), rgba(217, 198, 160, 0));
+  background: linear-gradient(rgb(var(--c-goldsoft) / 0.8), rgb(var(--c-goldsoft) / 0));
   animation: napd-drip 2.4s cubic-bezier(0.65, 0, 0.35, 1) infinite;
 }
 
@@ -678,13 +902,13 @@ html {
 .napd-foil-deep {
   background-image: linear-gradient(
     100deg,
-    #6f5330 0%,
-    #b08d57 22%,
-    #86663a 40%,
-    #c9a96e 52%,
-    #86663a 66%,
-    #5e4526 84%,
-    #9a7743 100%
+    var(--foil-d1) 0%,
+    var(--foil-3) 22%,
+    var(--foil-d2) 40%,
+    var(--foil-d3) 52%,
+    var(--foil-d2) 66%,
+    var(--foil-d4) 84%,
+    var(--foil-1) 100%
   );
 }
 .napd-flourish {
@@ -704,18 +928,18 @@ html {
   content: "";
   height: 1px;
   width: 48px;
-  background: rgba(176, 141, 87, 0.6);
+  background: rgb(var(--c-gold) / 0.6);
 }
 .napd-divider > i {
   width: 6px;
   height: 6px;
   transform: rotate(45deg);
-  background: #b08d57;
+  background: rgb(var(--c-gold));
 }
 
 /* ================= Arabic (RTL) ================= */
 html[lang="ar"] body {
-  font-family: var(--font-ar-sans), var(--font-dm-sans), Arial, sans-serif;
+  font-family: var(--font-ar-sans), var(--font-jost), Arial, sans-serif;
   letter-spacing: 0;
 }
 html[lang="ar"] h1,
@@ -723,7 +947,7 @@ html[lang="ar"] h2,
 html[lang="ar"] h3,
 html[lang="ar"] .napd-display,
 html[lang="ar"] .napd-hero-serif {
-  font-family: var(--font-ar-display), var(--font-bodoni), serif;
+  font-family: var(--font-ar-display), var(--napd-serif);
   font-weight: 400;
   font-style: normal;
   letter-spacing: 0;
@@ -825,4 +1049,198 @@ html[dir="rtl"] .napd-occasion-glow {
   .napd-occasion-motif {
     animation: napd-occasion-float 4.8s ease-in-out infinite alternate;
   }
+}
+
+/* ================= Maison typography =================
+   Quiet-luxury retail: Latin labels in a light geometric sans, all caps and
+   widely spaced; the classical serif only for names and moments. */
+.napd-caps {
+  font-family: var(--font-jost), "Jost", Arial, sans-serif;
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: 0.22em;
+}
+.napd-caps-wide {
+  font-family: var(--font-jost), "Jost", Arial, sans-serif;
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: 0.3em;
+}
+html[lang="ar"] .napd-caps,
+html[lang="ar"] .napd-caps-wide {
+  font-family: var(--font-ar-sans), var(--font-jost), sans-serif;
+  letter-spacing: 0;
+  text-transform: none;
+}
+/* the house button: a soft gold pill with ink lettering */
+.napd-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  height: 3.25rem;
+  padding: 0 2.6rem;
+  border-radius: 999px;
+  background: rgb(var(--c-gold) / 0.85);
+  color: rgb(var(--c-ink));
+  font-family: var(--font-jost), "Jost", Arial, sans-serif;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.24em;
+  transition: background-color 0.3s ease, color 0.3s ease, transform 0.3s ease;
+}
+.napd-pill:hover {
+  background: rgb(var(--c-ink));
+  color: rgb(var(--c-ivory));
+}
+html[lang="ar"] .napd-pill {
+  font-family: var(--font-ar-sans), sans-serif;
+  letter-spacing: 0;
+  font-size: 14px;
+}
+/* tabs with an ink rule under the chosen one */
+.napd-tab {
+  position: relative;
+  padding-bottom: 0.9rem;
+  color: rgb(var(--c-ink) / 0.55);
+  transition: color 0.3s ease;
+}
+.napd-tab::after {
+  content: "";
+  position: absolute;
+  inset-inline: 0;
+  bottom: 0;
+  height: 1.5px;
+  background: rgb(var(--c-ink));
+  transform: scaleX(0);
+  transition: transform 0.45s cubic-bezier(0.23, 1, 0.32, 1);
+}
+.napd-tab:hover,
+.napd-tab[aria-selected="true"] {
+  color: rgb(var(--c-ink));
+}
+.napd-tab[aria-selected="true"]::after {
+  transform: scaleX(1);
+}
+/* the logo is white artwork; as a mask it takes any house color */
+.napd-logo-mask {
+  display: block;
+  background-color: currentColor;
+  -webkit-mask: url("/napd-logo.png") no-repeat center / contain;
+  mask: url("/napd-logo.png") no-repeat center / contain;
+  aspect-ratio: 183 / 160;
+}
+
+/* product names as a maison sets them: caps, widely spaced (Latin only) */
+.napd-card-name {
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+}
+html[lang="ar"] .napd-card-name {
+  text-transform: none;
+  letter-spacing: 0;
+  font-size: 14px;
+}
+.napd-card-motif {
+  opacity: 0.75;
+  transition: transform 0.6s cubic-bezier(0.23, 1, 0.32, 1), opacity 0.4s ease;
+}
+.napd-card:hover .napd-card-motif {
+  opacity: 1;
+  transform: rotate(-8deg) scale(1.15);
+}
+
+@keyframes napd-panel-in {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .napd-tab-panel > * {
+    animation: napd-panel-in 700ms cubic-bezier(0.23, 1, 0.32, 1) both;
+  }
+  .napd-tab-panel > *:nth-child(2) { animation-delay: 60ms; }
+  .napd-tab-panel > *:nth-child(3) { animation-delay: 120ms; }
+  .napd-tab-panel > *:nth-child(4) { animation-delay: 180ms; }
+  .napd-tab-panel > *:nth-child(5) { animation-delay: 240ms; }
+}
+
+/* ================= Occasion ornaments ================= */
+.napd-orn-line--start {
+  background: linear-gradient(90deg, transparent, currentColor);
+}
+.napd-orn-line--end {
+  background: linear-gradient(90deg, currentColor, transparent);
+}
+html[dir="rtl"] .napd-orn-line--start {
+  background: linear-gradient(270deg, transparent, currentColor);
+}
+html[dir="rtl"] .napd-orn-line--end {
+  background: linear-gradient(270deg, currentColor, transparent);
+}
+@keyframes napd-seal-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .napd-seal-spin {
+    animation: napd-seal-spin 60s linear infinite;
+  }
+}
+.napd-countdown-num {
+  font-family: var(--napd-serif);
+  font-size: clamp(2rem, 3.6vw, 3rem);
+  line-height: 1;
+  font-weight: 400;
+  letter-spacing: 0;
+}
+.napd-countdown-sep {
+  height: 60%;
+  background: currentColor;
+  opacity: 0.25;
+}
+@keyframes napd-ribbon-sheen {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(100%);
+  }
+}
+.napd-ribbon-sheen {
+  background: linear-gradient(100deg, transparent 30%, rgb(var(--c-goldsoft) / 0.12) 50%, transparent 70%);
+}
+@media (prefers-reduced-motion: no-preference) {
+  .napd-ribbon-sheen {
+    animation: napd-ribbon-sheen 6s ease-in-out infinite;
+  }
+}
+/* the occasion's motif as a faint engraved field over the velvet */
+.napd-hero-field {
+  background-size: 120px 120px;
+  opacity: 0.045;
+  -webkit-mask-image: radial-gradient(70% 70% at 50% 45%, transparent 25%, #000 75%);
+  mask-image: radial-gradient(70% 70% at 50% 45%, transparent 25%, #000 75%);
+}
+
+/* product page title: caps, widely spaced, like an engraved label */
+.napd-pdp-title {
+  font-family: var(--font-jost), "Jost", Arial, sans-serif;
+  font-weight: 400;
+  font-size: clamp(1.35rem, 2vw, 1.75rem);
+  line-height: 1.35;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+}
+html[lang="ar"] .napd-pdp-title {
+  font-family: var(--font-ar-display), var(--napd-serif);
+  font-size: clamp(1.9rem, 3vw, 2.5rem);
+  text-transform: none;
+  letter-spacing: 0;
 }

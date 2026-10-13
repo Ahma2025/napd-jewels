@@ -9,6 +9,10 @@ import { useIsOwner } from "@/lib/useIsOwner";
 import { displayTitle, formatPrice, productName } from "@/lib/productDisplay";
 import { useLang } from "../../context/LangContext";
 import { onlyLeftLabel, type DictKey } from "@/lib/i18n";
+import OccasionMotif from "@/app/components/OccasionMotif";
+import OccasionCountdown from "@/app/components/OccasionCountdown";
+import { useOccasion } from "@/app/context/OccasionContext";
+import { THEMES, occasionText } from "@/lib/occasion";
 import { MessageCircle, ShieldCheck, Gem, Truck, RefreshCw } from "lucide-react";
 
 type DbProduct = {
@@ -79,6 +83,7 @@ export default function ProductDetailsClient({ id }: { id: string }) {
   const [sizeTouched, setSizeTouched] = useState(false);
 
   const { addToCart } = useCart();
+  const occasion = useOccasion();
   const { lang, t } = useLang();
   const paramLabel = (key: string) =>
     PARAM_KEYS.has(key) ? t(`param.${key}` as DictKey) : key;
@@ -317,7 +322,7 @@ ${t("wa.link")}: ${productUrl}`;
         {/* Breadcrumbs */}
         <nav
           aria-label="Breadcrumb"
-          className="mb-8 flex flex-wrap items-center gap-x-2 text-[11px] uppercase tracking-[0.18em] text-[#5E6B69]"
+          className="mb-8 flex flex-wrap items-center gap-x-2 text-[11px] uppercase tracking-[0.18em] text-napd-muted"
         >
           <Link href="/" className="napd-link">
             {t("pdp.home")}
@@ -333,7 +338,7 @@ ${t("wa.link")}: ${productUrl}`;
           {product && visibleToViewer && (
             <>
               <span aria-hidden="true">/</span>
-              <span className="text-[#182B2A] normal-case tracking-normal text-[13px]">
+              <span className="text-napd-ink normal-case tracking-normal text-[13px]">
                 {title}
               </span>
             </>
@@ -351,16 +356,16 @@ ${t("wa.link")}: ${productUrl}`;
           </div>
         ) : !product || !visibleToViewer ? (
           <div className="mx-auto max-w-md py-20 text-center">
-            <p className="napd-display text-3xl text-[#182B2A]">
+            <p className="napd-display text-3xl text-napd-ink">
               {t("pdp.goneTitle")}
             </p>
-            <p className="mt-3 text-sm leading-relaxed text-[#5E6B69]">
+            <p className="mt-3 text-sm leading-relaxed text-napd-muted">
               {t("pdp.goneBody")}
             </p>
             <div className="mt-7 flex flex-wrap justify-center gap-3">
               <Link
                 href="/"
-                className="napd-btn inline-flex h-12 items-center rounded-full bg-[#182B2A] px-6 text-[12px] uppercase tracking-[0.18em] text-[#FAF7F1]"
+                className="napd-btn inline-flex h-12 items-center rounded-full bg-napd-ink px-6 text-[12px] uppercase tracking-[0.18em] text-napd-ivory"
               >
                 {t("pdp.browse")}
               </Link>
@@ -368,7 +373,7 @@ ${t("wa.link")}: ${productUrl}`;
                 href={`https://wa.me/${WHATSAPP_NUMBER}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex h-12 items-center rounded-full border border-[#182B2A]/20 px-6 text-[12px] uppercase tracking-[0.18em] text-[#182B2A]"
+                className="inline-flex h-12 items-center rounded-full border border-napd-ink/20 px-6 text-[12px] uppercase tracking-[0.18em] text-napd-ink"
               >
                 {t("pdp.ask")}
               </a>
@@ -378,7 +383,7 @@ ${t("wa.link")}: ${productUrl}`;
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16">
             {/* Left: Images */}
             <div>
-              <div className="relative w-full aspect-square overflow-hidden rounded-md border border-[#182B2A]/[0.08] bg-white">
+              <div className="relative w-full aspect-square overflow-hidden bg-[#F7F6F3]">
                 <div className="absolute inset-4 md:inset-8">
                   <Image
                     src={activeImage}
@@ -386,11 +391,11 @@ ${t("wa.link")}: ${productUrl}`;
                     fill
                     priority
                     sizes="(min-width: 1024px) 560px, 100vw"
-                    className="object-contain"
+                    className="object-contain mix-blend-multiply"
                   />
                 </div>
                 {hasDiscount && (
-                  <span className="absolute start-4 top-4 rounded-sm bg-[#182B2A] px-2 py-1 text-[11px] font-medium tracking-[0.08em] text-[#FAF7F1] tabular-nums">
+                  <span className="absolute start-4 top-4 rounded-sm bg-napd-ink px-2 py-1 text-[11px] font-medium tracking-[0.08em] text-napd-ivory tabular-nums">
                     <bdi dir="ltr">−{pct}%</bdi>
                   </span>
                 )}
@@ -408,10 +413,10 @@ ${t("wa.link")}: ${productUrl}`;
                         aria-label={`${t("pdp.showImage")} ${i + 1}`}
                         aria-pressed={active}
                         className={[
-                          "relative h-[76px] w-[76px] flex-shrink-0 overflow-hidden rounded-md border bg-white transition-colors duration-200",
+                          "relative h-[76px] w-[76px] flex-shrink-0 overflow-hidden border bg-[#F7F6F3] transition-colors duration-200",
                           active
-                            ? "border-[#B08D57]"
-                            : "border-[#182B2A]/10 hover:border-[#182B2A]/30",
+                            ? "border-napd-gold"
+                            : "border-napd-ink/10 hover:border-napd-ink/30",
                         ].join(" ")}
                       >
                         <span className="absolute inset-1.5">
@@ -432,25 +437,24 @@ ${t("wa.link")}: ${productUrl}`;
 
             {/* Right: Details */}
             <div className="lg:pt-4">
-              <h1 className="napd-display text-[clamp(2.4rem,4.2vw,3.6rem)] leading-[1] text-[#182B2A]">
+              <p className="napd-caps text-[10.5px] text-napd-muted">NAPD Jewels</p>
+              <h1 className="napd-pdp-title mt-4 text-napd-ink">
                 {title}
               </h1>
-              <div aria-hidden="true" className="napd-divider mt-5">
-                <i />
-              </div>
+              <div aria-hidden="true" className="mt-6 h-px w-14 bg-napd-ink/30" />
 
-              <div className="mt-5 flex items-baseline gap-3 tabular-nums">
-                <p className="text-2xl font-semibold text-[#182B2A]">
+              <div className="mt-6 flex items-baseline gap-3 tabular-nums">
+                <p className="text-[1.35rem] tracking-[0.12em] text-napd-ink">
                   {formatMoney(finalPriceNumber)}
                 </p>
                 {hasDiscount && (
-                  <p className="text-base text-[#5E6B69] line-through">
+                  <p className="text-base text-napd-muted line-through">
                     {formatMoney(basePriceNumber)}
                   </p>
                 )}
               </div>
 
-              <p className="mt-3 flex items-center gap-2 text-[13px] text-[#5E6B69]">
+              <p className="mt-3 flex items-center gap-2 text-[13px] text-napd-muted">
                 <span
                   aria-hidden="true"
                   className={`h-1.5 w-1.5 rounded-full ${inStock ? "bg-[#2F7A5B]" : "bg-[#B4483C]"}`}
@@ -465,7 +469,7 @@ ${t("wa.link")}: ${productUrl}`;
               {/* Ring Size */}
               {isRing && (
                 <div className="mt-9">
-                  <p className="mb-3 text-[11px] uppercase tracking-[0.2em] text-[#5E6B69]">
+                  <p className="mb-3 text-[11px] uppercase tracking-[0.2em] text-napd-muted">
                     {t("pdp.ringSize")}
                     {needsSize && sizeTouched ? (
                       <span className="ms-2 normal-case tracking-normal text-[13px] text-[#B4483C]">
@@ -491,8 +495,8 @@ ${t("wa.link")}: ${productUrl}`;
                           className={[
                             "napd-btn h-11 w-11 rounded-full border text-sm tabular-nums transition-colors duration-200 disabled:opacity-50",
                             active
-                              ? "border-[#182B2A] bg-[#182B2A] text-[#FAF7F1]"
-                              : "border-[#182B2A]/15 text-[#182B2A] hover:border-[#182B2A]/40",
+                              ? "border-napd-ink bg-napd-ink text-napd-ivory"
+                              : "border-napd-ink/15 text-napd-ink hover:border-napd-ink/40",
                           ].join(" ")}
                         >
                           {s}
@@ -505,15 +509,15 @@ ${t("wa.link")}: ${productUrl}`;
 
               {/* Quantity */}
               <div className="mt-8">
-                <p className="mb-3 text-[11px] uppercase tracking-[0.2em] text-[#5E6B69]">
+                <p className="mb-3 text-[11px] uppercase tracking-[0.2em] text-napd-muted">
                   {t("pdp.quantity")}
                 </p>
 
-                <div className="inline-flex items-center overflow-hidden rounded-full border border-[#182B2A]/15 text-[#182B2A]">
+                <div className="inline-flex items-center overflow-hidden rounded-full border border-napd-ink/15 text-napd-ink">
                   <button
                     type="button"
                     onClick={() => setQty((q) => Math.max(1, q - 1))}
-                    className="flex h-11 w-11 items-center justify-center hover:bg-[#FAF7F1] disabled:opacity-40"
+                    className="flex h-11 w-11 items-center justify-center hover:bg-napd-ivory disabled:opacity-40"
                     aria-label={t("pdp.decrease")}
                     disabled={!inStock || qty <= 1}
                   >
@@ -527,7 +531,7 @@ ${t("wa.link")}: ${productUrl}`;
                     onClick={() =>
                       setQty((q) => Math.min(Math.max(1, q + 1), Math.max(1, maxQty)))
                     }
-                    className="flex h-11 w-11 items-center justify-center hover:bg-[#FAF7F1] disabled:opacity-40"
+                    className="flex h-11 w-11 items-center justify-center hover:bg-napd-ivory disabled:opacity-40"
                     aria-label={t("pdp.increase")}
                     disabled={!inStock || qty >= maxQty}
                   >
@@ -550,10 +554,10 @@ ${t("wa.link")}: ${productUrl}`;
                   rel="noopener noreferrer"
                   aria-disabled={!inStock}
                   className={[
-                    "napd-btn flex h-14 w-full items-center justify-center gap-2.5 rounded-full text-[12px] uppercase tracking-[0.2em]",
+                    "napd-btn napd-caps flex h-14 w-full items-center justify-center gap-2.5 rounded-full text-[12px]",
                     inStock
-                      ? "cursor-pointer bg-[#182B2A] text-[#FAF7F1]"
-                      : "pointer-events-none bg-[#182B2A]/30 text-[#FAF7F1]",
+                      ? "cursor-pointer bg-napd-ink text-napd-ivory"
+                      : "pointer-events-none bg-napd-ink/30 text-napd-ivory",
                   ].join(" ")}
                 >
                   <MessageCircle aria-hidden="true" strokeWidth={1.5} className="h-[18px] w-[18px]" />
@@ -564,47 +568,73 @@ ${t("wa.link")}: ${productUrl}`;
                   type="button"
                   onClick={handleAddToCart}
                   disabled={!inStock}
-                  className="napd-btn h-12 w-full rounded-full border border-[#182B2A]/20 text-[12px] uppercase tracking-[0.2em] text-[#182B2A] transition-colors duration-200 hover:border-[#182B2A]/50 disabled:opacity-40"
+                  className="napd-btn napd-caps h-12 w-full rounded-full border border-napd-ink/20 text-[12px] text-napd-ink transition-colors duration-200 hover:border-napd-ink/50 disabled:opacity-40"
                 >
                   {t("pdp.addToCart")}
                 </button>
 
-                <p className="pt-1 text-center text-[12px] text-[#5E6B69]">
+                <p className="pt-1 text-center text-[12px] text-napd-muted">
                   {t("pdp.note")}
                 </p>
               </div>
 
+              {/* During an occasion: how to give this piece */}
+              {occasion && (
+                <div className="napd-gift relative mt-9 overflow-hidden bg-napd-deep px-6 py-7 text-napd-ivory md:px-8">
+                  <OccasionMotif
+                    motif={THEMES[occasion.theme]?.motif ?? "star"}
+                    strokeWidth={0.8}
+                    className="pointer-events-none absolute -end-6 -top-6 h-36 w-36 text-napd-goldsoft/10"
+                  />
+                  <p className="napd-caps text-[10.5px] text-napd-goldsoft">{occasionText(occasion, lang).name}</p>
+                  <p className="napd-display mt-3 text-[1.7rem] leading-tight">{t("occasion.giftTitle")}</p>
+                  <p className="mt-2 max-w-[44ch] text-[13.5px] leading-relaxed text-napd-ivory/70">{t("occasion.giftBody")}</p>
+                  <div className="mt-6 flex flex-wrap items-center justify-between gap-5">
+                    <a
+                      href={`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(`${t("occasion.giftWa")} ${title}`)}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="napd-caps inline-flex h-11 items-center gap-2 rounded-full border border-napd-goldsoft/40 px-6 text-[11px] text-napd-goldsoft transition-colors hover:border-napd-goldsoft"
+                    >
+                      <MessageCircle aria-hidden="true" strokeWidth={1.5} className="h-4 w-4" />
+                      {t("occasion.giftCta")}
+                    </a>
+                    <OccasionCountdown occasion={occasion} variant="inline" className="napd-caps text-[11px] text-napd-ivory/70" />
+                  </div>
+                </div>
+              )}
+
               {/* Promises */}
-              <ul className="mt-9 grid grid-cols-2 gap-x-6 gap-y-4 border-t border-[#182B2A]/10 pt-7 text-[13px] text-[#182B2A]/80">
+              <ul className="mt-9 grid grid-cols-2 gap-x-6 gap-y-4 border-t border-napd-ink/10 pt-7 text-[13px] text-napd-ink/80">
                 <li className="flex items-center gap-2.5">
-                  <ShieldCheck aria-hidden="true" strokeWidth={1.5} className="h-[18px] w-[18px] shrink-0 text-[#86663A]" />
+                  <ShieldCheck aria-hidden="true" strokeWidth={1.5} className="h-[18px] w-[18px] shrink-0 text-napd-bronze" />
                   {t("pdp.p.warranty")}
                 </li>
                 <li className="flex items-center gap-2.5">
-                  <Gem aria-hidden="true" strokeWidth={1.5} className="h-[18px] w-[18px] shrink-0 text-[#86663A]" />
+                  <Gem aria-hidden="true" strokeWidth={1.5} className="h-[18px] w-[18px] shrink-0 text-napd-bronze" />
                   {t("pdp.p.silver")}
                 </li>
                 <li className="flex items-center gap-2.5">
-                  <Truck aria-hidden="true" strokeWidth={1.5} className="h-[18px] w-[18px] shrink-0 text-[#86663A]" />
+                  <Truck aria-hidden="true" strokeWidth={1.5} className="h-[18px] w-[18px] shrink-0 text-napd-bronze" />
                   {t("pdp.p.delivery")}
                 </li>
                 <li className="flex items-center gap-2.5">
-                  <RefreshCw aria-hidden="true" strokeWidth={1.5} className="h-[18px] w-[18px] shrink-0 text-[#86663A]" />
+                  <RefreshCw aria-hidden="true" strokeWidth={1.5} className="h-[18px] w-[18px] shrink-0 text-napd-bronze" />
                   {t("pdp.p.exchange")}
                 </li>
               </ul>
 
               {/* Product details */}
               {hasParameters && (
-                <div className="mt-9 border-t border-[#182B2A]/10 pt-7">
-                  <h2 className="napd-display text-2xl text-[#182B2A]">{t("pdp.details")}</h2>
-                  <dl className="mt-4 divide-y divide-[#182B2A]/[0.07]">
+                <div className="mt-9 border-t border-napd-ink/10 pt-7">
+                  <h2 className="napd-display text-2xl text-napd-ink">{t("pdp.details")}</h2>
+                  <dl className="mt-4 divide-y divide-napd-ink/[0.07]">
                     {parameters
                       .filter((p) => (p.value || "").trim())
                       .map((p) => (
                         <div key={p.id} className="grid grid-cols-2 gap-4 py-3 text-[13px]">
-                          <dt className="text-[#5E6B69]">{paramLabel(p.key)}</dt>
-                          <dd className="text-[#182B2A]">{p.value}</dd>
+                          <dt className="text-napd-muted">{paramLabel(p.key)}</dt>
+                          <dd className="text-napd-ink">{p.value}</dd>
                         </div>
                       ))}
                   </dl>
