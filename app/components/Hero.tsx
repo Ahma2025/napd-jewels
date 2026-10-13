@@ -102,7 +102,9 @@ export default function Hero() {
         {/* Line one, set against the top of the niche */}
         <p
           aria-hidden="true"
-          className="napd-hero-serif napd-depth-fast text-center text-[clamp(3.2rem,6.4vw,6.8rem)] whitespace-nowrap leading-[0.9] lg:self-start lg:pt-[9vh] lg:text-end"
+          className={`napd-hero-serif napd-depth-fast text-center leading-[0.95] lg:self-start lg:pt-[9vh] lg:text-end ${
+            occ && !ar ? "text-[clamp(2.4rem,4.4vw,4.6rem)]" : "text-[clamp(3.2rem,6.4vw,6.8rem)] whitespace-nowrap"
+          }`}
         >
           {occ ? (
             <span className={`block ${ar ? "" : "italic"}`}>
@@ -258,7 +260,7 @@ export default function Hero() {
             </p>
           ) : (
             <p aria-hidden="true" className="napd-depth-fast">
-              <span className="napd-hero-serif block text-[clamp(2.1rem,3.85vw,4.1rem)] whitespace-nowrap leading-[0.9]">
+              <span className="napd-hero-serif block text-[clamp(1.5rem,2.6vw,2.9rem)] whitespace-nowrap leading-[0.9]">
                 <Chars text="for exceptional" start={900} />
               </span>
               <span className="napd-script napd-foil napd-write block text-[clamp(6.4rem,12vw,11.5rem)] leading-[0.8] lg:ms-[0.2em]">

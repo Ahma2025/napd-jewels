@@ -2,12 +2,13 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Tilt from "./Tilt";
 import OccasionMotif from "./OccasionMotif";
 import { useLang } from "../context/LangContext";
 import { useOccasion } from "../context/OccasionContext";
 import { THEMES } from "@/lib/occasion";
+import { secondImage } from "@/lib/secondImage";
 import {
   productName,
   formatPrice,
@@ -29,6 +30,16 @@ export default function ProductCard({
   const [loaded, setLoaded] = useState(false);
   const { lang } = useLang();
   const occasion = useOccasion();
+  // a second photo that fades in on hover (pointer devices only)
+  const [alt, setAlt] = useState<string | null>(null);
+  useEffect(() => {
+    if (!window.matchMedia("(hover: hover)").matches) return;
+    let alive = true;
+    secondImage(product.id, product.image_url).then((u) => alive && setAlt(u));
+    return () => {
+      alive = false;
+    };
+  }, [product.id, product.image_url]);
   const name = productName(product, lang);
   const { hasDiscount, pct, original, final } = priceInfo(product);
 
@@ -50,8 +61,19 @@ export default function ProductCard({
             fill
             sizes={sizes}
             onLoad={() => setLoaded(true)}
-            className="napd-card-img object-contain object-center mix-blend-multiply"
+            className={`napd-card-img object-contain object-center mix-blend-multiply ${alt ? "napd-card-img--main" : ""}`}
           />
+          {alt && (
+            <Image
+              src={alt}
+              alt=""
+              aria-hidden="true"
+              fill
+              sizes={sizes}
+              loading="lazy"
+              className="napd-card-img napd-card-img--alt object-contain object-center mix-blend-multiply"
+            />
+          )}
         </div>
 
         {occasion && (
