@@ -4,7 +4,7 @@ import HomeBanners from "./components/HomeBanners";
 import HomeSections from "./components/HomeSections";
 import PromiseBand from "./components/PromiseBand";
 import OccasionBand from "./components/OccasionBand";
-import { SplitBanners, WideBanner } from "./components/ImageBanners";
+import { MoissaniteBanner, SetsBanner } from "./components/ImageBanners";
 
 export default function Home() {
   return (
@@ -13,9 +13,9 @@ export default function Home() {
       <OccasionBand />
       <MoissaniteEdit />
       <HomeBanners />
-      <WideBanner />
+      <MoissaniteBanner />
       <HomeSections />
-      <SplitBanners />
+      <SetsBanner />
       <PromiseBand />
     </>
   );
