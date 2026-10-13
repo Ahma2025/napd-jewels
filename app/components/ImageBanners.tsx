@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import Reveal from "./Reveal";
 import { useLang } from "../context/LangContext";
+import { useCollection } from "@/lib/useCollection";
 import type { DictKey } from "@/lib/i18n";
 
 type Banner = { href: string; image: string; eyebrow: DictKey; title: DictKey };
@@ -17,6 +18,7 @@ function Panel({ b, wide }: { b: Banner; wide?: boolean }) {
       className={`napd-banner group relative isolate block overflow-hidden ${
         wide ? "aspect-[4/5] sm:aspect-[16/9] lg:aspect-[21/8]" : "aspect-[4/5] md:aspect-[5/4]"
       }`}
+      aria-label={t(b.title)}
     >
       <Image
         src={b.image}
@@ -39,19 +41,31 @@ function Panel({ b, wide }: { b: Banner; wide?: boolean }) {
   );
 }
 
-export function WideBanner() {
+/** A banner only for a collection that has pieces in stock right now. */
+function StockedBanner({ category, b }: { category: string; b: Banner }) {
+  const { items, loading } = useCollection(category);
+  if (loading || !items.length) return null;
   return (
-    <section aria-label="Sets" className="bg-white">
-      <Panel wide b={{ href: "/sets", image: "/banners/sets.webp", eyebrow: "banner.sets.eyebrow", title: "banner.sets.title" }} />
+    <section aria-label={category} className="bg-white">
+      <Panel wide b={b} />
     </section>
   );
 }
 
-export function SplitBanners() {
+export function MoissaniteBanner() {
   return (
-    <section aria-label="Moissanite & Charms" className="grid bg-white md:grid-cols-2">
-      <Panel b={{ href: "/moissanite", image: "/banners/moissanite.webp", eyebrow: "banner.moissanite.eyebrow", title: "banner.moissanite.title" }} />
-      <Panel b={{ href: "/pandora", image: "/banners/pandora.webp", eyebrow: "banner.pandora.eyebrow", title: "banner.pandora.title" }} />
-    </section>
+    <StockedBanner
+      category="MOISSANITE"
+      b={{ href: "/moissanite", image: "/banners/moissanite.webp", eyebrow: "banner.moissanite.eyebrow", title: "banner.moissanite.title" }}
+    />
+  );
+}
+
+export function SetsBanner() {
+  return (
+    <StockedBanner
+      category="SETS"
+      b={{ href: "/sets", image: "/banners/sets.webp", eyebrow: "banner.sets.eyebrow", title: "banner.sets.title" }}
+    />
   );
 }
