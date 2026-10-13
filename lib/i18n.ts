@@ -302,12 +302,12 @@ export function daysLeftLabel(lang: Lang, n: number) {
   return `باقي ${n} يوماً`;
 }
 
-/** Low-stock line on the product page. */
-export function onlyLeftLabel(lang: Lang, n: number) {
-  if (lang === "en") return `Only ${n} left`;
-  if (n === 1) return "آخر قطعة متبقية";
-  if (n === 2) return "بقيت قطعتان فقط";
-  return `بقيت ${n} قطع فقط`;
+/**
+ * Low-stock line on the product page. The owner prefers "almost sold out" to
+ * showing the exact count ("last piece"), so the number is not shown.
+ */
+export function onlyLeftLabel(lang: Lang, _n: number) {
+  return lang === "en" ? "Almost sold out" : "قارب على النفاد";
 }
 
 export function detectLang(cookieValue?: string | null, acceptLanguage?: string | null): Lang {
