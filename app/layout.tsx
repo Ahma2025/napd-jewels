@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { DM_Sans, Jost } from "next/font/google";
+import { Cinzel, DM_Sans, Montserrat } from "next/font/google";
 import localFont from "next/font/local";
 import "./globals.css";
 import Header from "./components/Header";
@@ -12,11 +12,18 @@ import { OCCASION_COLUMNS, pickOccasion, todayInPalestine, type Occasion } from 
 import { cookies, headers } from "next/headers";
 import { detectLang, LANG_COOKIE } from "@/lib/i18n";
 
-// Couture geometric sans for every Latin line (body, labels, buttons).
-const jost = Jost({
-  variable: "--font-jost",
+// A solid geometric sans for every Latin line (body, labels, buttons).
+const montserrat = Montserrat({
+  variable: "--font-montserrat",
   subsets: ["latin"],
-  weight: ["300", "400", "500", "600"],
+  weight: ["400", "500", "600"],
+});
+
+// Engraved classical capitals for the house name, titles and numerals.
+const cinzel = Cinzel({
+  variable: "--font-cinzel",
+  subsets: ["latin"],
+  weight: ["500", "600", "700"],
 });
 
 const dmSans = DM_Sans({
@@ -116,7 +123,7 @@ export default async function RootLayout({
   return (
     <html lang={lang} dir={lang === "ar" ? "rtl" : "ltr"} data-occasion={occasion?.theme}>
       <body
-        className={`${jost.variable} ${dmSans.variable} ${cormorant.variable} ${bodoni.variable} ${pinyon.variable} ${arDisplay.variable} ${arScript.variable} ${arSans.variable} antialiased bg-white min-h-screen flex flex-col`}
+        className={`${montserrat.variable} ${cinzel.variable} ${dmSans.variable} ${cormorant.variable} ${bodoni.variable} ${pinyon.variable} ${arDisplay.variable} ${arScript.variable} ${arSans.variable} antialiased bg-white min-h-screen flex flex-col`}
       >
         <LangProvider initial={lang}>
           <OccasionProvider initial={occasion}>

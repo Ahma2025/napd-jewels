@@ -32,6 +32,14 @@ export default function Header() {
   const { cart } = useCart();
   const { lang, setLang, t } = useLang();
   const occasion = useOccasion();
+  // past the first screenful the header settles into a slimmer bar
+  const [scrolled, setScrolled] = useState(false);
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 60);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
   const totalItems = cart.reduce((acc, item) => acc + item.quantity, 0);
 
   const [authLoading, setAuthLoading] = useState(true);
@@ -198,10 +206,14 @@ export default function Header() {
   }
 
   return (
-    <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-md">
+    <header
+      className={`napd-header sticky top-0 z-50 bg-white/95 backdrop-blur-md transition-shadow duration-500 ${
+        scrolled ? "is-scrolled shadow-[0_10px_30px_-18px_rgba(0,0,0,0.28)]" : ""
+      }`}
+    >
       <OccasionRibbon />
       {/* ANNOUNCEMENT MARQUEE (an occasion's ribbon takes its place) */}
-      <div className={`${occasion ? "hidden" : "hidden md:flex"} h-9 items-center overflow-hidden bg-napd-ink`}>
+      <div className={`${occasion ? "hidden" : "hidden md:flex"} napd-header-marquee h-9 items-center overflow-hidden bg-napd-ink`}>
         <div className="napd-marquee-track">
           {[0, 1].map((rep) => (
             <div key={rep} className="flex items-center">
@@ -227,10 +239,10 @@ export default function Header() {
       </div>
 
       <div className="w-full border-b border-napd-ink/[0.08] px-5 md:px-10">
-        <div className="relative flex h-[72px] items-center justify-between md:h-[88px]">
+        <div className="napd-header-bar relative flex h-[72px] items-center justify-between md:h-[88px]">
           {/* LOGO: centred on phones, at the start on desktop */}
           <Link href="/" className="absolute left-1/2 -translate-x-1/2 lg:static lg:translate-x-0 shrink-0">
-            <span role="img" aria-label="NAPD Jewels" className="napd-logo-mask h-11 w-[50px] text-napd-bronze lg:h-[52px] lg:w-[60px]" />
+            <span role="img" aria-label="NAPD Jewels" className="napd-logo-mask napd-header-logo h-11 w-[50px] text-napd-bronze lg:h-[52px] lg:w-[60px]" />
           </Link>
 
           {/* DESKTOP NAV, centred like a maison's */}

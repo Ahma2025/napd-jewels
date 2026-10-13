@@ -38,7 +38,7 @@ export function OccasionSeal({
         </defs>
         <circle cx="100" cy="100" r="97" fill="none" stroke="currentColor" strokeWidth="0.8" opacity="0.6" />
         <circle cx="100" cy="100" r="62" fill="none" stroke="currentColor" strokeWidth="0.6" opacity="0.45" />
-        <text fill="currentColor" style={{ fontFamily: "var(--font-jost), sans-serif", fontSize: 11.5, letterSpacing: "0.42em" }}>
+        <text fill="currentColor" style={{ fontFamily: "var(--font-montserrat), sans-serif", fontSize: 11.5, letterSpacing: "0.42em" }}>
           <textPath href={`#${id}`} startOffset="0">
             {text}
           </textPath>

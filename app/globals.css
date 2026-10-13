@@ -34,28 +34,31 @@
 
 /* ---- Occasion palettes: the whole storefront takes the occasion's colors ---- */
 html[data-occasion="black_friday"] {
-  --c-ink: 17 17 18;
-  --c-deep: 6 6 7;
-  --c-gold: 201 168 106;
-  --c-goldsoft: 230 214 178;
-  --c-ivory: 245 242 236;
-  --c-emerald: 28 28 30;
-  --c-muted: 104 104 108;
-  --c-bronze: 140 110 62;
-  --c-paper: 236 232 225;
-  --c-accent: 201 168 106;
-  --c-velvet-light: 62 56 46;
+  /* red and black */
+  --c-ink: 14 13 14;
+  --c-deep: 5 4 5;
+  --c-gold: 196 22 44;
+  --c-goldsoft: 238 206 208;
+  --c-ivory: 248 244 243;
+  --c-emerald: 30 10 13;
+  --c-muted: 108 100 102;
+  --c-bronze: 168 16 36;
+  --c-paper: 246 240 240;
+  --c-accent: 226 34 58;
+  --c-velvet-light: 128 8 26;
   --c-velvet-dark: 0 0 0;
-  --foil-1: #a07d45;
-  --foil-2: #f1dfb0;
-  --foil-3: #c9a86a;
-  --foil-4: #fff6dc;
-  --foil-5: #8c6c38;
-  --foil-6: #e6d6b2;
-  --foil-d1: #6f5330;
-  --foil-d2: #8c6c38;
-  --foil-d3: #c9a86a;
-  --foil-d4: #5e4526;
+  --pill-bg: 196 22 44;
+  --pill-fg: 255 255 255;
+  --foil-1: #8a0c1c;
+  --foil-2: #ff6b7d;
+  --foil-3: #d0142f;
+  --foil-4: #ffd9de;
+  --foil-5: #7a0916;
+  --foil-6: #ec4a60;
+  --foil-d1: #6a0812;
+  --foil-d2: #8a0c1c;
+  --foil-d3: #d0142f;
+  --foil-d4: #4a050c;
 }
 html[data-occasion="valentine"] {
   --c-ink: 58 21 32;
@@ -240,11 +243,12 @@ html[data-occasion="graduation"] {
 body {
   /* the house serif: a classical roman, like an engraved maison name.
      Set on body, where next/font defines the font variables. */
-  --napd-serif: var(--font-cormorant), var(--font-bodoni), Georgia, "Times New Roman", serif;
+  --napd-serif: var(--font-cinzel), var(--font-cormorant), Georgia, "Times New Roman", serif;
+  /* Cinzel has no italic or lowercase: flourishes are set in Cormorant italic */
+  --napd-italic: var(--font-cormorant), Georgia, serif;
   background: var(--background);
   color: var(--foreground);
-  /* Jost: a geometric couture sans (Futura's lineage) for every Latin line */
-  font-family: var(--font-jost), "Jost", var(--font-dm-sans), Arial, Helvetica, sans-serif;
+  font-family: var(--font-montserrat), "Montserrat", var(--font-dm-sans), Arial, Helvetica, sans-serif;
   letter-spacing: 0.01em;
   font-feature-settings: "kern", "liga";
 }
@@ -254,7 +258,7 @@ h2,
 h3,
 .napd-display {
   font-family: var(--napd-serif);
-  font-weight: 400;
+  font-weight: 500;
   font-optical-sizing: auto;
   letter-spacing: -0.02em;
   text-wrap: balance;
@@ -750,13 +754,13 @@ html {
   font-weight: 400;
   letter-spacing: -0.025em;
 }
-/* English flourishes are set in Bodoni italic, the formal couture voice;
+/* English flourishes are set in Cormorant italic;
    Arabic keeps its Ruqaa script below. */
 .napd-script {
-  font-family: var(--napd-serif);
+  font-family: var(--napd-italic);
   font-style: italic;
-  font-weight: 400;
-  letter-spacing: -0.02em;
+  font-weight: 600;
+  letter-spacing: -0.01em;
 }
 /* gold-leaf flourish: the foil catches the light slowly */
 @keyframes napd-foil {
@@ -939,7 +943,7 @@ html {
 
 /* ================= Arabic (RTL) ================= */
 html[lang="ar"] body {
-  font-family: var(--font-ar-sans), var(--font-jost), Arial, sans-serif;
+  font-family: var(--font-ar-sans), var(--font-montserrat), Arial, sans-serif;
   letter-spacing: 0;
 }
 html[lang="ar"] h1,
@@ -1055,20 +1059,20 @@ html[dir="rtl"] .napd-occasion-glow {
    Quiet-luxury retail: Latin labels in a light geometric sans, all caps and
    widely spaced; the classical serif only for names and moments. */
 .napd-caps {
-  font-family: var(--font-jost), "Jost", Arial, sans-serif;
+  font-family: var(--font-montserrat), "Montserrat", Arial, sans-serif;
   font-weight: 400;
   text-transform: uppercase;
   letter-spacing: 0.22em;
 }
 .napd-caps-wide {
-  font-family: var(--font-jost), "Jost", Arial, sans-serif;
+  font-family: var(--font-montserrat), "Montserrat", Arial, sans-serif;
   font-weight: 400;
   text-transform: uppercase;
   letter-spacing: 0.3em;
 }
 html[lang="ar"] .napd-caps,
 html[lang="ar"] .napd-caps-wide {
-  font-family: var(--font-ar-sans), var(--font-jost), sans-serif;
+  font-family: var(--font-ar-sans), var(--font-montserrat), sans-serif;
   letter-spacing: 0;
   text-transform: none;
 }
@@ -1081,9 +1085,9 @@ html[lang="ar"] .napd-caps-wide {
   height: 3.25rem;
   padding: 0 2.6rem;
   border-radius: 999px;
-  background: rgb(var(--c-gold) / 0.85);
-  color: rgb(var(--c-ink));
-  font-family: var(--font-jost), "Jost", Arial, sans-serif;
+  background: rgb(var(--pill-bg, var(--c-gold)) / 0.9);
+  color: rgb(var(--pill-fg, var(--c-ink)));
+  font-family: var(--font-montserrat), "Montserrat", Arial, sans-serif;
   font-size: 13px;
   text-transform: uppercase;
   letter-spacing: 0.24em;
@@ -1231,7 +1235,7 @@ html[dir="rtl"] .napd-orn-line--end {
 
 /* product page title: caps, widely spaced, like an engraved label */
 .napd-pdp-title {
-  font-family: var(--font-jost), "Jost", Arial, sans-serif;
+  font-family: var(--font-montserrat), "Montserrat", Arial, sans-serif;
   font-weight: 400;
   font-size: clamp(1.35rem, 2vw, 1.75rem);
   line-height: 1.35;
@@ -1242,5 +1246,77 @@ html[lang="ar"] .napd-pdp-title {
   font-family: var(--font-ar-display), var(--napd-serif);
   font-size: clamp(1.9rem, 3vw, 2.5rem);
   text-transform: none;
+  letter-spacing: 0;
+}
+
+/* Cinzel is capitals only: anything set in italic inside a title takes the
+   Cormorant italic, so flourishes keep their sweep. */
+html:not([lang="ar"]) :is(h1, h2, h3, .napd-display, .napd-hero-serif) :is(.italic, em),
+html:not([lang="ar"]) :is(.napd-display, .napd-hero-serif).italic {
+  font-family: var(--napd-italic);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+html:not([lang="ar"]) .napd-hero-serif {
+  font-weight: 500;
+  letter-spacing: 0.02em;
+}
+
+/* ================= Header: settles slimmer once you scroll ================= */
+.napd-header-bar,
+.napd-header-logo,
+.napd-header-marquee {
+  transition: height 0.45s cubic-bezier(0.23, 1, 0.32, 1), width 0.45s cubic-bezier(0.23, 1, 0.32, 1),
+    opacity 0.3s ease;
+}
+.napd-header.is-scrolled .napd-header-bar {
+  height: 60px;
+}
+.napd-header.is-scrolled .napd-header-logo {
+  height: 36px;
+  width: 41px;
+}
+.napd-header.is-scrolled .napd-header-marquee {
+  height: 0;
+  opacity: 0;
+}
+
+/* hover swap to the product's second photo */
+.napd-card-img--main,
+.napd-card-img--alt {
+  transition: opacity 0.6s ease, transform 0.9s cubic-bezier(0.23, 1, 0.32, 1) !important;
+}
+.napd-card-img--alt {
+  opacity: 0;
+}
+@media (hover: hover) {
+  .napd-card:hover .napd-card-img--main {
+    opacity: 0;
+  }
+  .napd-card:hover .napd-card-img--alt {
+    opacity: 1;
+  }
+}
+
+/* ================= Full-bleed image banners ================= */
+.napd-banner-img {
+  transition: transform 1.6s cubic-bezier(0.23, 1, 0.32, 1);
+}
+@media (hover: hover) {
+  .napd-banner:hover .napd-banner-img {
+    transform: scale(1.04);
+  }
+}
+/* darkens toward the words, tinted with the season's ink */
+.napd-banner-shade {
+  background: linear-gradient(180deg, rgb(var(--c-deep) / 0) 25%, rgb(var(--c-deep) / 0.88) 100%),
+    linear-gradient(0deg, rgb(var(--c-ink) / 0.25), rgb(var(--c-ink) / 0.25));
+}
+.napd-banner-title {
+  font-size: clamp(2.2rem, 4.6vw, 4rem);
+  line-height: 1;
+  letter-spacing: 0.08em;
+}
+html[lang="ar"] .napd-banner-title {
   letter-spacing: 0;
 }
