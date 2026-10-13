@@ -32,6 +32,13 @@ export function OccasionProvider({ initial, children }: { initial: Occasion | nu
     };
   }, []);
 
+  // The palette lives on <html data-occasion>, so a preview re-dresses every page too.
+  useEffect(() => {
+    const root = document.documentElement;
+    if (occasion) root.dataset.occasion = occasion.theme;
+    else delete root.dataset.occasion;
+  }, [occasion]);
+
   return <OccasionContext.Provider value={occasion}>{children}</OccasionContext.Provider>;
 }
 

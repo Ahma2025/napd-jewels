@@ -164,56 +164,78 @@ export default function HomeSections() {
     };
   }, []);
 
+  const [activeId, setActiveId] = useState<string | null>(null);
+  const active = sections.find((s) => s.category.id === activeId) ?? sections[0];
+
   return (
-    <section className="bg-white pt-16 pb-8 md:pt-20">
-      <div className="max-w-[1200px] mx-auto px-5 md:px-6">
-        {loading
-          ? [0, 1].map((i) => (
-              <div key={i} className="mb-20">
-                <div className="napd-skeleton mb-10 h-8 w-40 rounded-sm" />
-                <div className="grid grid-cols-2 gap-x-5 md:grid-cols-4 md:gap-x-8">
-                  {[0, 1, 2, 3].map((j) => (
-                    <ProductCardSkeleton
-                      key={j}
-                      className={j > 1 ? "hidden md:block" : ""}
-                    />
-                  ))}
-                </div>
-              </div>
-            ))
-          : sections.map(({ category, meta, items }) => (
-              <div key={category.id} className="mb-20 md:mb-24">
-                <div className="mb-8 flex items-end justify-between gap-4 border-b border-[#182B2A]/10 pb-4 md:mb-10">
-                  <Link
-                    href={`/${category.slug}`}
-                    className="napd-display napd-heading-link text-3xl md:text-[2.5rem] italic text-[#182B2A]"
+    <section className="bg-white py-20 md:py-28" aria-labelledby="napd-collections">
+      <div className="mx-auto max-w-[1360px] px-5 md:px-10">
+        <p id="napd-collections" className="napd-caps-wide text-center text-[11px] text-napd-muted">
+          {t("sections.eyebrow")}
+        </p>
+
+        {loading ? (
+          <>
+            <div className="mx-auto mt-8 flex justify-center gap-10">
+              {[0, 1, 2].map((i) => (
+                <div key={i} className="napd-skeleton h-4 w-28" />
+              ))}
+            </div>
+            <div className="mt-16 grid grid-cols-2 gap-x-5 gap-y-10 md:grid-cols-5 md:gap-x-8">
+              {[0, 1, 2, 3, 4].map((j) => (
+                <ProductCardSkeleton key={j} className={j > 1 ? "hidden md:block" : ""} />
+              ))}
+            </div>
+          </>
+        ) : (
+          active && (
+            <>
+              {/* the collections as tabs, a rule under the chosen one */}
+              <div
+                role="tablist"
+                aria-label={t("sections.eyebrow")}
+                className="scrollbar-hide -mx-5 mt-8 flex gap-8 overflow-x-auto px-5 md:mx-0 md:justify-center md:gap-14 md:px-0"
+              >
+                {sections.map(({ category, meta }) => (
+                  <button
+                    key={category.id}
+                    type="button"
+                    role="tab"
+                    aria-selected={category.id === active.category.id}
+                    onClick={() => setActiveId(category.id)}
+                    className="napd-tab napd-caps-wide shrink-0 whitespace-nowrap text-[13px] md:text-[15px]"
                   >
                     {sectionTitle(category.name, meta.title)}
-                  </Link>
-
-                  <Link
-                    href={`/${category.slug}`}
-                    className="napd-link shrink-0 text-[11px] uppercase tracking-[0.2em] text-[#86663A]"
-                  >
-                    {t("sections.viewAll")}
-                  </Link>
-                </div>
-
-                {/* Phones: swipeable row. Desktop: one row of four. */}
-                <div className="napd-row -mx-5 flex snap-x snap-mandatory gap-4 overflow-x-auto scroll-px-5 px-5 pb-2 scrollbar-hide md:mx-0 md:grid md:grid-cols-4 md:gap-x-8 md:overflow-visible md:px-0">
-                  {items.map((product, i) => (
-                    <ProductCard
-                      key={product.id}
-                      product={product}
-                      sizes="(min-width: 768px) 270px, 42vw"
-                      className={`w-[42vw] max-w-[220px] shrink-0 snap-start md:w-auto md:max-w-none ${
-                        i >= 4 ? "md:hidden" : ""
-                      }`}
-                    />
-                  ))}
-                </div>
+                  </button>
+                ))}
               </div>
-            ))}
+
+              {/* Phones: swipeable row. Desktop: one row of five. */}
+              <div
+                key={active.category.id}
+                role="tabpanel"
+                className="napd-tab-panel napd-row -mx-5 mt-12 flex snap-x snap-mandatory gap-4 overflow-x-auto scroll-px-5 px-5 pb-2 scrollbar-hide md:mx-0 md:mt-16 md:grid md:grid-cols-5 md:gap-x-8 md:overflow-visible md:px-0"
+              >
+                {active.items.map((product, i) => (
+                  <ProductCard
+                    key={product.id}
+                    product={product}
+                    sizes="(min-width: 768px) 240px, 46vw"
+                    className={`w-[46vw] max-w-[230px] shrink-0 snap-start md:w-auto md:max-w-none ${
+                      i >= 5 ? "md:hidden" : ""
+                    }`}
+                  />
+                ))}
+              </div>
+
+              <div className="mt-14 flex justify-center md:mt-16">
+                <Link href={`/${active.category.slug}`} className="napd-pill">
+                  {t("sections.viewAll")}
+                </Link>
+              </div>
+            </>
+          )
+        )}
       </div>
     </section>
   );

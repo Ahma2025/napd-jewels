@@ -8,6 +8,9 @@ import { inStock, type ListingProduct } from "@/lib/productDisplay";
 import ProductCard, { ProductCardSkeleton } from "./ProductCard";
 import { useLang } from "../context/LangContext";
 import { piecesLabel, type DictKey } from "@/lib/i18n";
+import { OccasionDivider } from "./OccasionOrnament";
+import { useOccasion } from "../context/OccasionContext";
+import { THEMES, occasionCategory, occasionText } from "@/lib/occasion";
 
 const WHATSAPP_URL = "https://wa.me/972593255260";
 
@@ -25,6 +28,9 @@ export default function CategoryPage({ dbName, title }: Props) {
   const [products, setProducts] = useState<ListingProduct[]>([]);
   const [loading, setLoading] = useState(true);
   const { isOwner } = useIsOwner();
+  const occasion = useOccasion();
+  const occText = occasion ? occasionText(occasion, lang) : null;
+  const featured = occasion ? occasionCategory(occasion) === dbName : false;
 
   useEffect(() => {
     let mounted = true;
@@ -67,55 +73,56 @@ export default function CategoryPage({ dbName, title }: Props) {
   }, [dbName, isOwner]);
 
   return (
-    <section className="max-w-[1200px] mx-auto px-5 md:px-6 pt-12 pb-20">
-      <div className="flex items-end justify-between gap-4 border-b border-[#182B2A]/10 pb-5 mb-10">
-        <div>
-          <h1 className="napd-display text-[clamp(2.8rem,6vw,4.75rem)] leading-[0.95] text-[#182B2A]">
-            {heading}
-          </h1>
-          <div aria-hidden="true" className="napd-divider mt-4">
-            <i />
-          </div>
-          {!loading && products.length > 0 && (
-            <p className="mt-3 text-[11px] uppercase tracking-[0.22em] text-[#5E6B69] tabular-nums">
-              {piecesLabel(lang, products.length)}
-            </p>
-          )}
-        </div>
-
-        <Link
-          href="/"
-          className="napd-link text-[11px] uppercase tracking-[0.2em] text-[#86663A]"
-        >
+    <section className="mx-auto max-w-[1360px] px-5 pb-24 pt-14 md:px-10 md:pt-20">
+      <div className="mb-14 text-center md:mb-20">
+        <Link href="/" className="napd-caps text-[10.5px] text-napd-muted transition-colors hover:text-napd-ink">
           {t("catpage.back")}
         </Link>
+        {occasion && featured ? (
+          <p className="napd-caps mt-8 text-[11px] text-napd-bronze">
+            {t("occasion.editTitle")} {occText!.name}
+          </p>
+        ) : null}
+        <h1 className="napd-caps-wide mt-5 text-[clamp(1.4rem,2.6vw,2rem)] leading-tight text-napd-ink">
+          {heading}
+        </h1>
+        {occasion ? (
+          <OccasionDivider motif={THEMES[occasion.theme]?.motif ?? "star"} className="mt-6 text-napd-gold" />
+        ) : (
+          <div aria-hidden="true" className="mx-auto mt-6 h-px w-14 bg-napd-ink/30" />
+        )}
+        {!loading && products.length > 0 && (
+          <p className="napd-caps mt-5 text-[10.5px] text-napd-muted tabular-nums">
+            {piecesLabel(lang, products.length)}
+          </p>
+        )}
       </div>
 
       {loading ? (
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-5 gap-y-10 md:gap-x-8">
-          {Array.from({ length: 8 }).map((_, i) => (
+        <div className="grid grid-cols-2 gap-x-5 gap-y-14 md:grid-cols-3 md:gap-x-8 lg:grid-cols-4 xl:grid-cols-5">
+          {Array.from({ length: 10 }).map((_, i) => (
             <ProductCardSkeleton key={i} />
           ))}
         </div>
       ) : products.length === 0 ? (
         <div className="mx-auto max-w-md py-16 text-center">
-          <p className="napd-display text-2xl text-[#182B2A]">
+          <p className="napd-display text-2xl text-napd-ink">
             {t("catpage.emptyTitle")}
           </p>
-          <p className="mt-3 text-sm leading-relaxed text-[#5E6B69]">
+          <p className="mt-3 text-sm leading-relaxed text-napd-muted">
             {t("catpage.emptyBody")}
           </p>
           <a
             href={WHATSAPP_URL}
             target="_blank"
             rel="noopener noreferrer"
-            className="napd-btn mt-7 inline-flex items-center justify-center rounded-full bg-[#182B2A] px-6 py-3 text-[12px] uppercase tracking-[0.18em] text-[#FAF7F1]"
+            className="napd-pill mt-8"
           >
             {t("catpage.ask")}
           </a>
         </div>
       ) : (
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-5 gap-y-10 md:gap-x-8">
+        <div className="napd-tab-panel grid grid-cols-2 gap-x-5 gap-y-14 md:grid-cols-3 md:gap-x-8 lg:grid-cols-4 xl:grid-cols-5">
           {products.map((product) => (
             <ProductCard
               key={product.id}

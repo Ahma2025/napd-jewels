@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { DM_Sans } from "next/font/google";
+import { DM_Sans, Jost } from "next/font/google";
 import localFont from "next/font/local";
 import "./globals.css";
 import Header from "./components/Header";
@@ -11,6 +11,13 @@ import { supabase } from "@/lib/supabase";
 import { OCCASION_COLUMNS, pickOccasion, todayInPalestine, type Occasion } from "@/lib/occasion";
 import { cookies, headers } from "next/headers";
 import { detectLang, LANG_COOKIE } from "@/lib/i18n";
+
+// Couture geometric sans for every Latin line (body, labels, buttons).
+const jost = Jost({
+  variable: "--font-jost",
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "600"],
+});
 
 const dmSans = DM_Sans({
   variable: "--font-dm-sans",
@@ -107,9 +114,9 @@ export default async function RootLayout({
   );
 
   return (
-    <html lang={lang} dir={lang === "ar" ? "rtl" : "ltr"}>
+    <html lang={lang} dir={lang === "ar" ? "rtl" : "ltr"} data-occasion={occasion?.theme}>
       <body
-        className={`${dmSans.variable} ${cormorant.variable} ${bodoni.variable} ${pinyon.variable} ${arDisplay.variable} ${arScript.variable} ${arSans.variable} antialiased bg-white min-h-screen flex flex-col`}
+        className={`${jost.variable} ${dmSans.variable} ${cormorant.variable} ${bodoni.variable} ${pinyon.variable} ${arDisplay.variable} ${arScript.variable} ${arSans.variable} antialiased bg-white min-h-screen flex flex-col`}
       >
         <LangProvider initial={lang}>
           <OccasionProvider initial={occasion}>

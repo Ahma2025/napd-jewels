@@ -5,7 +5,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 
-const PRIMARY = "#123E38";
+const PRIMARY = "rgb(var(--c-emerald))";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -89,7 +89,7 @@ export default function LoginPage() {
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full border border-black/10 rounded-xl px-4 py-3 text-sm outline-none focus:border-[#123E38] focus:ring-2 focus:ring-[#123E38]/20 transition"
+                className="w-full border border-black/10 rounded-xl px-4 py-3 text-sm outline-none focus:border-napd-emerald focus:ring-2 focus:ring-napd-emerald/20 transition"
               />
             </div>
 
@@ -102,7 +102,7 @@ export default function LoginPage() {
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full border border-black/10 rounded-xl px-4 py-3 text-sm outline-none focus:border-[#123E38] focus:ring-2 focus:ring-[#123E38]/20 transition"
+                className="w-full border border-black/10 rounded-xl px-4 py-3 text-sm outline-none focus:border-napd-emerald focus:ring-2 focus:ring-napd-emerald/20 transition"
               />
             </div>
 
@@ -119,7 +119,7 @@ export default function LoginPage() {
               Don’t have an account?{" "}
               <Link
                 href="/register"
-                className="underline underline-offset-4 hover:text-[#123E38]"
+                className="underline underline-offset-4 hover:text-napd-emerald"
               >
                 Create one
               </Link>

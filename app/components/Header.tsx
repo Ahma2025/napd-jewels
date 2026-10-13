@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import Image from "next/image";
 import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
 import { ShoppingBag, Menu, X } from "lucide-react";
@@ -9,15 +8,14 @@ import { useCart } from "../context/CartContext";
 import { supabase } from "@/lib/supabase";
 import { useLang } from "../context/LangContext";
 import OccasionRibbon from "./OccasionRibbon";
+import { useOccasion } from "../context/OccasionContext";
 
-const PRIMARY = "#182B2A";
-const GOLD = "#B08D57";
+const PRIMARY = "rgb(var(--c-ink))";
+const GOLD = "rgb(var(--c-gold))";
 
 const navLinkClass =
-  "relative uppercase text-[13px] tracking-[0.15em] text-white/80 transition-all duration-300 " +
-  "hover:text-[#B08D57] " +
-  "hover:drop-shadow-[0_0_10px_rgba(176,141,87,0.35)] " +
-  "after:content-[''] after:absolute after:start-0 after:-bottom-2 after:h-[1px] after:w-0 after:bg-[#B08D57] " +
+  "napd-caps relative text-[13px] text-napd-ink/75 transition-colors duration-300 hover:text-napd-ink " +
+  "after:content-[''] after:absolute after:start-0 after:-bottom-2 after:h-[1px] after:w-0 after:bg-napd-ink " +
   "after:transition-all after:duration-300 hover:after:w-full";
 
 type Profile = {
@@ -33,6 +31,7 @@ export default function Header() {
 
   const { cart } = useCart();
   const { lang, setLang, t } = useLang();
+  const occasion = useOccasion();
   const totalItems = cart.reduce((acc, item) => acc + item.quantity, 0);
 
   const [authLoading, setAuthLoading] = useState(true);
@@ -199,10 +198,10 @@ export default function Header() {
   }
 
   return (
-    <header className="sticky top-0 z-50" style={{ backgroundColor: PRIMARY }}>
+    <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-md">
       <OccasionRibbon />
-      {/* ANNOUNCEMENT MARQUEE */}
-      <div className="hidden md:flex h-9 items-center overflow-hidden border-b border-white/10">
+      {/* ANNOUNCEMENT MARQUEE (an occasion's ribbon takes its place) */}
+      <div className={`${occasion ? "hidden" : "hidden md:flex"} h-9 items-center overflow-hidden bg-napd-ink`}>
         <div className="napd-marquee-track">
           {[0, 1].map((rep) => (
             <div key={rep} className="flex items-center">
@@ -215,7 +214,7 @@ export default function Header() {
                   <span
                     dir="auto"
                     className="text-[11px] uppercase tracking-[0.2em]"
-                    style={{ color: "#D9C6A0" }}
+                    style={{ color: "rgb(var(--c-goldsoft))" }}
                   >
                     {label}
                   </span>
@@ -227,10 +226,15 @@ export default function Header() {
         </div>
       </div>
 
-      <div className="w-full px-6 border-b border-white/10">
-        <div className="h-20 flex items-center justify-between">
-          {/* LEFT - DESKTOP NAV */}
-          <nav className="hidden md:flex items-center gap-10">
+      <div className="w-full border-b border-napd-ink/[0.08] px-5 md:px-10">
+        <div className="relative flex h-[72px] items-center justify-between md:h-[88px]">
+          {/* LOGO: centred on phones, at the start on desktop */}
+          <Link href="/" className="absolute left-1/2 -translate-x-1/2 lg:static lg:translate-x-0 shrink-0">
+            <span role="img" aria-label="NAPD Jewels" className="napd-logo-mask h-11 w-[50px] text-napd-bronze lg:h-[52px] lg:w-[60px]" />
+          </Link>
+
+          {/* DESKTOP NAV, centred like a maison's */}
+          <nav className="absolute left-1/2 hidden -translate-x-1/2 items-center gap-10 lg:flex xl:gap-12">
             <Link href="/chains" className={navLinkClass}>
               {t("nav.necklaces")}
             </Link>
@@ -269,7 +273,7 @@ export default function Header() {
 
           {/* MOBILE MENU BUTTON */}
           <button
-            className="md:hidden text-white"
+            className="lg:hidden text-napd-ink"
             onClick={() => setIsOpen(!isOpen)}
             aria-label={t("nav.menu")}
             aria-expanded={isOpen}
@@ -289,7 +293,7 @@ export default function Header() {
               onClick={() => setLang(lang === "ar" ? "en" : "ar")}
               aria-label={t("lang.switchLabel")}
               lang={lang === "ar" ? "en" : "ar"}
-              className={`inline-flex h-9 min-w-[3rem] items-center justify-center rounded-full border border-[#B08D57]/40 px-3 text-[#D9C6A0] transition-colors duration-200 hover:border-[#B08D57] hover:text-[#FBF2DA] ${
+              className={`inline-flex h-9 min-w-[3rem] items-center justify-center rounded-full border border-napd-ink/15 px-3 text-napd-ink/75 transition-colors duration-200 hover:border-napd-ink hover:text-napd-ink ${
                 lang === "ar"
                   ? "text-[11px] tracking-[0.18em] font-medium [font-family:var(--font-dm-sans)]"
                   : "text-[14px] [font-family:var(--font-ar-sans)]"
@@ -301,16 +305,16 @@ export default function Header() {
             {!authLoading && !userId ? (
               <Link
                 href="/login"
-                className="hidden md:inline-flex items-center justify-center px-4 py-2 rounded-full border border-white/20 text-[12px] uppercase tracking-wide text-white/80 transition-all duration-200 hover:text-[#B08D57] hover:border-[#B08D57]/50"
+                className="napd-caps hidden lg:inline-flex items-center justify-center text-[12px] text-napd-ink/75 transition-colors duration-200 hover:text-napd-ink"
               >
                 {t("nav.login")}
               </Link>
             ) : (
-              <div className="hidden md:block relative" ref={accountWrapRef}>
+              <div className="hidden lg:block relative" ref={accountWrapRef}>
                 <button
                   type="button"
                   disabled={authLoading}
-                  className="inline-flex items-center justify-center px-4 py-2 rounded-full border border-white/20 text-[12px] uppercase tracking-wide text-white/80 transition-all duration-200 hover:text-[#B08D57] hover:border-[#B08D57]/50 disabled:opacity-60"
+                  className="napd-caps inline-flex items-center justify-center text-[12px] text-napd-ink/75 transition-colors duration-200 hover:text-napd-ink disabled:opacity-60"
                   onClick={() => {
                     if (!userId) {
                       router.push("/login");
@@ -325,12 +329,11 @@ export default function Header() {
 
                 {userId && isAccountOpen && (
                   <div
-                    className="absolute end-0 mt-2 w-44 rounded-xl border border-white/10 shadow-lg overflow-hidden"
-                    style={{ backgroundColor: PRIMARY }}
+                    className="absolute end-0 mt-3 w-44 overflow-hidden border border-napd-ink/10 bg-white shadow-[0_18px_40px_-20px_rgba(0,0,0,0.25)]"
                   >
                     <button
                       type="button"
-                      className="w-full text-start px-4 py-3 text-[13px] uppercase tracking-wide text-white/80 hover:text-[#B08D57] hover:bg-white/[0.04] transition-all"
+                      className="napd-caps w-full text-start px-4 py-3 text-[12px] text-napd-ink/75 hover:text-napd-ink hover:bg-napd-paper transition-all"
                       onClick={handleLogout}
                     >
                       {t("nav.logout")}
@@ -345,7 +348,7 @@ export default function Header() {
               <ShoppingBag
                 size={22}
                 strokeWidth={1.5}
-                className="text-white/80 hover:text-[#B08D57] transition-colors duration-200"
+                className="text-napd-ink/80 hover:text-napd-ink transition-colors duration-200"
               />
 
               {totalItems > 0 && (
@@ -358,17 +361,6 @@ export default function Header() {
               )}
             </Link>
 
-            {/* LOGO */}
-            <Link href="/" className="shrink-0">
-              <Image
-                src="/napd-logo.png"
-                alt="NAPD Jewels"
-                width={183}
-                height={160}
-                priority
-                className="h-11 w-auto"
-              />
-            </Link>
           </div>
         </div>
       </div>
@@ -376,33 +368,32 @@ export default function Header() {
       {/* MOBILE DROPDOWN MENU */}
       {isOpen && (
         <div
-          className="md:hidden border-t border-white/10 px-6 py-6 space-y-6"
-          style={{ backgroundColor: PRIMARY }}
+          className="lg:hidden border-b border-napd-ink/10 bg-white px-6 py-7 space-y-6"
         >
           <Link
             href="/chains"
-            className="block uppercase text-white/80 hover:text-[#B08D57]"
+            className="napd-caps block text-[13px] text-napd-ink/80 hover:text-napd-ink"
             onClick={() => setIsOpen(false)}
           >
             {t("nav.necklaces")}
           </Link>
           <Link
             href="/earrings"
-            className="block uppercase text-white/80 hover:text-[#B08D57]"
+            className="napd-caps block text-[13px] text-napd-ink/80 hover:text-napd-ink"
             onClick={() => setIsOpen(false)}
           >
             {t("nav.earrings")}
           </Link>
           <Link
             href="/bracelets"
-            className="block uppercase text-white/80 hover:text-[#B08D57]"
+            className="napd-caps block text-[13px] text-napd-ink/80 hover:text-napd-ink"
             onClick={() => setIsOpen(false)}
           >
             {t("nav.bracelets")}
           </Link>
           <Link
             href="/rings"
-            className="block uppercase text-white/80 hover:text-[#B08D57]"
+            className="napd-caps block text-[13px] text-napd-ink/80 hover:text-napd-ink"
             onClick={() => setIsOpen(false)}
           >
             {t("nav.rings")}
@@ -412,7 +403,7 @@ export default function Header() {
           {isOwner && (
             <Link
               href="/owner/orders"
-              className="flex items-center justify-between uppercase text-white/80 hover:text-[#B08D57]"
+              className="napd-caps flex items-center justify-between text-[13px] text-napd-ink/80 hover:text-napd-ink"
               onClick={() => setIsOpen(false)}
             >
               <span>{t("nav.orders")}</span>
@@ -431,7 +422,7 @@ export default function Header() {
           {isOwner && (
             <Link
               href="/owner-dashboard"
-              className="block uppercase text-white/80 hover:text-[#B08D57]"
+              className="napd-caps block text-[13px] text-napd-ink/80 hover:text-napd-ink"
               onClick={() => setIsOpen(false)}
             >
               {t("nav.dashboard")}
@@ -442,22 +433,20 @@ export default function Header() {
           {!authLoading && !userId ? (
             <Link
               href="/login"
-              className="inline-flex items-center justify-center w-full px-4 py-3 rounded-xl text-[#182B2A] uppercase tracking-wide"
-              style={{ backgroundColor: GOLD }}
+              className="napd-pill w-full"
               onClick={() => setIsOpen(false)}
             >
               {t("nav.login")}
             </Link>
           ) : (
             <div className="space-y-3">
-              <div className="text-center text-sm text-white/60">
+              <div className="text-center text-sm text-napd-muted">
                 {authLoading ? "..." : displayName}
               </div>
 
               <button
                 type="button"
-                className="inline-flex items-center justify-center w-full px-4 py-3 rounded-xl text-[#182B2A] uppercase tracking-wide"
-                style={{ backgroundColor: GOLD }}
+                className="napd-pill w-full"
                 onClick={handleLogout}
                 disabled={authLoading}
               >
